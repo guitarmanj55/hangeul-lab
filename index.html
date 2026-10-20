@@ -195,6 +195,27 @@ section.view.active{display:block; animation:rise .28s ease both;}
 .lesson-points{margin:0 0 6px; padding-left:20px; font-size:13.5px; color:var(--ink-1); line-height:1.65;}
 .lesson-points li{margin-bottom:4px;}
 .said{font-family:var(--font-kr-serif); color:var(--dancheong); white-space:nowrap;}
+.option-btn.en-opt{font-family:var(--font-kr-sans); font-size:15px; font-weight:500; line-height:1.3;}
+.hint-btn{font-size:11.5px; padding:5px 10px; margin-top:8px;}
+.course-card{margin-bottom:16px; border-left:4px solid var(--indigo);}
+.course-card h3{font-size:18px; margin:4px 0 2px;}
+.meet-glyph{font-family:var(--font-kr-serif); font-size:84px; font-weight:700; text-align:center; color:var(--indigo); line-height:1.1; overflow-wrap:anywhere; word-break:keep-all;}
+.meet-sound{text-align:center; font-size:14px; color:var(--ink-2); margin:6px 0 14px;}
+.reveal-box{text-align:center; margin-top:10px;}
+.unit-head{margin:22px 0 8px;}
+.unit-head h3{font-size:15px;}
+.unit-head p{font-size:12.5px; color:var(--ink-2); margin:2px 0 0;}
+.step-row .state{font-family:var(--font-mono); font-size:14px; min-width:22px; text-align:center;}
+.step-row.next{box-shadow:inset 3px 0 0 var(--indigo);}
+.dlg{display:flex; flex-direction:column; gap:10px; margin-bottom:14px;}
+.bubble{max-width:86%; padding:10px 14px; border-radius:14px; background:var(--paper-raised); border:1px solid var(--line); cursor:pointer; align-self:flex-start;}
+.bubble.you{align-self:flex-end; background:var(--indigo-tint); border-color:var(--indigo-tint);}
+.bubble.playing{outline:2px solid var(--gold);}
+.bubble .who{font-family:var(--font-mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3);}
+.bubble .k{font-family:var(--font-kr-serif); font-size:18px; color:var(--ink-1);}
+.bubble .r{font-family:var(--font-mono); font-size:11px; color:var(--ink-3);}
+.bubble .e{font-size:13px; color:var(--ink-2);}
+.known-toggle.on{background:var(--celadon-tint); border-color:var(--celadon); color:var(--celadon);}
 
 .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 .stat{background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius-lg); padding:14px 16px;}
@@ -388,6 +409,7 @@ section.view.active{display:block; animation:rise .28s ease both;}
 
   <nav class="tabs" id="tabs">
     <button data-view="home" class="active">Home</button>
+    <button data-view="course">Course</button>
     <button data-view="hangul">Hangeul</button>
     <button data-view="vocab">Vocab</button>
     <button data-view="read">Reading</button>
@@ -398,6 +420,7 @@ section.view.active{display:block; animation:rise .28s ease both;}
 
   <!-- HOME -->
   <section class="view active" id="view-home">
+    <div class="card course-card" id="courseCard"></div>
     <div class="hero">
       <div class="hero-main">
         <div class="glyphs">한글</div>
@@ -517,6 +540,20 @@ section.view.active{display:block; animation:rise .28s ease both;}
     <div class="drill-wrap" id="listenWrap"></div>
   </section>
 
+  <!-- COURSE -->
+  <section class="view" id="view-course">
+    <div class="section-head"><div><span class="eyebrow">Beginner path</span><h2>Your course</h2></div></div>
+    <p style="font-size:13px;color:var(--ink-2);margin:-4px 0 14px;">Small steps in order: meet it, then check yourself. You can open any step, but the course works best top to bottom.</p>
+    <div id="courseMap"></div>
+  </section>
+  <section class="view" id="view-step">
+    <div class="section-head"><div><span class="eyebrow" id="stepEyebrow"></span><h2 id="stepTitle"></h2></div>
+      <button class="btn ghost" data-goto="course">← Course</button>
+    </div>
+    <div id="stepIntro"></div>
+    <div class="drill-wrap" id="stepBody"></div>
+  </section>
+
   <!-- READING + SOUND RULES -->
   <section class="view" id="view-read">
     <div class="section-head"><div><span class="eyebrow">Module 3</span><h2>Reading practice</h2></div></div>
@@ -597,6 +634,10 @@ section.view.active{display:block; animation:rise .28s ease both;}
       <div class="settings-row">
         <div><div class="lbl">Appearance</div><div class="sub">Follows your system by default</div></div>
         <div class="btn-row"><button class="btn ghost" id="themeAuto">Auto</button><button class="btn ghost" id="themeLight">Light</button><button class="btn ghost" id="themeDark">Dark</button></div>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Audio speed</div><div class="sub">Slow plays every clip at 70%. The 🐢 buttons always play slowly.</div></div>
+        <div class="btn-row"><button class="btn ghost" data-rate="1">Normal</button><button class="btn ghost" data-rate="0.7">Slow</button></div>
       </div>
       <div class="settings-row">
         <div><div class="lbl">Daily new-item cap</div><div class="sub">How many new letters/words to introduce per day</div></div>
@@ -981,6 +1022,143 @@ var LESSONS = [
    examples:[{kr:"물 있어요?",rm:"mul isseoyo?",en:"Do you have water?"},{kr:"시간 없어요",rm:"sigan eopseoyo",en:"I don't have time"},{kr:"화장실이 어디에 있어요?",rm:"hwajangsiri eodie isseoyo?",en:"Where is the toilet?"}],
    quiz:[{q:"영어 메뉴 ＿?",a:"있어요",opts:["있어요","없어요","이에요"],en:"Do you have an English menu?"},{q:"현금이 ＿",a:"없어요",opts:["없어요","있어요","아니에요"],en:"I don't have cash"},{q:"저기 약국이 ＿",a:"있어요",opts:["있어요","없어요","예요"],en:"There's a pharmacy over there"}]}
 ];
+
+/* =====================================================================
+   DATA — BEGINNER PATH
+   ===================================================================== */
+/* Extra easy words for "words you can read now"; loan = borrowed from English. */
+var BEGINNER_WORDS = [
+  {kr:"머리",rm:"meori",en:"head / hair"},
+  {kr:"고기",rm:"gogi",en:"meat"},
+  {kr:"거기",rm:"geogi",en:"there"},
+  {kr:"구두",rm:"gudu",en:"dress shoes"},
+  {kr:"나라",rm:"nara",en:"country"},
+  {kr:"모기",rm:"mogi",en:"mosquito"},
+  {kr:"드라마",rm:"deurama",en:"TV drama",loan:true},
+  {kr:"바나나",rm:"banana",en:"banana",loan:true},
+  {kr:"라디오",rm:"radio",en:"radio",loan:true},
+  {kr:"사자",rm:"saja",en:"lion"},
+  {kr:"오이",rm:"oi",en:"cucumber"},
+  {kr:"이거",rm:"igeo",en:"this (thing)"},
+  {kr:"피자",rm:"pija",en:"pizza",loan:true},
+  {kr:"버스",rm:"beoseu",en:"bus",loan:true},
+  {kr:"토마토",rm:"tomato",en:"tomato",loan:true},
+  {kr:"카메라",rm:"kamera",en:"camera",loan:true},
+  {kr:"아이스크림",rm:"aiseukeurim",en:"ice cream",loan:true},
+  {kr:"호텔",rm:"hotel",en:"hotel",loan:true},
+  {kr:"치즈",rm:"chijeu",en:"cheese",loan:true},
+  {kr:"게임",rm:"geim",en:"game",loan:true},
+  {kr:"케이크",rm:"keikeu",en:"cake",loan:true},
+  {kr:"요가",rm:"yoga",en:"yoga",loan:true},
+  {kr:"햄버거",rm:"haembeogeo",en:"hamburger",loan:true},
+  {kr:"컴퓨터",rm:"keompyuteo",en:"computer",loan:true},
+  {kr:"오빠",rm:"oppa",en:"older brother (said by a woman)"},
+  {kr:"와이파이",rm:"waipai",en:"wifi",loan:true},
+  {kr:"샌드위치",rm:"saendeuwichi",en:"sandwich",loan:true},
+  {kr:"스웨터",rm:"seuweteo",en:"sweater",loan:true}
+];
+
+/* Role-play conversations. who: "them" or "you". */
+var DIALOGUES = [
+  {id:"d_cafe",title:"At a café",them:"Staff",lines:[
+    {who:"them",kr:"어서 오세요.",rm:"eoseo oseyo.",en:"Welcome."},
+    {who:"you",kr:"아메리카노 하나 주세요.",rm:"amerikano hana juseyo.",en:"One americano, please."},
+    {who:"them",kr:"따뜻한 거요, 아이스요?",rm:"ttatteutan geoyo, aiseuyo?",en:"Hot or iced?"},
+    {who:"you",kr:"아이스요.",rm:"aiseuyo.",en:"Iced."},
+    {who:"them",kr:"드시고 가세요?",rm:"deusigo gaseyo?",en:"Is it for here?"},
+    {who:"you",kr:"아니요, 포장이요.",rm:"aniyo, pojangiyo.",en:"No, to go."},
+    {who:"them",kr:"사천오백 원입니다.",rm:"sacheon-obaek wonimnida.",en:"That's 4,500 won."},
+    {who:"you",kr:"카드로 할게요.",rm:"kadeuro halgeyo.",en:"I'll pay by card."}]},
+  {id:"d_restaurant",title:"Eating out",them:"Staff",lines:[
+    {who:"them",kr:"몇 분이세요?",rm:"myeot buniseyo?",en:"How many people?"},
+    {who:"you",kr:"두 명이요.",rm:"du myeongiyo.",en:"Two."},
+    {who:"you",kr:"저기요! 메뉴 주세요.",rm:"jeogiyo! menyu juseyo.",en:"Excuse me! The menu, please."},
+    {who:"you",kr:"돼지국밥 두 개 주세요.",rm:"dwaejigukbap du gae juseyo.",en:"Two pork rice soups, please."},
+    {who:"them",kr:"네, 잠시만요.",rm:"ne, jamsimanyo.",en:"Sure, one moment."},
+    {who:"you",kr:"물 좀 주세요.",rm:"mul jom juseyo.",en:"Some water, please."},
+    {who:"you",kr:"잘 먹었습니다!",rm:"jal meogeotseumnida!",en:"Thank you for the meal! (said when leaving)"}]},
+  {id:"d_taxi",title:"Taking a taxi",them:"Driver",lines:[
+    {who:"them",kr:"어디로 가세요?",rm:"eodiro gaseyo?",en:"Where to?"},
+    {who:"you",kr:"해운대로 가 주세요.",rm:"haeundaero ga juseyo.",en:"To Haeundae, please."},
+    {who:"you",kr:"얼마나 걸려요?",rm:"eolmana geollyeoyo?",en:"How long will it take?"},
+    {who:"them",kr:"이십 분쯤 걸려요.",rm:"isip bunjjeum geollyeoyo.",en:"About twenty minutes."},
+    {who:"you",kr:"여기서 세워 주세요.",rm:"yeogiseo sewo juseyo.",en:"Please stop here."},
+    {who:"them",kr:"만 이천 원입니다.",rm:"man icheon wonimnida.",en:"That's 12,000 won."}]},
+  {id:"d_store",title:"At the convenience store",them:"Staff",lines:[
+    {who:"them",kr:"어서 오세요.",rm:"eoseo oseyo.",en:"Welcome."},
+    {who:"you",kr:"이거 얼마예요?",rm:"igeo eolmayeyo?",en:"How much is this?"},
+    {who:"them",kr:"삼천 원이에요.",rm:"samcheon wonieyo.",en:"It's 3,000 won."},
+    {who:"them",kr:"봉투 필요하세요?",rm:"bongtu piryohaseyo?",en:"Do you need a bag?"},
+    {who:"you",kr:"아니요, 괜찮아요.",rm:"aniyo, gwaenchanayo.",en:"No, I'm fine."},
+    {who:"them",kr:"영수증 드릴까요?",rm:"yeongsujeung deurilkkayo?",en:"Would you like the receipt?"},
+    {who:"you",kr:"네, 주세요.",rm:"ne, juseyo.",en:"Yes, please."}]},
+  {id:"d_directions",title:"Asking the way",them:"Local",lines:[
+    {who:"you",kr:"저기요, 지하철역이 어디예요?",rm:"jeogiyo, jihacheollyeogi eodiyeyo?",en:"Excuse me, where's the subway station?"},
+    {who:"them",kr:"쭉 가서 오른쪽으로 가세요.",rm:"jjuk gaseo oreunjjogeuro gaseyo.",en:"Go straight on, then turn right."},
+    {who:"you",kr:"멀어요?",rm:"meoreoyo?",en:"Is it far?"},
+    {who:"them",kr:"아니요, 오 분 정도 걸려요.",rm:"aniyo, o bun jeongdo geollyeoyo.",en:"No, about five minutes."},
+    {who:"you",kr:"감사합니다!",rm:"gamsahamnida!",en:"Thank you!"}]},
+  {id:"d_work",title:"Meeting a colleague",them:"Colleague",lines:[
+    {who:"them",kr:"안녕하세요! 처음 뵙겠습니다.",rm:"annyeonghaseyo! cheoeum boepgetseumnida.",en:"Hello! Nice to meet you."},
+    {who:"you",kr:"안녕하세요. 저는 올리예요.",rm:"annyeonghaseyo. jeoneun olliyeyo.",en:"Hello. I'm Oli."},
+    {who:"them",kr:"어느 나라 사람이에요?",rm:"eoneu nara saramieyo?",en:"Where are you from?"},
+    {who:"you",kr:"영국 사람이에요.",rm:"yeongguk saramieyo.",en:"I'm British."},
+    {who:"them",kr:"한국어 잘하시네요!",rm:"hangugeo jalhasineyo!",en:"Your Korean is good!"},
+    {who:"you",kr:"아니에요, 아직 배우고 있어요.",rm:"anieyo, ajik baeugo isseoyo.",en:"Not really, I'm still learning."},
+    {who:"them",kr:"점심 같이 먹을래요?",rm:"jeomsim gachi meogeullaeyo?",en:"Shall we have lunch together?"},
+    {who:"you",kr:"좋아요!",rm:"joayo!",en:"Sounds good!"}]}
+];
+
+/* Phrases people pick up just by living in Korea: ticking one credits it in reviews. */
+var KNOWN_CHECK = ["v_annyeonghaseyo","v_gamsahamnida","v_ne","v_aniyo","v_jeogiyo","v_joesonghamnida","v_gwaenchanhayo","v_igeo_juseyo","v_eolmayeyo","v_masisseoyo","v_hwajangsiri_eodiyeyo","v_jamkkanmanyo","v_geonbae","v_hwaiting","v_mul","v_keopi","v_annyeonghi_gaseyo","v_algesseoyo"];
+
+/* The course. Step ids are "c_<unit>_<index>" in state.done (lesson and rule steps use their own ids),
+   so only ever append steps to a unit or add units at the end. */
+var COURSE = [
+  {id:"u1",title:"First vowels",intro:"Every syllable needs a vowel. These six are the building blocks; every other vowel is made from them.",steps:[{type:"letters",ids:["h_a","h_eo","h_o","h_u","h_eu","h_i"]}]},
+  {id:"u2",title:"First consonants",intro:"Consonant shapes copy your mouth: ㄱ and ㄴ show where your tongue goes. Stack one with a vowel and you have a syllable: ㄴ + ㅏ = 나.",steps:[{type:"letters",ids:["h_g","h_n","h_d","h_r","h_m"]},{type:"read"}]},
+  {id:"u3",title:"More consonants",intro:"ㅇ is special: silent at the start of a syllable (it just holds the vowel), and \"ng\" at the end.",steps:[{type:"letters",ids:["h_b","h_s","h_ng","h_j","h_h"]},{type:"read"}]},
+  {id:"u4",title:"Breathy consonants",intro:"Add a stroke for a puff of air: ㄱ→ㅋ, ㄷ→ㅌ, ㅂ→ㅍ, ㅈ→ㅊ. Now you can read lots of English loanwords.",steps:[{type:"letters",ids:["h_k","h_t","h_p","h_ch"]},{type:"read"}]},
+  {id:"u5",title:"Y-vowels, ㅐ and ㅔ",intro:"A second stroke adds a \"y\": ㅏ→ㅑ, ㅓ→ㅕ, ㅗ→ㅛ, ㅜ→ㅠ. ㅐ and ㅔ both sound like the \"e\" in \"bed\".",steps:[{type:"letters",ids:["h_ya","h_yeo","h_yo","h_yu","h_ae","h_e"]},{type:"read"}]},
+  {id:"u6",title:"Double consonants",intro:"Doubled letters are tense: say them firmly, with no puff of air.",steps:[{type:"letters",ids:["h_kk","h_tt","h_pp","h_ss","h_jj"]},{type:"read"}]},
+  {id:"u7",title:"Combined vowels",intro:"These glide from one vowel to another: ㅗ + ㅏ = ㅘ (wa). After this you know the whole alphabet.",steps:[{type:"letters",ids:["h_wa","h_wae","h_oe","h_wo","h_we","h_wi","h_ui","h_yae","h_ye"]},{type:"read"}]},
+  {id:"u8",title:"What you already say",intro:"You picked up plenty in Busan. Tick what you already say, then see how the basics are spelled.",steps:[{type:"known"},{type:"phrases",ids:["v_annyeonghaseyo","v_gamsahamnida","v_ne","v_aniyo","v_jeogiyo","v_joesonghamnida","v_gwaenchanhayo"]}]},
+  {id:"u9",title:"At a café",intro:"Ordering is mostly \"thing + 주세요\" (please give me).",steps:[{type:"phrases",ids:["v_igeo_juseyo","v_eolmayeyo","v_pojangiyo","v_keopi","v_hana"]},{type:"dialogue",id:"d_cafe"}]},
+  {id:"u10",title:"Eating out",intro:"Call staff with 저기요, and say 잘 먹었습니다 when you leave.",steps:[{type:"phrases",ids:["v_mul","v_masisseoyo","v_maewoyo","v_jumunhalgeyo","v_gyesanseo_juseyo"]},{type:"dialogue",id:"d_restaurant"}]},
+  {id:"u11",title:"Getting around",intro:"Places + 로 가 주세요 gets a taxi anywhere.",steps:[{type:"phrases",ids:["v_hwajangsiri_eodiyeyo","v_oenjjok","v_oreunjjok","v_jikjinhaseyo","v_eolmana_geollyeoyo"]},{type:"dialogue",id:"d_taxi"},{type:"dialogue",id:"d_directions"}]},
+  {id:"u12",title:"Shops and numbers",intro:"Prices use the Sino-Korean numbers: 일, 이, 삼…",steps:[{type:"phrases",ids:["v_il","v_i","v_sam","v_sa","v_o","v_yuk","v_chil","v_pal","v_gu","v_sip"]},{type:"dialogue",id:"d_store"}]},
+  {id:"u13",title:"Meeting people",intro:"Introductions at work, and what to say when you don't understand.",steps:[{type:"phrases",ids:["v_bangapseumnida","v_yeongguk_saramieyo","v_ireumi_mwoyeyo","v_cheoncheonhi_malhae_juseyo","v_ihaega_an_dwaeyo"]},{type:"dialogue",id:"d_work"}]},
+  {id:"u14",title:"How sentences work",intro:"Now the patterns behind the phrases you know.",steps:[{type:"lesson",id:"g_order"},{type:"lesson",id:"g_copula"},{type:"lesson",id:"g_topic"}]},
+  {id:"u15",title:"Doing things",intro:"Verbs, objects, and saying no.",steps:[{type:"lesson",id:"g_object"},{type:"lesson",id:"g_present"},{type:"lesson",id:"g_negation"}]},
+  {id:"u16",title:"Asking for things",intro:"Requests, having, and wanting.",steps:[{type:"lesson",id:"g_please"},{type:"lesson",id:"g_have"},{type:"lesson",id:"g_want"}]},
+  {id:"u17",title:"Sounding natural",intro:"Why Korean isn't always said the way it's spelled.",steps:[{type:"rule",id:"r_link"},{type:"rule",id:"r_final"},{type:"rule",id:"r_nasal"}]},
+  {id:"u18",title:"Past, places and subjects",intro:"Talk about what you did and where.",steps:[{type:"lesson",id:"g_past"},{type:"lesson",id:"g_subject"},{type:"lesson",id:"g_place"}]}
+];
+
+/* One-line plain-English summary shown at the top of each lesson and rule. */
+var PLAIN = {
+  g_order:"Korean puts the verb at the very end, like saying \"I coffee drink\".",
+  g_topic:"은/는 means \"as for…\". 저는… = \"As for me…\".",
+  g_subject:"이/가 points at who or what does something, or what exists: \"the toilet: where is it?\"",
+  g_object:"을/를 sticks onto the thing you're doing something to: 커피를 마셔요 = coffee, (I) drink.",
+  g_place:"에 = to or at a place. 에서 = the place where you're doing something.",
+  g_copula:"이에요 / 예요 means \"is\" or \"am\". Stick it on the end of a noun: 학생이에요 = (I) am a student.",
+  g_present:"Polite verbs end in -요. Swap the dictionary ending 다 for 아요, 어요 or 해요.",
+  g_past:"Add a ㅆ for the past: 가요 (go) becomes 갔어요 (went).",
+  g_negation:"Put 안 (don't) or 못 (can't) right before the verb.",
+  g_want:"Want to do something? Verb + 고 싶어요.",
+  g_please:"Asking for a thing: thing + 주세요. Asking someone to do something: verb + 주세요.",
+  g_have:"있어요 = there is / I have. 없어요 = there isn't / I don't have.",
+  r_link:"Words run together: a final consonant jumps onto a vowel that follows it.",
+  r_final:"Only seven sounds can end a syllable, so several letters sound the same at the end.",
+  r_nasal:"Before ㄴ or ㅁ, hard sounds go nasal. That's why 합니다 is \"ham-ni-da\".",
+  r_liquid:"ㄴ and ㄹ side by side both become ㄹ, a long \"ll\".",
+  r_rton:"ㄹ after ㅁ or ㅇ turns into ㄴ.",
+  r_aspir:"ㅎ next to ㄱ ㄷ ㅂ ㅈ adds a puff of air, making ㅋ ㅌ ㅍ ㅊ.",
+  r_tense:"After a ㄱ, ㄷ or ㅂ sound, the next consonant goes tense: 학교 is \"hak-kkyo\".",
+  r_palatal:"ㄷ or ㅌ followed by 이 sounds like 지 or 치: 같이 is \"ga-chi\".",
+  r_hsilent:"ㅎ at the end of a block goes silent before a vowel: 좋아요 is \"jo-a-yo\"."
+};
 /* Vocab IDs are permanent: progress is saved against them, so never rename one.
    v1 keyed progress by list position ("v_0", "v_1"…); this is the v1 list order,
    used once by migrateState() to move old progress onto the permanent IDs. Frozen. */
@@ -1009,13 +1187,13 @@ function romanizeSelection(ini,vow,fin){
 /* =====================================================================
    STATE / PERSISTENCE
    ===================================================================== */
-var APP_VERSION = "1.2.2";
-var APP_WHATS_NEW = "Record & compare works properly on iPhone";
+var APP_VERSION = "1.3";
+var APP_WHATS_NEW = "a guided beginner course. Tap Course to start";
 var STORAGE_KEY = "hangeullab_progress_v1";
 var SCHEMA = 2;
 var state = loadState();
 function defaultState(){
-  return { schema:SCHEMA, items:{}, streak:0, lastActiveDay:null, dailyCap:10, dailyIntroDay:null, dailyIntroCount:0, theme:"auto", done:{} };
+  return { schema:SCHEMA, items:{}, streak:0, lastActiveDay:null, dailyCap:10, dailyIntroDay:null, dailyIntroCount:0, theme:"auto", done:{}, audioRate:1 };
 }
 /* Brings saved progress (from storage or an imported backup) up to the current schema.
    Schema 1 (no field): vocab progress keyed "v_<list position>". Schema 2: permanent vocab IDs. */
@@ -1149,12 +1327,12 @@ VOCAB.forEach(function(v){ VOCAB_BY_ID[v.id]=v; });
 /* =====================================================================
    NAVIGATION
    ===================================================================== */
-var TAB_PARENT = { "builder":"hangul", "hangul-drill":"hangul", "vocab-drill":"vocab", "reading":"read" };
+var TAB_PARENT = { "builder":"hangul", "hangul-drill":"hangul", "vocab-drill":"vocab", "reading":"read", "step":"course" };
 function goto(view){
   $all(".view").forEach(function(v){ v.classList.remove("active"); });
   var el = $("#view-"+view);
   if(el) el.classList.add("active");
-  var tabTarget = view==="lesson" ? (lessonCtx.kind==="rule" ? "read" : "grammar") : (TAB_PARENT[view] || view);
+  var tabTarget = view==="lesson" ? lessonCtx.from : (TAB_PARENT[view] || view);
   $all("#tabs button").forEach(function(b){ b.classList.toggle("active", b.dataset.view===tabTarget); });
   window.scrollTo({top:0,behavior:"instant" in window ? "instant":"auto"});
   if(view==="home") renderHome();
@@ -1164,12 +1342,14 @@ function goto(view){
   if(view==="speak") renderSpeak(true);
   if(view==="read") renderReadView();
   if(view==="grammar") renderGrammarView();
+  if(view==="course") renderCourseMap();
 }
 
 /* =====================================================================
    RENDER — HOME
    ===================================================================== */
 function renderHome(){
+  renderCourseCard();
   var hangulSeen = HANGUL.filter(function(h){ return state.items[h.id] && state.items[h.id].seen; });
   var hangulDue = HANGUL.filter(function(h){ return isDue(h.id); });
   var hangulMastered = HANGUL.filter(function(h){ return isMastered(h.id); });
@@ -1367,12 +1547,14 @@ function renderDrillCard(){
     return;
   }
   var id = drill.queue[drill.pos];
-  if(!state.items[id] || !state.items[id].seen){ markSeenNow(id); consumeIntroBudget(1); saveState(); }
+  /* Teach first: a never-seen item opens already turned over, so you meet it before being tested. */
+  var isNew = !state.items[id] || !state.items[id].seen;
+  if(isNew){ markSeenNow(id); consumeIntroBudget(1); saveState(); }
   var total = drill.queue.length;
   var isHangul = drill.kind==="hangul";
   var d = byId(id);
   var frontGlyph = isHangul ? d.glyph : d.kr;
-  var frontSub = isHangul ? "" : "";
+  var frontSub = isHangul ? "" : '<button class="btn ghost hint-btn" id="drillHint">Hint</button>';
   var backKr = isHangul ? d.glyph : d.kr;
   var backRom = isHangul ? (d.roman+" &middot; "+d.name) : d.rm;
   var backEn = isHangul ? d.sound : d.en;
@@ -1381,7 +1563,7 @@ function renderDrillCard(){
     '<div class="drill-progress"><div class="progress-track"><div class="progress-fill" style="width:'+Math.round(100*drill.pos/total)+'%"></div></div><span class="mono">'+(drill.pos+1)+' / '+total+'</span></div>'
     + '<div class="flashcard" id="flashcard">'
       + '<div class="front"><div class="front-glyph kr">'+frontGlyph+'</div><div class="front-sub">'+frontSub+'</div><span class="tap-hint">tap to reveal</span></div>'
-      + '<div class="back"><span class="answer-kr kr">'+backKr+'</span><span class="answer-rom mono">'+backRom+'</span><span class="answer-en">'+backEn+'</span>'
+      + '<div class="back">'+(isNew ? '<span class="pill new">New: meet it</span>' : '')+'<span class="answer-kr kr">'+backKr+'</span><span class="answer-rom mono">'+backRom+'</span><span class="answer-en">'+backEn+'</span>'
         + (isHangul ? '<div class="examples" style="justify-content:center;margin-top:8px;">'+d.examples.map(function(e){return '<span class="example-chip">'+e.kr+' <span class="rom">'+e.rm+"</span></span>";}).join("")+'</div>' : '')
       + '</div>'
     + '</div>'
@@ -1400,6 +1582,8 @@ function renderDrillCard(){
     $("#gradeRow").style.visibility = card.classList.contains("flipped") ? "visible":"hidden";
   };
   $("#drillListen").onclick = function(ev){ ev.stopPropagation(); speak(isHangul?letterSpeakText(d):d.kr); };
+  if($("#drillHint")) $("#drillHint").onclick = function(ev){ ev.stopPropagation(); this.outerHTML = '<span class="mono" style="color:var(--ink-3);">'+d.rm+'</span>'; };
+  if(isNew){ card.classList.add("flipped"); $("#gradeRow").style.visibility = "visible"; speak(isHangul?letterSpeakText(d):d.kr); }
   $all("[data-g]", $("#gradeRow")).forEach(function(btn){
     btn.onclick = function(ev){
       ev.stopPropagation();
@@ -1542,10 +1726,11 @@ function runQuiz(cfg){
       return;
     }
     var q = cfg.qs[pos], opts = shuffle(q.options);
+    if(q.firstAudio) speak(q.firstAudio);
     cfg.wrap.innerHTML = progressBar(pos, cfg.qs.length)
       + '<div class="card" style="padding:22px 16px;margin-bottom:14px;"><div class="quiz-prompt">'+q.prompt+'</div>'
       + (q.sub ? '<div class="listen-hint" style="margin:6px 0 0;">'+q.sub+'</div>' : '') + '</div>'
-      + '<div class="option-grid">'+opts.map(function(o,i){ return '<button class="option-btn kr'+(cfg.small?" words":"")+'" data-i="'+i+'">'+o+'</button>'; }).join("")+'</div>'
+      + '<div class="option-grid">'+opts.map(function(o,i){ return '<button class="option-btn kr'+(/[a-z]/i.test(o) ? " en-opt" : (cfg.small?" words":""))+'" data-i="'+i+'">'+o+'</button>'; }).join("")+'</div>'
       + '<div class="listen-feedback" id="quizFeedback"></div>'
       + '<div class="btn-row" style="justify-content:center;"><button class="btn" id="quizNext" style="visibility:hidden;">'+(pos+1===cfg.qs.length?"See results":"Next →")+'</button></div>';
     $all("[data-i]", cfg.wrap).forEach(function(btn){
@@ -1559,6 +1744,7 @@ function runQuiz(cfg){
       };
     });
     $("#quizNext").onclick = function(){ pos++; render(); };
+    $all(".quiz-prompt [data-say]", cfg.wrap).forEach(function(el){ el.onclick=function(){ speak(el.dataset.say); }; });
   }
   render();
 }
@@ -1592,7 +1778,7 @@ function renderReading(){
   }
   var r = reading.qs[reading.pos];
   wrap.innerHTML = progressBar(reading.pos, reading.qs.length)
-    + '<div class="flashcard" id="readCard"><div class="front"><div class="front-glyph kr" style="font-size:46px;">'+r.kr+'</div><div class="front-sub">Sound it out, then tap to check</div></div>'
+    + '<div class="flashcard" id="readCard"><div class="front"><div class="front-glyph kr" style="font-size:46px;">'+r.kr+'</div><div class="front-sub">Sound it out, then tap to check</div><button class="btn ghost hint-btn" id="readHint" style="margin-top:10px;">Hint</button></div>'
     + '<div class="back"><span class="answer-kr kr">'+r.kr+'</span><span class="answer-rom mono">'+r.rm+'</span><span class="answer-en">'+r.en+'</span>'
     + (r.note ? '<span style="font-size:12.5px;color:var(--ink-3);max-width:34ch;">'+r.note+'</span>' : '') + '</div></div>'
     + '<div class="btn-row" style="justify-content:center;margin:12px 0;"><button class="sound-btn" id="readListen" style="visibility:hidden;">🔊</button></div>'
@@ -1605,6 +1791,7 @@ function renderReading(){
     speak(r.kr);
   };
   $("#readListen").onclick = function(){ speak(r.kr); };
+  $("#readHint").onclick = function(ev){ ev.stopPropagation(); this.outerHTML = '<div class="mono" style="color:var(--ink-3);margin-top:10px;">'+r.rm+'</div>'; };
   $all("[data-ok]", wrap).forEach(function(b){
     b.onclick = function(){
       if(b.dataset.ok==="1") reading.score++; else reading.missed.push(r);
@@ -1625,8 +1812,10 @@ function renderGrammarView(){
   $all("[data-lesson]").forEach(function(el){ el.onclick=function(){ openLesson("grammar", el.dataset.lesson); }; });
 }
 function lessonList(kind){ return kind==="rule" ? RULES : LESSONS; }
-function openLesson(kind, id){
+/* from: the tab to return to ("course", "read" or "grammar"). */
+function openLesson(kind, id, from){
   lessonCtx.kind = kind; lessonCtx.id = id;
+  lessonCtx.from = from || (kind==="rule" ? "read" : "grammar");
   var list = lessonList(kind), idx = list.findIndex(function(x){ return x.id===id; }), l = list[idx];
   goto("lesson");
   $("#lessonEyebrow").textContent = (kind==="rule" ? "Sound rule " : "Grammar ")+(idx+1)+" of "+list.length+" · "+l.kr;
@@ -1636,14 +1825,16 @@ function openLesson(kind, id){
       + '<button class="sound-btn" data-say="'+e.kr+'" style="width:32px;height:32px;font-size:13px;">🔊</button><span></span></div>';
   }).join("");
   var n = kind==="rule" ? l.examples.length : l.quiz.length;
-  $("#lessonBody").innerHTML = '<div class="card" style="margin-bottom:14px;"><ul class="lesson-points">'+l.points.map(function(p){ return "<li>"+p+"</li>"; }).join("")+'</ul></div>'
+  $("#lessonBody").innerHTML = (PLAIN[l.id] ? '<div class="mnemonic"><strong>In plain English:</strong> '+PLAIN[l.id]+'</div>' : '')
+    + '<div class="card" style="margin-bottom:14px;"><ul class="lesson-points">'+l.points.map(function(p){ return "<li>"+p+"</li>"; }).join("")+'</ul></div>'
     + '<div class="vocab-list" style="margin-bottom:14px;">'+rows+'</div>'
     + '<div class="btn-row"><button class="btn" id="lessonPractise">Practise ('+n+' questions)</button>'
     + (idx+1<list.length ? '<button class="btn ghost" id="lessonNext">Next: '+list[idx+1].title+' →</button>' : '') + '</div>';
   $("#lessonQuiz").innerHTML = "";
   $all("[data-say]", $("#lessonBody")).forEach(function(el){ el.onclick=function(){ speak(el.dataset.say); }; });
   $("#lessonPractise").onclick = function(){ startLessonQuiz(kind, [l], l.id); };
-  if($("#lessonNext")) $("#lessonNext").onclick = function(){ openLesson(kind, list[idx+1].id); };
+  if($("#lessonNext")) $("#lessonNext").onclick = function(){ openLesson(kind, list[idx+1].id, lessonCtx.from); };
+  if(lessonCtx.from==="course" && $("#lessonNext")) $("#lessonNext").remove();
 }
 function ruleQuestions(rules){
   var qs = [];
@@ -1675,17 +1866,339 @@ function startLessonQuiz(kind, items, doneId){
       return doneId ? "Get all but one right to mark it done." : "";
     },
     onAgain:function(){ startLessonQuiz(kind, items, doneId); },
-    onDone:function(){ if(doneId) openLesson(kind, doneId); else goto("read"); }
+    onDone:function(){
+      if(doneId && lessonCtx.from==="course" && state.done[doneId]){ goto("step"); stepDoneScreen($("#stepBody"), "Lesson complete."); }
+      else if(doneId) openLesson(kind, doneId, lessonCtx.from); else goto("read");
+    }
   });
   wrap.scrollIntoView({behavior:"smooth", block:"start"});
 }
 function startMixedRules(){
-  lessonCtx.kind = "rule"; lessonCtx.id = null;
+  lessonCtx.kind = "rule"; lessonCtx.id = null; lessonCtx.from = "read";
   goto("lesson");
   $("#lessonEyebrow").textContent = "Sound rules · mixed";
   $("#lessonTitle").textContent = "How is it said?";
   $("#lessonBody").innerHTML = '<p style="font-size:13px;color:var(--ink-2);margin:0;">Ten words from all the rules. Pick the pronunciation, then hear it.</p>';
   startLessonQuiz("rule", RULES, null);
+}
+
+/* =====================================================================
+   BEGINNER COURSE
+   ===================================================================== */
+var LESSON_BY_ID = {}, RULE_BY_ID = {}, DIALOGUE_BY_ID = {};
+LESSONS.forEach(function(l){ LESSON_BY_ID[l.id]=l; });
+RULES.forEach(function(r){ RULE_BY_ID[r.id]=r; });
+DIALOGUES.forEach(function(d){ DIALOGUE_BY_ID[d.id]=d; });
+var stepCtx = { u:0, i:0 };
+
+function stepKey(u, i){ return "c_"+u.id+"_"+i; }
+function isStepDone(u, i){
+  var s = u.steps[i];
+  return (s.type==="lesson" || s.type==="rule") ? !!state.done[s.id] : !!state.done[stepKey(u,i)];
+}
+function nextStep(){
+  for(var a=0;a<COURSE.length;a++) for(var b=0;b<COURSE[a].steps.length;b++) if(!isStepDone(COURSE[a],b)) return {u:a, i:b};
+  return null;
+}
+function courseCounts(){
+  var t=0, d=0;
+  COURSE.forEach(function(u){ u.steps.forEach(function(s,i){ t++; if(isStepDone(u,i)) d++; }); });
+  return {t:t, d:d};
+}
+function stepLabel(s){
+  if(s.type==="letters") return "Meet "+s.ids.length+" letters: "+s.ids.map(function(id){ return HANGUL_BY_ID[id].glyph; }).join(" ");
+  if(s.type==="read") return "Words you can read now";
+  if(s.type==="phrases") return "Learn "+s.ids.length+" phrases";
+  if(s.type==="dialogue") return "Conversation: "+DIALOGUE_BY_ID[s.id].title.toLowerCase();
+  if(s.type==="known") return "Tick what you already say";
+  if(s.type==="lesson") return "Grammar: "+LESSON_BY_ID[s.id].title;
+  if(s.type==="rule") return "Sound rule: "+RULE_BY_ID[s.id].title;
+  return "";
+}
+
+function renderCourseCard(){
+  var c = courseCounts(), nx = nextStep(), card = $("#courseCard");
+  if(!nx){
+    card.innerHTML = '<span class="eyebrow">Your course</span><h3>Course complete. 잘했어요!</h3><p style="font-size:13px;color:var(--ink-2);margin:4px 0 12px;">Keep your daily reviews going, and use the other tabs for extra practice.</p><button class="btn ghost" data-goto="course">Course map</button>';
+  } else {
+    var u = COURSE[nx.u];
+    card.innerHTML = '<span class="eyebrow">Your course · unit '+(nx.u+1)+' of '+COURSE.length+'</span>'
+      + '<h3>'+stepLabel(u.steps[nx.i])+'</h3>'
+      + '<p style="font-size:13px;color:var(--ink-2);margin:2px 0 12px;">'+u.title+(c.d===0 ? ' · Start here: about five minutes a step.' : '')+'</p>'
+      + '<div class="progress-track" style="margin-bottom:6px;"><div class="progress-fill" style="width:'+Math.round(100*c.d/c.t)+'%"></div></div>'
+      + '<div class="mono" style="font-size:11px;color:var(--ink-3);margin-bottom:12px;">'+c.d+' of '+c.t+' steps done</div>'
+      + '<div class="btn-row"><button class="btn" id="courseContinue">'+(c.d ? "Continue →" : "Start the course →")+'</button><button class="btn ghost" data-goto="course">Course map</button></div>';
+    $("#courseContinue").onclick = function(){ openStep(nx.u, nx.i); };
+  }
+  $all("[data-goto]", card).forEach(function(b){ b.onclick=function(){ goto(b.dataset.goto); }; });
+}
+
+function renderCourseMap(){
+  var nx = nextStep();
+  $("#courseMap").innerHTML = COURSE.map(function(u, a){
+    var rows = u.steps.map(function(s, b){
+      var done = isStepDone(u,b), isNext = nx && nx.u===a && nx.i===b;
+      return '<div class="vocab-row step-row'+(isNext?" next":"")+'" data-step="'+a+'.'+b+'" style="cursor:pointer;grid-template-columns:auto 1fr auto;">'
+        + '<span class="state" style="color:var('+(done?"--celadon":(isNext?"--indigo":"--ink-3"))+');">'+(done?"✓":(isNext?"●":"○"))+'</span>'
+        + '<span class="mid"><span class="en" style="color:var(--ink-1);">'+stepLabel(s)+'</span></span>'
+        + (isNext ? '<span class="pill new">next</span>' : '<span></span>') + '</div>';
+    }).join("");
+    return '<div class="unit-head"><span class="eyebrow">Unit '+(a+1)+'</span><h3>'+u.title+'</h3><p>'+u.intro+'</p></div><div class="vocab-list">'+rows+'</div>';
+  }).join("");
+  $all("[data-step]").forEach(function(el){ el.onclick=function(){ var p=el.dataset.step.split("."); openStep(+p[0], +p[1]); }; });
+}
+
+function completeStep(){
+  state.done[stepKey(COURSE[stepCtx.u], stepCtx.i)] = Date.now();
+  touchStreak();
+  saveState();
+}
+function stepDoneScreen(wrap, msg){
+  var nx = nextStep();
+  $("#stepIntro").innerHTML = "";
+  wrap.innerHTML = '<div class="card" style="text-align:center;"><div class="session-empty" style="padding:6px 0 16px;"><div class="g">잘했어요</div>'+msg+'<div style="font-size:12px;color:var(--ink-3);margin-top:4px;">(jalhaesseoyo: well done)</div></div>'
+    + '<div class="btn-row" style="justify-content:center;">'+(nx ? '<button class="btn" id="stepNext">Next: '+stepLabel(COURSE[nx.u].steps[nx.i])+' →</button>' : '')
+    + '<button class="btn ghost" id="stepMap">Course map</button></div></div>';
+  if(nx) $("#stepNext").onclick = function(){ openStep(nx.u, nx.i); };
+  $("#stepMap").onclick = function(){ goto("course"); };
+}
+function audioButtons(text){
+  return '<div class="btn-row" style="justify-content:center;margin-top:12px;"><button class="sound-btn" data-say="'+text+'" title="Play">🔊</button><button class="sound-btn" data-slow="'+text+'" title="Play slowly">🐢</button></div>';
+}
+function wireAudio(root){
+  $all("[data-say]", root).forEach(function(el){ el.onclick=function(e){ e.stopPropagation(); speak(el.dataset.say); }; });
+  $all("[data-slow]", root).forEach(function(el){ el.onclick=function(e){ e.stopPropagation(); speak(el.dataset.slow, 0.7); }; });
+}
+/* Teach-first pager: one item per card, Back / Next, then onFinish (usually the quiz). */
+function runMeet(wrap, items, render, onFinish, finishLabel){
+  var pos = 0;
+  function draw(){
+    var it = items[pos];
+    wrap.innerHTML = progressBar(pos, items.length) + '<div class="card">'+render(it)+'</div>'
+      + '<div class="btn-row" style="justify-content:space-between;margin-top:14px;"><button class="btn ghost" id="meetPrev"'+(pos?'':' disabled')+'>← Back</button>'
+      + '<button class="btn" id="meetNext">'+(pos+1<items.length ? "Next →" : finishLabel)+'</button></div>';
+    wireAudio(wrap);
+    $all("[data-reveal]", wrap).forEach(function(b){ b.onclick=function(){ b.hidden=true; $(".reveal-box", wrap).hidden=false; speak(b.dataset.reveal); }; });
+    $("#meetPrev").onclick = function(){ pos--; draw(); };
+    $("#meetNext").onclick = function(){ if(pos+1<items.length){ pos++; draw(); } else onFinish(); };
+    if(it.say) speak(it.say);
+  }
+  draw();
+}
+/* Pass mark 80%. Passing completes the current course step. */
+function stepQuiz(wrap, qs, reviewIds){
+  var passed = false;
+  $("#stepIntro").innerHTML = "";
+  runQuiz({ wrap:wrap, qs:qs, small:qs.some(function(q){ return q.options.some(function(o){ return o.length>4; }); }),
+    onFinish:function(score, n){
+      var need = Math.ceil(n*0.8);
+      if(score >= need){
+        passed = true;
+        /* Passing counts as the first review, so newly met items come back tomorrow, not straight away. */
+        (reviewIds||[]).forEach(function(id){ if(!state.items[id].lastReview) gradeItem(id, 2); });
+        completeStep();
+        return "Step complete.";
+      }
+      return "You need "+need+" right to finish this step. Have another go when you're ready.";
+    },
+    onAgain:function(){ stepQuiz(wrap, shuffle(qs), reviewIds); },
+    onDone:function(){ if(passed) stepDoneScreen(wrap, "Step complete."); else goto("course"); }
+  });
+}
+function pick(pool, n){ return shuffle(pool).slice(0, n); }
+function distinctOptions(answer, candidates, n){
+  var out = [answer];
+  shuffle(candidates).forEach(function(c){ if(out.length<n && out.indexOf(c)<0) out.push(c); });
+  return out;
+}
+
+/* ---- words you can read: only letters met so far, at least one from this unit ---- */
+var FINAL_PARTS = {"ㄳ":["ㄱ","ㅅ"],"ㄵ":["ㄴ","ㅈ"],"ㄶ":["ㄴ","ㅎ"],"ㄺ":["ㄹ","ㄱ"],"ㄻ":["ㄹ","ㅁ"],"ㄼ":["ㄹ","ㅂ"],"ㄽ":["ㄹ","ㅅ"],"ㄾ":["ㄹ","ㅌ"],"ㄿ":["ㄹ","ㅍ"],"ㅀ":["ㄹ","ㅎ"],"ㅄ":["ㅂ","ㅅ"]};
+function jamoOf(word){
+  var out = [];
+  for(var k=0;k<word.length;k++){
+    var c = word.charCodeAt(k)-0xAC00;
+    if(c<0 || c>11171) continue;
+    out.push(INITIALS[Math.floor(c/588)], VOWELS_ORDER[Math.floor((c%588)/28)]);
+    var f = FINALS_ORDER[c%28];
+    if(f) out = out.concat(FINAL_PARTS[f] || [f]);
+  }
+  return out;
+}
+function unitLetters(a){
+  var out = [];
+  COURSE[a].steps.forEach(function(s){ if(s.type==="letters") s.ids.forEach(function(id){ out.push(HANGUL_BY_ID[id].glyph); }); });
+  return out;
+}
+var readPoolCache = null, unitWordsCache = {};
+function readPool(){
+  if(readPoolCache) return readPoolCache;
+  var seen = {}, out = [];
+  function add(w){ if(!w.kr || seen[w.kr] || !/^[가-힣]+$/.test(w.kr)) return; seen[w.kr]=1; out.push({kr:w.kr, rm:w.rm, en:w.en, loan:!!w.loan}); }
+  BEGINNER_WORDS.forEach(add);
+  HANGUL.forEach(function(h){ h.examples.forEach(add); });
+  VOCAB.forEach(add); READING.forEach(add);
+  return (readPoolCache = out);
+}
+function wordsForUnit(a){
+  if(unitWordsCache[a]) return unitWordsCache[a];
+  var known = {}, fresh = unitLetters(a), used = {};
+  for(var k=0;k<=a;k++) unitLetters(k).forEach(function(g){ known[g]=1; });
+  for(k=0;k<a;k++) wordsForUnit(k).forEach(function(w){ used[w.kr]=1; });
+  var words = readPool().filter(function(w){
+    var j = jamoOf(w.kr);
+    return !used[w.kr] && j.every(function(x){ return known[x]; }) && j.some(function(x){ return fresh.indexOf(x)>=0; });
+  }).sort(function(x,y){
+    /* Loanwords first (instant wins), then 2-3 syllable words; lone syllables like 이 are ambiguous. */
+    var fit = function(w){ return w.kr.length>=2 && w.kr.length<=3 ? 0 : (w.kr.length>3 ? 1 : 2); };
+    return (y.loan-x.loan) || (fit(x)-fit(y)) || (x.kr.length-y.kr.length);
+  }).slice(0, 6);
+  return (unitWordsCache[a] = words);
+}
+
+/* ---- dialogue playback through one element, so iOS allows the whole chain from one tap ---- */
+var seqPlayer = new Audio();
+function playLines(texts, rate, onLine){
+  var k = 0;
+  if(clipPlayer) clipPlayer.pause();
+  function next(){
+    if(k >= texts.length){ if(onLine) onLine(-1); return; }
+    if(onLine) onLine(k);
+    seqPlayer.onended = function(){ k++; setTimeout(next, 450); };
+    seqPlayer.onerror = function(){ k++; next(); };
+    seqPlayer.src = clipUrl(texts[k]);
+    seqPlayer.playbackRate = seqPlayer.defaultPlaybackRate = rate || state.audioRate || 1;
+    var p = seqPlayer.play(); if(p && p.catch) p.catch(function(){});
+  }
+  next();
+}
+
+function openStep(a, b){
+  stepCtx.u = a; stepCtx.i = b;
+  var u = COURSE[a], s = u.steps[b];
+  if(s.type==="lesson" || s.type==="rule"){ openLesson(s.type==="rule" ? "rule" : "grammar", s.id, "course"); return; }
+  goto("step");
+  $("#stepEyebrow").textContent = "Unit "+(a+1)+" · "+u.title;
+  $("#stepTitle").textContent = stepLabel(s);
+  $("#stepIntro").innerHTML = b===0 ? '<div class="mnemonic">'+u.intro+'</div>' : '';
+  var wrap = $("#stepBody");
+
+  if(s.type==="letters"){
+    var ls = s.ids.map(function(id){ return HANGUL_BY_ID[id]; });
+    runMeet(wrap, ls.map(function(h){ return {h:h, say:letterSpeakText(h)}; }), function(it){
+      var h = it.h;
+      return '<div class="meet-glyph">'+h.glyph+'</div><div class="eyebrow" style="text-align:center;">'+h.name+' · '+h.roman+'</div>'
+        + '<p class="meet-sound">'+h.sound+'</p><div class="mnemonic">'+h.mnemonic+'</div>'
+        + '<div class="examples" style="justify-content:center;">'+h.examples.map(function(e){ return '<div class="example-chip" data-say="'+e.kr+'" style="cursor:pointer;">'+e.kr+' <span class="rom">'+e.rm+' · '+e.en+'</span></div>'; }).join("")+'</div>'
+        + audioButtons(it.say);
+    }, function(){
+      ls.forEach(function(h){ markSeenNow(h.id); }); saveState();
+      var known = []; for(var k=0;k<=a;k++) known = known.concat(unitLetters(k));
+      var qs = [];
+      ls.forEach(function(h){
+        var family = HANGUL.filter(function(x){ return letterFamily(x)===letterFamily(h) && x!==h && groupOf(MERGED,h.glyph).indexOf(x.glyph)<0; });
+        var near = family.filter(function(x){ return known.indexOf(x.glyph)>=0; });
+        qs.push({ prompt:h.glyph, sub:"Which sound does it make?", options:distinctOptions(h.roman, (near.length>=2?near:family).map(function(x){ return x.roman; }), 3),
+          answer:h.roman, audio:letterSpeakText(h), after:h.name, miss:{label:h.glyph, sub:h.roman} });
+        qs.push({ prompt:'<button class="sound-btn listen-play" data-say="'+letterSpeakText(h)+'">🔊</button>', sub:"Which letter did you hear?",
+          options:distinctOptions(h.glyph, (near.length>=2?near:family).map(function(x){ return x.glyph; }), 3), answer:h.glyph,
+          audio:letterSpeakText(h), firstAudio:letterSpeakText(h), after:h.roman+' · '+h.name, miss:{label:h.glyph, sub:h.roman} });
+      });
+      stepQuiz(wrap, shuffle(qs).slice(0, 12), s.ids);
+    }, "Check yourself →");
+  }
+
+  else if(s.type==="read"){
+    var words = wordsForUnit(a);
+    if(!words.length){ completeStep(); stepDoneScreen(wrap, "No new words for these letters yet."); return; }
+    runMeet(wrap, words, function(w){
+      return '<div class="meet-glyph" style="font-size:56px;">'+w.kr+'</div><p class="meet-sound">'+(w.loan ? "This one's borrowed from English. Sound it out." : "Sound it out, then check.")+'</p>'
+        + '<div style="text-align:center;"><button class="btn" data-reveal="'+w.kr+'">Check</button></div>'
+        + '<div class="reveal-box" hidden><div class="mono" style="color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;">'+w.rm+'</div><div style="font-size:16px;margin:4px 0;">'+w.en+'</div>'+audioButtons(w.kr)+'</div>';
+    }, function(){
+      var pool = readPool().map(function(w){ return w.en; });
+      stepQuiz(wrap, shuffle(words.map(function(w){
+        return { prompt:w.kr, sub:"What does it mean?", options:distinctOptions(w.en, words.map(function(x){ return x.en; }).concat(pick(pool, 6)), 3),
+          answer:w.en, audio:w.kr, after:'<span class="mono">'+w.rm+'</span>', miss:{label:w.kr, sub:w.en} };
+      })));
+    }, "Check yourself →");
+  }
+
+  else if(s.type==="phrases"){
+    var ps = s.ids.map(function(id){ return VOCAB_BY_ID[id]; });
+    runMeet(wrap, ps.map(function(v){ return {v:v, say:v.kr}; }), function(it){
+      var v = it.v;
+      return (state.done["k_"+v.id] ? '<div style="text-align:center;margin-bottom:6px;"><span class="pill mastered">you already say this</span></div>' : '')
+        + '<div class="meet-glyph" style="font-size:'+(v.kr.length>6?34:48)+'px;">'+v.kr+'</div>'
+        + '<div class="mono" style="text-align:center;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;margin-top:6px;">'+v.rm+'</div>'
+        + '<p class="meet-sound" style="font-size:16px;color:var(--ink-1);">'+v.en+'</p>' + audioButtons(v.kr);
+    }, function(){
+      ps.forEach(function(v){ markSeenNow(v.id); }); saveState();
+      var ens = VOCAB.map(function(v){ return v.en; }), krs = VOCAB.map(function(v){ return v.kr; });
+      var qs = [];
+      ps.forEach(function(v){
+        qs.push({ prompt:'<span>'+v.kr+'</span> <button class="sound-btn" data-say="'+v.kr+'" style="vertical-align:middle;">🔊</button>', sub:"What does it mean?",
+          options:distinctOptions(v.en, ps.map(function(x){ return x.en; }).concat(pick(ens, 4)), 3), answer:v.en, audio:v.kr, firstAudio:v.kr,
+          after:'<span class="mono">'+v.rm+'</span>', miss:{label:v.kr, sub:v.en} });
+        qs.push({ prompt:'<span style="font-family:var(--font-kr-sans);font-size:22px;">'+v.en+'</span>', sub:"Which is it in Korean?",
+          options:distinctOptions(v.kr, ps.map(function(x){ return x.kr; }).concat(pick(krs, 4)), 3), answer:v.kr, audio:v.kr,
+          after:'<span class="mono">'+v.rm+'</span>', miss:{label:v.kr, sub:v.en} });
+      });
+      stepQuiz(wrap, shuffle(qs).slice(0, 12), s.ids);
+    }, "Check yourself →");
+  }
+
+  else if(s.type==="dialogue"){
+    var d = DIALOGUE_BY_ID[s.id];
+    wrap.innerHTML = '<div class="dlg">'+d.lines.map(function(l, k){
+        return '<div class="bubble'+(l.who==="you"?" you":"")+'" data-line="'+k+'"><div class="who">'+(l.who==="you"?"You":d.them)+'</div><div class="k">'+l.kr+'</div><div class="r">'+l.rm+'</div><div class="e">'+l.en+'</div></div>';
+      }).join("")+'</div>'
+      + '<div class="btn-row" style="justify-content:center;"><button class="btn ghost" id="dlgPlay">▶ Play it all</button><button class="btn ghost" id="dlgSlow">🐢 Slowly</button><button class="btn" id="dlgPractise">Practise your lines →</button></div>'
+      + '<p style="font-size:12px;color:var(--ink-3);text-align:center;margin-top:10px;">Tap any line to hear it.</p>';
+    var bubbles = $all("[data-line]", wrap);
+    var highlight = function(k){ bubbles.forEach(function(el, j){ el.classList.toggle("playing", j===k); }); };
+    bubbles.forEach(function(el){ el.onclick=function(){ playLines([d.lines[+el.dataset.line].kr], null, function(k){ highlight(k<0?-1:+el.dataset.line); }); }; });
+    $("#dlgPlay").onclick = function(){ playLines(d.lines.map(function(l){ return l.kr; }), null, highlight); };
+    $("#dlgSlow").onclick = function(){ playLines(d.lines.map(function(l){ return l.kr; }), 0.7, highlight); };
+    $("#dlgPractise").onclick = function(){
+      seqPlayer.pause();
+      var otherYou = []; DIALOGUES.forEach(function(x){ x.lines.forEach(function(l){ if(l.who==="you") otherYou.push(l.kr); }); });
+      var qs = [];
+      d.lines.forEach(function(l, k){
+        if(l.who!=="you") return;
+        var prev = d.lines[k-1];
+        qs.push({ prompt:prev ? '<span style="font-size:22px;">'+prev.kr+'</span> <button class="sound-btn" data-say="'+prev.kr+'" style="vertical-align:middle;">🔊</button>' : '<span style="font-family:var(--font-kr-sans);font-size:18px;">'+l.en+'</span>',
+          sub:(prev ? (prev.who==="you" ? "You said that. What do you say next?" : d.them+': "'+prev.en+'" What do you say?') : "How do you start?"),
+          options:distinctOptions(l.kr, d.lines.filter(function(x){ return x.who==="you"; }).map(function(x){ return x.kr; }).concat(pick(otherYou, 4)), 3),
+          answer:l.kr, audio:l.kr, firstAudio:prev && prev.who!=="you" ? prev.kr : null, after:l.en, miss:{label:l.kr, sub:l.en} });
+      });
+      stepQuiz(wrap, qs);
+    };
+  }
+
+  else if(s.type==="known"){
+    var ticked = {};
+    KNOWN_CHECK.forEach(function(id){ if(state.done["k_"+id]) ticked[id]=1; });
+    wrap.innerHTML = '<div class="vocab-list" style="margin-bottom:14px;">'+KNOWN_CHECK.map(function(id){
+        var v = VOCAB_BY_ID[id];
+        return '<div class="vocab-row" style="grid-template-columns:1fr auto auto;"><span class="mid"><span class="g kr" style="font-size:18px;">'+v.kr+'</span><br><span class="en">'+v.en+'</span></span>'
+          + '<button class="sound-btn" data-say="'+v.kr+'" style="width:32px;height:32px;font-size:13px;">🔊</button>'
+          + '<button class="btn ghost known-toggle'+(ticked[id]?" on":"")+'" data-known="'+id+'" style="font-size:12px;padding:7px 10px;">'+(ticked[id]?"✓ I say this":"I say this")+'</button></div>';
+      }).join("")+'</div><div class="btn-row" style="justify-content:center;"><button class="btn" id="knownSave">Save and continue</button></div>';
+    wireAudio(wrap);
+    $all("[data-known]", wrap).forEach(function(b){ b.onclick=function(){
+      var id = b.dataset.known; if(ticked[id]) delete ticked[id]; else ticked[id]=1;
+      b.classList.toggle("on", !!ticked[id]); b.textContent = ticked[id] ? "✓ I say this" : "I say this";
+    }; });
+    $("#knownSave").onclick = function(){
+      var n = 0;
+      Object.keys(ticked).forEach(function(id){
+        if(!state.done["k_"+id]){ state.done["k_"+id] = Date.now(); n++; if(!state.items[id] || !state.items[id].seen){ markSeenNow(id); gradeItem(id, 2); } }
+      });
+      completeStep();
+      stepDoneScreen(wrap, n ? "Credited "+n+" phrase"+(n===1?"":"s")+" you already know. They'll come up in reviews now and then." : "Saved.");
+    };
+  }
 }
 
 /* =====================================================================
@@ -1873,7 +2386,7 @@ function clipUrl(text){
   return "audio/" + ("0000000" + h.toString(16)).slice(-8) + ".mp3";
 }
 var clipPlayer = null;
-function playClip(text, onMissing, onPlaying){
+function playClip(text, onMissing, onPlaying, rate){
   if(clipPlayer) clipPlayer.pause();
   if("speechSynthesis" in window) speechSynthesis.cancel();
   var a = new Audio(clipUrl(text)), failed = false;
@@ -1881,6 +2394,7 @@ function playClip(text, onMissing, onPlaying){
   function fail(){ if(failed || clipPlayer!==a) return; failed = true; onMissing(); }
   a.onerror = fail;
   if(onPlaying) a.onplaying = onPlaying;
+  a.playbackRate = a.defaultPlaybackRate = rate || 1;
   var p = a.play();
   if(p && p.catch) p.catch(function(e){ if(e.name!=="AbortError") fail(); });
 }
@@ -1895,11 +2409,13 @@ function voiceStatus(){
 }
 /* Recorded clip first; the device's own Korean voice only covers what has no clip
    (mostly builder syllables with a final consonant). */
-function speak(text){
+/* rate: 0.7 for the 🐢 buttons; otherwise the Settings audio speed. */
+function speak(text, rate){
   if(!text) return;
-  playClip(text, function(){ speakWithVoice(text); });
+  var r = rate || state.audioRate || 1;
+  playClip(text, function(){ speakWithVoice(text, r); }, null, r);
 }
-function speakWithVoice(text){
+function speakWithVoice(text, rate){
   if(!("speechSynthesis" in window)){ toast("No recording for this one, and this browser has no speech synthesis"); return; }
   try{
     loadVoices();
@@ -1912,7 +2428,7 @@ function speakWithVoice(text){
     var u = new SpeechSynthesisUtterance(text);
     u.lang = "ko-KR";
     if(koVoice) u.voice = koVoice;
-    u.rate = 0.85;
+    u.rate = 0.85 * (rate || 1);
     u.volume = 1;
     u.onerror = function(ev){
       if(ev && ev.error && ev.error!=="canceled" && ev.error!=="interrupted") toast("Audio failed: "+ev.error);
@@ -1949,8 +2465,17 @@ function renderSettingsCaps(){
     b.style.borderColor = match ? "var(--indigo)" : "";
     b.style.color = match ? "var(--indigo-ink)" : "";
   });
+  $all("[data-rate]").forEach(function(b){
+    var match = parseFloat(b.dataset.rate)===(state.audioRate||1);
+    b.style.background = match ? "var(--indigo-tint)" : "";
+    b.style.borderColor = match ? "var(--indigo)" : "";
+    b.style.color = match ? "var(--indigo-ink)" : "";
+  });
 }
 function wireSettings(){
+  $all("[data-rate]").forEach(function(b){
+    b.onclick=function(){ state.audioRate=parseFloat(b.dataset.rate); saveState(); renderSettingsCaps(); speak("안녕하세요"); };
+  });
   $("#themeAuto").onclick=function(){ state.theme="auto"; saveState(); applyTheme(); };
   $("#themeLight").onclick=function(){ state.theme="light"; saveState(); applyTheme(); };
   $("#themeDark").onclick=function(){ state.theme="dark"; saveState(); applyTheme(); };
@@ -2094,7 +2619,7 @@ document.addEventListener("DOMContentLoaded", function(){
   $("#listenBack").onclick=function(){ goto(listen.from); };
   $("#btnStartReading").onclick=startReading;
   $("#btnMixedRules").onclick=startMixedRules;
-  $("#lessonBack").onclick=function(){ goto(lessonCtx.kind==="rule" ? "read" : "grammar"); };
+  $("#lessonBack").onclick=function(){ goto(lessonCtx.from); };
 
   /* One-off notice the first time a new version opens (separate key from progress). */
   try{

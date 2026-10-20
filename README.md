@@ -4,6 +4,7 @@ A personal Korean-learning app: read Hangeul first, then vocabulary, then speaki
 
 Live at https://guitarmanj55.github.io/hangeul-lab/ (pushing to `main` redeploys it).
 
+- **Beginner course:** 18 short units in order, from the first vowels to real conversations, each step teaching first and then checking
 - **Hangeul module:** all 40 letters with shape mnemonics, plus a syllable builder
 - **Vocab module:** 147 survival words and phrases in 12 categories
 - **Reading practice:** real signs, menus and Busan place names, plus 9 sound-change rules (why 합니다 is said "hamnida")
@@ -12,7 +13,7 @@ Live at https://guitarmanj55.github.io/hangeul-lab/ (pushing to `main` redeploys
 - **Speaking practice:** listen, say it aloud, get a score where the device supports it, or record yourself and compare with the native clip
 - **Backup:** download or copy your progress and load it on another device (merges, never overwrites newer reviews)
 - **Spaced repetition:** a simplified SM-2 scheduler drives all reviews
-- **Recorded audio:** 723 natural-voice clips, so it sounds right on phones with no Korean voice installed
+- **Recorded audio:** 789 natural-voice clips, so it sounds right on phones with no Korean voice installed
 - **Installable and offline:** add it to your home screen; after the first visit it works with no signal
 
 ## Run it
@@ -38,4 +39,4 @@ Then bump `CACHE` in `sw.js` so installed copies pick up the new clips.
 
 ## Status
 
-v1.2.2: reading practice, sound rules, grammar, more vocab. See `ROADMAP.md` for ideas beyond that.
+v1.3: guided beginner course. See `ROADMAP.md` for history and ideas.

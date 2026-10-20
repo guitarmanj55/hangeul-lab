@@ -1,6 +1,15 @@
 # Roadmap
 
 ## Done
+### v1.3: Beginner path
+- [x] Course tab: 18 units, 41 steps, Continue card on Home; letters → words you can read → phrases → conversations → grammar → sound rules
+- [x] Teach first: meet each item, then a multiple-choice check (80% to pass); passing schedules the first review for tomorrow
+- [x] "Words you can read now" built only from letters already learned, loanwords first
+- [x] "What you already say" check credits phrases picked up in Busan
+- [x] Six conversations (café, restaurant, taxi, convenience store, directions, colleague) with play-all, slow mode and a practise-your-lines quiz
+- [x] Slow audio (🐢 buttons and a Settings speed), romanization hints in drills and reading, plain-English line on every lesson and rule
+- [x] Drills: a never-seen item opens turned over so you meet it before being tested
+
 ### v1.2.2
 - [x] iPhone home-screen app: scoring mic hidden (iOS blocks it there); Record & compare plays through one tap-unlocked player so iOS doesn't block playback
 

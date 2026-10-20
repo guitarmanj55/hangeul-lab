@@ -2,7 +2,7 @@
    The page is network-first so updates arrive as soon as you're online; audio,
    icons and fonts are cache-first. Bump CACHE when audio/ is regenerated so the
    new clips are precached for offline use. */
-var CACHE = "hangeullab-v2";
+var CACHE = "hangeullab-v3";
 var SHELL = [
   "./",
   "index.html",
