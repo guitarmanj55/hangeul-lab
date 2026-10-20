@@ -2,6 +2,8 @@
 
 A personal Korean-learning app: read Hangeul first, then vocabulary, then speaking.
 
+Live at https://guitarmanj55.github.io/hangeul-lab/ (pushing to `main` redeploys it).
+
 - **Hangeul module:** all 40 letters with shape mnemonics, plus a syllable builder
 - **Vocab module:** 97 survival words and phrases in 8 categories
 - **Speaking practice:** listen, then say it aloud (mic scoring where the browser supports it)

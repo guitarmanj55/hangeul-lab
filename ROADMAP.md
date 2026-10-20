@@ -4,7 +4,7 @@
 - [x] Pre-recorded audio for every letter and word in `audio/`, so sound does not depend on the voices installed on the phone (the artifact version failed on a device with no Korean voice)
 - [x] `scripts/` generator that builds the audio files from the word list, run once on the laptop
 - [x] Play recorded audio first; fall back to browser speech only for the syllable builder (open syllables like 가 are recorded too; ones with a 받침 still use the device voice)
-- [ ] Deploy to GitHub Pages (or Vercel) so it has its own address
+- [x] Deploy to GitHub Pages: https://guitarmanj55.github.io/hangeul-lab/
 - [x] Installable on a phone home screen, working offline (web app manifest + service worker)
 
 ## Then
