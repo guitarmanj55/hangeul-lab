@@ -1,6 +1,11 @@
 # Roadmap
 
 ## Done
+### v1.2.1
+- [x] Mic scoring no longer sticks on "Listening": start and overall timeouts, tap to stop, interim results, clear error reasons
+- [x] Record & compare: record yourself, hear the native clip then yours
+- [x] Version number and "Check for update" in Settings
+
 ### v1.2
 - [x] Reading practice: 45 real signs, menu items and Busan place names; sound it out, reveal, self-check
 - [x] Sound rules: 9 batchim/pronunciation rules (linking, final sounds, nasalisation, ㄴ+ㄹ, ㄹ→ㄴ, aspiration, tensing, palatalisation, silent ㅎ) with examples and quizzes
@@ -28,4 +33,4 @@
 
 ## Known limits
 - Progress is stored per browser; move it with Settings > Back up progress
-- Mic scoring needs Chrome and a direct page (not an embedded preview)
+- Mic scoring depends on the device's speech service (needs internet on Android; unreliable in the iPhone home-screen app). Record & compare works everywhere
