@@ -34,6 +34,7 @@
   --celadon-tint:#e6ede7;
   --gold:#b8862f;
   --gold-tint:#f4ead4;
+  --hero:#25406e;
   --shadow: 0 1px 2px rgba(36,31,26,0.06), 0 6px 20px -8px rgba(36,31,26,0.18);
   --radius: 3px;
   --radius-lg: 6px;
@@ -60,6 +61,7 @@
     --celadon-tint:#212e24;
     --gold:#d9ac57;
     --gold-tint:#332a17;
+    --hero:#22365a;
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 30px -10px rgba(0,0,0,0.5);
   }
 }
@@ -80,6 +82,7 @@
   --celadon-tint:#212e24;
   --gold:#d9ac57;
   --gold-tint:#332a17;
+  --hero:#22365a;
   --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 30px -10px rgba(0,0,0,0.5);
 }
 
@@ -177,7 +180,7 @@ section.view.active{display:block; animation:rise .28s ease both;}
 }
 @media (max-width:640px){.hero{grid-template-columns:1fr;}}
 .hero-main{
-  background:var(--indigo); color:var(--paper-raised); border-radius:var(--radius-lg); padding:26px;
+  background:var(--hero); color:var(--paper-raised); border-radius:var(--radius-lg); padding:26px;
   position:relative; overflow:hidden; box-shadow:var(--shadow);
 }
 .hero-main .glyphs{
@@ -186,7 +189,12 @@ section.view.active{display:block; animation:rise .28s ease both;}
 }
 .hero-main h1{font-size:26px; color:#fff; position:relative;}
 .hero-main p{font-size:13.5px; color:#dfe6f2; max-width:38ch; margin:10px 0 18px; position:relative;}
-.hero-main .btn{background:#fff; color:var(--indigo-ink); border-color:#fff; position:relative;}
+.hero-main .btn{background:#fff; color:#1a2d4f; border-color:#fff; position:relative;}
+.quiz-prompt{font-family:var(--font-kr-serif); font-size:34px; font-weight:600; text-align:center; line-height:1.35; margin:8px 0 4px; overflow-wrap:anywhere; word-break:keep-all;}
+.quiz-prompt .blank{display:inline-block; min-width:1.6em; border-bottom:2px solid var(--indigo); color:var(--indigo);}
+.lesson-points{margin:0 0 6px; padding-left:20px; font-size:13.5px; color:var(--ink-1); line-height:1.65;}
+.lesson-points li{margin-bottom:4px;}
+.said{font-family:var(--font-kr-serif); color:var(--dancheong); white-space:nowrap;}
 
 .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 .stat{background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius-lg); padding:14px 16px;}
@@ -382,6 +390,8 @@ section.view.active{display:block; animation:rise .28s ease both;}
     <button data-view="home" class="active">Home</button>
     <button data-view="hangul">Hangeul</button>
     <button data-view="vocab">Vocab</button>
+    <button data-view="read">Reading</button>
+    <button data-view="grammar">Grammar</button>
     <button data-view="speak">Speaking</button>
     <button data-view="settings">Settings</button>
   </nav>
@@ -417,6 +427,20 @@ section.view.active{display:block; animation:rise .28s ease both;}
         <p>Greetings, numbers, food, transport, money, and emergency phrases &mdash; the words you need on the ground.</p>
         <div class="progress-track"><div class="progress-fill" id="vocabProgress" style="width:0%"></div></div>
         <div class="meta"><span id="vocabMeta">0 of 0 introduced</span><span id="vocabDueMeta">0 due</span></div>
+      </div>
+      <div class="card module-card" data-goto="read">
+        <div class="top"><div class="icon" style="background:var(--celadon-tint); color:var(--celadon);">읽</div></div>
+        <h3>Reading &amp; sound rules</h3>
+        <p>Real signs, menus and Busan place names, plus the rules for why Korean isn't always said the way it's spelled.</p>
+        <div class="progress-track"><div class="progress-fill" id="readProgress" style="width:0%"></div></div>
+        <div class="meta"><span id="readMeta">0 of 0 rules practised</span></div>
+      </div>
+      <div class="card module-card" data-goto="grammar">
+        <div class="top"><div class="icon" style="background:var(--gold-tint); color:var(--gold);">문</div></div>
+        <h3>Grammar basics</h3>
+        <p>Sentence order, the core particles, polite verb endings, past tense, negation and requests.</p>
+        <div class="progress-track"><div class="progress-fill" id="grammarProgress" style="width:0%"></div></div>
+        <div class="meta"><span id="grammarMeta">0 of 0 lessons done</span></div>
       </div>
     </div>
 
@@ -493,9 +517,46 @@ section.view.active{display:block; animation:rise .28s ease both;}
     <div class="drill-wrap" id="listenWrap"></div>
   </section>
 
+  <!-- READING + SOUND RULES -->
+  <section class="view" id="view-read">
+    <div class="section-head"><div><span class="eyebrow">Module 3</span><h2>Reading practice</h2></div></div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--ink-2);margin:0 0 12px;">Text you'll actually see in Korea. Sound each one out, then tap to check and hear it.</p>
+      <div class="category-strip" id="readModes" style="margin-bottom:12px;"></div>
+      <button class="btn" id="btnStartReading">Start a round</button>
+    </div>
+    <div class="section-head"><div><span class="eyebrow">Pronunciation</span><h2>Sound rules</h2></div>
+      <button class="btn ghost" id="btnMixedRules">Mixed practice</button>
+    </div>
+    <div class="vocab-list" id="ruleList"></div>
+  </section>
+
+  <section class="view" id="view-reading">
+    <div class="section-head"><div><span class="eyebrow">Reading practice</span><h2 id="readingTitle">Read it aloud</h2></div>
+      <button class="btn ghost" data-goto="read">← Back</button>
+    </div>
+    <div class="drill-wrap" id="readingWrap"></div>
+  </section>
+
+  <!-- GRAMMAR -->
+  <section class="view" id="view-grammar">
+    <div class="section-head"><div><span class="eyebrow">Module 4</span><h2>Grammar basics</h2></div></div>
+    <p style="font-size:13px;color:var(--ink-2);margin:-4px 0 14px;">Short lessons in order. Each ends with a quick check; get all but one right to mark it done.</p>
+    <div class="vocab-list" id="lessonList"></div>
+  </section>
+
+  <!-- LESSON (grammar lesson or sound rule) -->
+  <section class="view" id="view-lesson">
+    <div class="section-head"><div><span class="eyebrow" id="lessonEyebrow"></span><h2 id="lessonTitle"></h2></div>
+      <button class="btn ghost" id="lessonBack">← Back</button>
+    </div>
+    <div id="lessonBody"></div>
+    <div class="drill-wrap" id="lessonQuiz" style="margin-top:18px;"></div>
+  </section>
+
   <!-- SPEAKING -->
   <section class="view" id="view-speak">
-    <div class="section-head"><div><span class="eyebrow">Module 3</span><h2>Speaking practice</h2></div></div>
+    <div class="section-head"><div><span class="eyebrow">Module 5</span><h2>Speaking practice</h2></div></div>
     <div class="category-strip" id="speakCategoryStrip"></div>
     <div class="card speak-card">
       <div class="target-kr kr" id="speakKr">안녕하세요</div>
@@ -617,7 +678,11 @@ var CATEGORIES = [
   {id:"shopping",label:"Shopping & money"},
   {id:"emergency",label:"Emergency & help"},
   {id:"time",label:"Time & days"},
-  {id:"phrases",label:"Everyday phrases"}
+  {id:"phrases",label:"Everyday phrases"},
+  {id:"people",label:"People & family"},
+  {id:"work",label:"Work & study"},
+  {id:"describe",label:"Describing things"},
+  {id:"feelings",label:"Feelings"}
 ];
 var VOCAB = [
   {id:"v_annyeonghaseyo",cat:"greet",kr:"안녕하세요",rm:"annyeonghaseyo",en:"Hello"},
@@ -716,7 +781,197 @@ var VOCAB = [
   {id:"v_gwaenchaneuseyo",cat:"phrases",kr:"괜찮으세요?",rm:"gwaenchaneuseyo?",en:"Are you okay?"},
   {id:"v_sajin_jjigeodo_dwaeyo",cat:"phrases",kr:"사진 찍어도 돼요?",rm:"sajin jjigeodo dwaeyo?",en:"Can I take a photo?"},
   {id:"v_waipai_bimilbeonhoga_mwoyeyo",cat:"phrases",kr:"와이파이 비밀번호가 뭐예요?",rm:"waipai bimilbeonhoga mwoyeyo?",en:"What's the wifi password?"},
-  {id:"v_geonbae",cat:"phrases",kr:"건배!",rm:"geonbae!",en:"Cheers!"}
+  {id:"v_geonbae",cat:"phrases",kr:"건배!",rm:"geonbae!",en:"Cheers!"},
+  /* v1.2 additions */
+  {id:"v_yeoseot",cat:"numbers",kr:"여섯",rm:"yeoseot",en:"six (native)"},
+  {id:"v_ilgop",cat:"numbers",kr:"일곱",rm:"ilgop",en:"seven (native)"},
+  {id:"v_yeodeol",cat:"numbers",kr:"여덟",rm:"yeodeol",en:"eight (native)"},
+  {id:"v_ahop",cat:"numbers",kr:"아홉",rm:"ahop",en:"nine (native)"},
+  {id:"v_yeol",cat:"numbers",kr:"열",rm:"yeol",en:"ten (native)"},
+  {id:"v_baek",cat:"numbers",kr:"백",rm:"baek",en:"one hundred"},
+  {id:"v_cheon",cat:"numbers",kr:"천",rm:"cheon",en:"one thousand"},
+  {id:"v_man",cat:"numbers",kr:"만",rm:"man",en:"ten thousand (₩10,000 is 만 원)"},
+  {id:"v_suyoil",cat:"time",kr:"수요일",rm:"suyoil",en:"Wednesday"},
+  {id:"v_mogyoil",cat:"time",kr:"목요일",rm:"mogyoil",en:"Thursday"},
+  {id:"v_geumyoil",cat:"time",kr:"금요일",rm:"geumyoil",en:"Friday"},
+  {id:"v_toyoil",cat:"time",kr:"토요일",rm:"toyoil",en:"Saturday"},
+  {id:"v_iryoil",cat:"time",kr:"일요일",rm:"iryoil",en:"Sunday"},
+  {id:"v_jeomsim",cat:"time",kr:"점심",rm:"jeomsim",en:"lunch / midday"},
+  {id:"v_bam",cat:"time",kr:"밤",rm:"bam",en:"night"},
+  {id:"v_jeo",cat:"people",kr:"저",rm:"jeo",en:"I / me (polite)"},
+  {id:"v_chingu",cat:"people",kr:"친구",rm:"chingu",en:"friend"},
+  {id:"v_gajok",cat:"people",kr:"가족",rm:"gajok",en:"family"},
+  {id:"v_eomma",cat:"people",kr:"엄마",rm:"eomma",en:"mum"},
+  {id:"v_hyeong",cat:"people",kr:"형",rm:"hyeong",en:"older brother (said by a man)"},
+  {id:"v_nuna",cat:"people",kr:"누나",rm:"nuna",en:"older sister (said by a man)"},
+  {id:"v_seonsaengnim",cat:"people",kr:"선생님",rm:"seonsaengnim",en:"teacher"},
+  {id:"v_saram",cat:"people",kr:"사람",rm:"saram",en:"person"},
+  {id:"v_hoesa",cat:"work",kr:"회사",rm:"hoesa",en:"company"},
+  {id:"v_samusil",cat:"work",kr:"사무실",rm:"samusil",en:"office"},
+  {id:"v_dongnyo",cat:"work",kr:"동료",rm:"dongnyo",en:"colleague"},
+  {id:"v_hoeui",cat:"work",kr:"회의",rm:"hoeui",en:"meeting"},
+  {id:"v_ilhaeyo",cat:"work",kr:"일해요",rm:"ilhaeyo",en:"I work"},
+  {id:"v_haksaeng",cat:"work",kr:"학생",rm:"haksaeng",en:"student"},
+  {id:"v_yeongguk_saramieyo",cat:"work",kr:"영국 사람이에요",rm:"yeongguk saramieyo",en:"I'm British"},
+  {id:"v_gongbuhaeyo",cat:"work",kr:"공부해요",rm:"gongbuhaeyo",en:"I study"},
+  {id:"v_joayo",cat:"describe",kr:"좋아요",rm:"joayo",en:"Good / I like it"},
+  {id:"v_sireoyo",cat:"describe",kr:"싫어요",rm:"sireoyo",en:"I don't like it / no thanks"},
+  {id:"v_keoyo",cat:"describe",kr:"커요",rm:"keoyo",en:"It's big"},
+  {id:"v_jagayo",cat:"describe",kr:"작아요",rm:"jagayo",en:"It's small"},
+  {id:"v_manayo",cat:"describe",kr:"많아요",rm:"manayo",en:"There's a lot"},
+  {id:"v_jogeum",cat:"describe",kr:"조금",rm:"jogeum",en:"a little"},
+  {id:"v_deo",cat:"describe",kr:"더",rm:"deo",en:"more"},
+  {id:"v_tteugeowoyo",cat:"describe",kr:"뜨거워요",rm:"tteugeowoyo",en:"It's hot (to touch)"},
+  {id:"v_chagawoyo",cat:"describe",kr:"차가워요",rm:"chagawoyo",en:"It's cold (to touch)"},
+  {id:"v_deowoyo",cat:"describe",kr:"더워요",rm:"deowoyo",en:"It's hot (weather)"},
+  {id:"v_chuwoyo",cat:"describe",kr:"추워요",rm:"chuwoyo",en:"It's cold (weather)"},
+  {id:"v_baegopayo",cat:"feelings",kr:"배고파요",rm:"baegopayo",en:"I'm hungry"},
+  {id:"v_pigonhaeyo",cat:"feelings",kr:"피곤해요",rm:"pigonhaeyo",en:"I'm tired"},
+  {id:"v_haengbokaeyo",cat:"feelings",kr:"행복해요",rm:"haengbokaeyo",en:"I'm happy"},
+  {id:"v_jaemiisseoyo",cat:"feelings",kr:"재미있어요",rm:"jaemiisseoyo",en:"It's fun"},
+  {id:"v_mollayo",cat:"feelings",kr:"몰라요",rm:"mollayo",en:"I don't know"},
+  {id:"v_algesseoyo",cat:"feelings",kr:"알겠어요",rm:"algesseoyo",en:"Got it / understood"},
+  {id:"v_joahaeyo",cat:"feelings",kr:"좋아해요",rm:"joahaeyo",en:"I like (it)"},
+  {id:"v_bogo_sipeoyo",cat:"feelings",kr:"보고 싶어요",rm:"bogo sipeoyo",en:"I miss you"}
+];
+
+/* =====================================================================
+   DATA — READING PRACTICE (real-world text)
+   ===================================================================== */
+var READING = [
+  {id:"r_chulgu",cat:"sign",kr:"출구",rm:"chulgu",en:"Exit"},
+  {id:"r_ipgu",cat:"sign",kr:"입구",rm:"ipgu",en:"Entrance"},
+  {id:"r_hwajangsil",cat:"sign",kr:"화장실",rm:"hwajangsil",en:"Toilets"},
+  {id:"r_namja",cat:"sign",kr:"남자",rm:"namja",en:"Men"},
+  {id:"r_yeoja",cat:"sign",kr:"여자",rm:"yeoja",en:"Women"},
+  {id:"r_bisanggu",cat:"sign",kr:"비상구",rm:"bisanggu",en:"Emergency exit"},
+  {id:"r_danggiseyo",cat:"sign",kr:"당기세요",rm:"danggiseyo",en:"Pull (on doors)"},
+  {id:"r_miseyo",cat:"sign",kr:"미세요",rm:"miseyo",en:"Push (on doors)"},
+  {id:"r_geumyeon",cat:"sign",kr:"금연",rm:"geumyeon",en:"No smoking"},
+  {id:"r_yeongeopjung",cat:"sign",kr:"영업중",rm:"yeongeopjung",en:"Open (for business)"},
+  {id:"r_hyumu",cat:"sign",kr:"휴무",rm:"hyumu",en:"Closed (day off)"},
+  {id:"r_garataneun_got",cat:"sign",kr:"갈아타는 곳",rm:"garataneun got",en:"Transfer (subway interchange)"},
+  {id:"r_maepyoso",cat:"sign",kr:"매표소",rm:"maepyoso",en:"Ticket office"},
+  {id:"r_annae",cat:"sign",kr:"안내",rm:"annae",en:"Information"},
+  {id:"r_pyeonuijeom",cat:"sign",kr:"편의점",rm:"pyeonuijeom",en:"Convenience store"},
+  {id:"r_yakguk",cat:"sign",kr:"약국",rm:"yakguk",en:"Pharmacy",note:"Said 약꾹: see the tensing rule."},
+  {id:"r_eunhaeng",cat:"sign",kr:"은행",rm:"eunhaeng",en:"Bank"},
+  {id:"r_juchajang",cat:"sign",kr:"주차장",rm:"juchajang",en:"Car park"},
+  {id:"r_gimchijjigae",cat:"menu",kr:"김치찌개",rm:"gimchijjigae",en:"Kimchi stew"},
+  {id:"r_doenjangjjigae",cat:"menu",kr:"된장찌개",rm:"doenjangjjigae",en:"Soybean paste stew"},
+  {id:"r_bibimbap",cat:"menu",kr:"비빔밥",rm:"bibimbap",en:"Mixed rice with vegetables"},
+  {id:"r_bulgogi",cat:"menu",kr:"불고기",rm:"bulgogi",en:"Marinated grilled beef"},
+  {id:"r_samgyeopsal",cat:"menu",kr:"삼겹살",rm:"samgyeopsal",en:"Grilled pork belly"},
+  {id:"r_dwaejigukbap",cat:"menu",kr:"돼지국밥",rm:"dwaejigukbap",en:"Pork and rice soup",note:"Busan's signature dish."},
+  {id:"r_milmyeon",cat:"menu",kr:"밀면",rm:"milmyeon",en:"Cold wheat noodles",note:"A Busan speciality, born in the war years."},
+  {id:"r_eomuk",cat:"menu",kr:"어묵",rm:"eomuk",en:"Fish cake",note:"Busan is famous for it."},
+  {id:"r_ssiathotteok",cat:"menu",kr:"씨앗호떡",rm:"ssiathotteok",en:"Seed-filled sweet pancake",note:"Busan street food, especially around Nampo-dong."},
+  {id:"r_naengmyeon",cat:"menu",kr:"냉면",rm:"naengmyeon",en:"Cold buckwheat noodles"},
+  {id:"r_tteokbokki",cat:"menu",kr:"떡볶이",rm:"tteokbokki",en:"Spicy rice cakes"},
+  {id:"r_gimbap",cat:"menu",kr:"김밥",rm:"gimbap",en:"Seaweed rice rolls"},
+  {id:"r_soju",cat:"menu",kr:"소주",rm:"soju",en:"Soju"},
+  {id:"r_maekju",cat:"menu",kr:"맥주",rm:"maekju",en:"Beer"},
+  {id:"r_amerikano",cat:"menu",kr:"아메리카노",rm:"amerikano",en:"Americano"},
+  {id:"r_busan",cat:"place",kr:"부산",rm:"Busan",en:"Busan"},
+  {id:"r_busanyeok",cat:"place",kr:"부산역",rm:"Busanyeok",en:"Busan Station"},
+  {id:"r_haeundae",cat:"place",kr:"해운대",rm:"Haeundae",en:"Haeundae (beach)"},
+  {id:"r_gwangalli",cat:"place",kr:"광안리",rm:"Gwangalli",en:"Gwangalli (beach)",note:"Spelled 광안리, said 광알리: see the ㄴ + ㄹ rule."},
+  {id:"r_seomyeon",cat:"place",kr:"서면",rm:"Seomyeon",en:"Seomyeon (city centre)"},
+  {id:"r_nampodong",cat:"place",kr:"남포동",rm:"Nampo-dong",en:"Nampo-dong (old downtown)"},
+  {id:"r_jagalchi",cat:"place",kr:"자갈치시장",rm:"Jagalchi sijang",en:"Jagalchi Fish Market"},
+  {id:"r_gamcheon",cat:"place",kr:"감천문화마을",rm:"Gamcheon munhwa maeul",en:"Gamcheon Culture Village"},
+  {id:"r_taejongdae",cat:"place",kr:"태종대",rm:"Taejongdae",en:"Taejongdae (cliffs park)"},
+  {id:"r_gimhae",cat:"place",kr:"김해공항",rm:"Gimhae gonghang",en:"Gimhae Airport"},
+  {id:"r_seoul",cat:"place",kr:"서울",rm:"Seoul",en:"Seoul"},
+  {id:"r_seoulyeok",cat:"place",kr:"서울역",rm:"Seouryeok",en:"Seoul Station",note:"The ㄹ links into 역: 서울역 is said 서울력."}
+];
+var READ_MODES = [{id:"all",label:"All"},{id:"sign",label:"Signs"},{id:"menu",label:"Menus"},{id:"place",label:"Places"}];
+
+/* =====================================================================
+   DATA — SOUND RULES. said = how it's pronounced; w = a plausible wrong reading for the quiz.
+   ===================================================================== */
+var RULES = [
+  {id:"r_link",title:"Linking",kr:"연음",
+   points:["When a block ends in a consonant and the next block starts with a silent ㅇ, the consonant slides across and starts the next syllable.","With a double final (ㄺ, ㄵ…), only the second consonant moves."],
+   examples:[{kr:"음악",said:"으막",w:"으낙",rm:"eumak",en:"music"},{kr:"한국어",said:"한구거",w:"한국거",rm:"hangugeo",en:"Korean (language)"},{kr:"맛있어요",said:"마시써요",w:"마딛서요",rm:"masisseoyo",en:"it's delicious"},{kr:"옷이",said:"오시",w:"오디",rm:"osi",en:"clothes (subject)"},{kr:"읽어요",said:"일거요",w:"이거요",rm:"ilgeoyo",en:"I read"},{kr:"앉아요",said:"안자요",w:"안아요",rm:"anjayo",en:"I sit"}]},
+  {id:"r_final",title:"Seven final sounds",kr:"받침",
+   points:["At the end of a block only seven sounds exist: ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅇ.","ㅋ and ㄲ are said ㄱ; ㅅ ㅆ ㅈ ㅊ ㅌ ㅎ are said ㄷ; ㅍ is said ㅂ.","The real letter comes back when it links into a vowel: 옷 is [옫], but 옷이 is [오시]."],
+   examples:[{kr:"옷",said:"옫",w:"오",rm:"ot",en:"clothes"},{kr:"밖",said:"박",w:"바",rm:"bak",en:"outside"},{kr:"부엌",said:"부억",w:"부어",rm:"bueok",en:"kitchen"},{kr:"앞",said:"압",w:"아",rm:"ap",en:"front"},{kr:"낮",said:"낟",w:"나",rm:"nat",en:"daytime"},{kr:"꽃",said:"꼳",w:"꼬",rm:"kkot",en:"flower"}]},
+  {id:"r_nasal",title:"Nasal change",kr:"비음화",
+   points:["A ㄱ, ㄷ or ㅂ sound right before ㄴ or ㅁ turns nasal: ㄱ→ㅇ, ㄷ→ㄴ, ㅂ→ㅁ.","This is why every -ㅂ니다 ending sounds like \"-mnida\"."],
+   examples:[{kr:"합니다",said:"함니다",w:"한니다",rm:"hamnida",en:"(formal verb ending)"},{kr:"입니다",said:"임니다",w:"인니다",rm:"imnida",en:"it is (formal)"},{kr:"작년",said:"장년",w:"작련",rm:"jangnyeon",en:"last year"},{kr:"십만",said:"심만",w:"신만",rm:"simman",en:"one hundred thousand"},{kr:"국물",said:"궁물",w:"굼물",rm:"gungmul",en:"broth"},{kr:"거짓말",said:"거진말",w:"거짐말",rm:"geojinmal",en:"a lie"}]},
+  {id:"r_liquid",title:"ㄴ next to ㄹ",kr:"유음화",
+   points:["When ㄴ meets ㄹ, in either order, the ㄴ becomes ㄹ and you get a long \"ll\".","That's why 광안리 is said Gwangalli."],
+   examples:[{kr:"신라",said:"실라",w:"신나",rm:"silla",en:"Silla (ancient kingdom)"},{kr:"연락",said:"열락",w:"연낙",rm:"yeollak",en:"contact"},{kr:"설날",said:"설랄",w:"선날",rm:"seollal",en:"Lunar New Year"},{kr:"광안리",said:"광알리",w:"광안니",rm:"gwangalli",en:"Gwangalli"},{kr:"일년",said:"일련",w:"인년",rm:"illyeon",en:"one year"}]},
+  {id:"r_rton",title:"ㄹ after ㅁ or ㅇ",kr:"ㄹ → ㄴ",
+   points:["A ㄹ that follows ㅁ or ㅇ is said ㄴ."],
+   examples:[{kr:"종로",said:"종노",w:"존노",rm:"jongno",en:"Jongno (Seoul district)"},{kr:"심리",said:"심니",w:"신리",rm:"simni",en:"psychology"},{kr:"대통령",said:"대통녕",w:"대통영",rm:"daetongnyeong",en:"president"},{kr:"음료",said:"음뇨",w:"음요",rm:"eumnyo",en:"drinks"}]},
+  {id:"r_aspir",title:"ㅎ adds a puff of air",kr:"격음화",
+   points:["When ㄱ ㄷ ㅂ ㅈ meet ㅎ, in either order, they merge into the breathy ㅋ ㅌ ㅍ ㅊ."],
+   examples:[{kr:"좋다",said:"조타",w:"조다",rm:"jota",en:"to be good"},{kr:"축하해요",said:"추카해요",w:"추가해요",rm:"chukahaeyo",en:"congratulations"},{kr:"입학",said:"이팍",w:"이박",rm:"ipak",en:"starting school"},{kr:"많다",said:"만타",w:"만다",rm:"manta",en:"to be many"},{kr:"못해요",said:"모태요",w:"모새요",rm:"motaeyo",en:"I can't (do it)"}]},
+  {id:"r_tense",title:"Tensing",kr:"경음화",
+   points:["After a ㄱ, ㄷ or ㅂ sound, the next ㄱ ㄷ ㅂ ㅅ ㅈ is said tense: ㄲ ㄸ ㅃ ㅆ ㅉ."],
+   examples:[{kr:"학교",said:"학꾜",w:"하교",rm:"hakgyo",en:"school"},{kr:"식당",said:"식땅",w:"시당",rm:"sikdang",en:"restaurant"},{kr:"국밥",said:"국빱",w:"구밥",rm:"gukbap",en:"rice soup"},{kr:"약국",said:"약꾹",w:"야국",rm:"yakguk",en:"pharmacy"},{kr:"식사",said:"식싸",w:"시사",rm:"siksa",en:"a meal"}]},
+  {id:"r_palatal",title:"ㄷ, ㅌ before 이",kr:"구개음화",
+   points:["A final ㄷ or ㅌ followed by 이 is said ㅈ or ㅊ."],
+   examples:[{kr:"같이",said:"가치",w:"가티",rm:"gachi",en:"together"},{kr:"굳이",said:"구지",w:"구디",rm:"guji",en:"necessarily"},{kr:"해돋이",said:"해도지",w:"해도디",rm:"haedoji",en:"sunrise"},{kr:"붙이다",said:"부치다",w:"부티다",rm:"buchida",en:"to stick on"}]},
+  {id:"r_hsilent",title:"Silent ㅎ",kr:"ㅎ 탈락",
+   points:["A final ㅎ (including in ㄶ and ㅀ) disappears before a vowel."],
+   examples:[{kr:"좋아요",said:"조아요",w:"조하요",rm:"joayo",en:"good"},{kr:"괜찮아요",said:"괜차나요",w:"괜찬하요",rm:"gwaenchanayo",en:"it's okay"},{kr:"많이",said:"마니",w:"만히",rm:"mani",en:"a lot"},{kr:"싫어요",said:"시러요",w:"실허요",rm:"sireoyo",en:"I don't like it"},{kr:"놓아요",said:"노아요",w:"노하요",rm:"noayo",en:"I put (it) down"}]}
+];
+
+/* =====================================================================
+   DATA — GRAMMAR LESSONS. Quiz: q has one ＿ gap, a fills it; hint shows for verb forms.
+   ===================================================================== */
+var LESSONS = [
+  {id:"g_order",title:"Sentence order",kr:"어순",
+   points:["Korean is subject → object → verb. The verb always comes last.","Particles (small endings on nouns) show each word's role, so the order is flexible, but the verb stays at the end.","The subject is often dropped when it's obvious, especially 저 (I)."],
+   examples:[{kr:"저는 커피를 마셔요",rm:"jeoneun keopireul masyeoyo",en:"I drink coffee"},{kr:"친구가 부산에 가요",rm:"chinguga busane gayo",en:"My friend goes to Busan"},{kr:"밥을 먹어요",rm:"babeul meogeoyo",en:"(I) eat a meal"}],
+   quiz:[{q:"＿",a:"저는 밥을 먹어요",opts:["저는 밥을 먹어요","먹어요 저는 밥을","저는 먹어요 밥을"],en:"I eat a meal"},{q:"＿",a:"친구가 커피를 마셔요",opts:["친구가 커피를 마셔요","마셔요 친구가 커피를","커피를 마셔요 친구가"],en:"My friend drinks coffee"},{q:"＿",a:"저는 부산에 가요",opts:["저는 부산에 가요","가요 저는 부산에","부산에 가요 저는"],en:"I go to Busan"}]},
+  {id:"g_topic",title:"Topic: 은 / 는",kr:"은/는",
+   points:["Marks the topic: \"as for…\". Often used for \"I\" and for contrast.","은 after a consonant (받침), 는 after a vowel."],
+   examples:[{kr:"저는 영국 사람이에요",rm:"jeoneun yeongguk saramieyo",en:"I'm British"},{kr:"오늘은 바빠요",rm:"oneureun bappayo",en:"Today, I'm busy"},{kr:"부산은 커요",rm:"busaneun keoyo",en:"Busan is big"}],
+   quiz:[{q:"저＿ 학생이에요",a:"는",opts:["는","은","를"],en:"I'm a student"},{q:"오늘＿ 추워요",a:"은",opts:["은","는","을"],en:"Today it's cold"},{q:"서울＿ 커요",a:"은",opts:["은","는","가"],en:"Seoul is big"}]},
+  {id:"g_subject",title:"Subject: 이 / 가",kr:"이/가",
+   points:["Marks the subject, especially new information, and with 있어요 / 없어요 and question words.","이 after a consonant, 가 after a vowel.","저 + 가 becomes 제가."],
+   examples:[{kr:"화장실이 어디예요?",rm:"hwajangsiri eodiyeyo?",en:"Where's the toilet?"},{kr:"비가 와요",rm:"biga wayo",en:"It's raining"},{kr:"제가 할게요",rm:"jega halgeyo",en:"I'll do it"}],
+   quiz:[{q:"화장실＿ 어디예요?",a:"이",opts:["이","가","을"],en:"Where's the toilet?"},{q:"친구＿ 와요",a:"가",opts:["가","이","를"],en:"My friend is coming"},{q:"시간＿ 없어요",a:"이",opts:["이","가","는"],en:"There's no time"}]},
+  {id:"g_object",title:"Object: 을 / 를",kr:"을/를",
+   points:["Marks the thing the verb acts on.","을 after a consonant, 를 after a vowel.","In casual speech it's often dropped: 커피 마셔요."],
+   examples:[{kr:"커피를 마셔요",rm:"keopireul masyeoyo",en:"I drink coffee"},{kr:"밥을 먹어요",rm:"babeul meogeoyo",en:"I eat a meal"},{kr:"한국어를 공부해요",rm:"hangugeoreul gongbuhaeyo",en:"I study Korean"}],
+   quiz:[{q:"물＿ 주세요",a:"을",opts:["을","를","이"],en:"Water, please"},{q:"커피＿ 좋아해요",a:"를",opts:["를","을","가"],en:"I like coffee"},{q:"사진＿ 찍어요",a:"을",opts:["을","를","에"],en:"I take a photo"}]},
+  {id:"g_place",title:"Places: 에 / 에서",kr:"에/에서",
+   points:["에 = to a place, or where something is (with 가요, 와요, 있어요).","에서 = where an action happens (eating, working, studying)."],
+   examples:[{kr:"부산에 가요",rm:"busane gayo",en:"I'm going to Busan"},{kr:"집에 있어요",rm:"jibe isseoyo",en:"I'm at home"},{kr:"식당에서 먹어요",rm:"sikdangeseo meogeoyo",en:"I eat at a restaurant"}],
+   quiz:[{q:"학교＿ 가요",a:"에",opts:["에","에서","를"],en:"I go to school"},{q:"카페＿ 공부해요",a:"에서",opts:["에서","에","을"],en:"I study at a café"},{q:"화장실은 2층＿ 있어요",a:"에",opts:["에","에서","이"],en:"The toilet is on the 2nd floor"}]},
+  {id:"g_copula",title:"To be: 이에요 / 예요",kr:"이에요/예요",
+   points:["\"X is Y\": attach to the noun.","이에요 after a consonant, 예요 after a vowel.","Negative: 아니에요 (it's not)."],
+   examples:[{kr:"학생이에요",rm:"haksaengieyo",en:"I'm a student"},{kr:"의사예요",rm:"uisayeyo",en:"I'm a doctor"},{kr:"이거 뭐예요?",rm:"igeo mwoyeyo?",en:"What is this?"}],
+   quiz:[{q:"저는 영국 사람＿",a:"이에요",opts:["이에요","예요"],en:"I'm British"},{q:"이거 커피＿",a:"예요",opts:["예요","이에요"],en:"This is coffee"},{q:"여기가 부산역＿",a:"이에요",opts:["이에요","예요"],en:"This is Busan Station"}]},
+  {id:"g_present",title:"Polite present: -아요 / -어요",kr:"-아요/-어요",
+   points:["Take the verb stem (drop 다).","Last vowel ㅏ or ㅗ → add 아요. Anything else → add 어요. 하다 → 해요.","Vowels merge: 가 + 아요 = 가요, 오 + 아요 = 와요, 마시 + 어요 = 마셔요."],
+   examples:[{kr:"가요",rm:"gayo",en:"I go (가다)"},{kr:"먹어요",rm:"meogeoyo",en:"I eat (먹다)"},{kr:"공부해요",rm:"gongbuhaeyo",en:"I study (공부하다)"},{kr:"마셔요",rm:"masyeoyo",en:"I drink (마시다)"}],
+   quiz:[{hint:"먹다",q:"＿",a:"먹어요",opts:["먹어요","먹아요","먹해요"],en:"to eat"},{hint:"살다",q:"＿",a:"살아요",opts:["살아요","살어요","사요"],en:"to live"},{hint:"일하다",q:"＿",a:"일해요",opts:["일해요","일하요","일어요"],en:"to work"},{hint:"보다",q:"＿",a:"봐요",opts:["봐요","보어요","버요"],en:"to see"}]},
+  {id:"g_past",title:"Past: -았어요 / -었어요",kr:"-았/었어요",
+   points:["Same split as the present: ㅏ/ㅗ → 았어요, otherwise 었어요, 하다 → 했어요.","Vowels merge the same way: 가 + 았어요 = 갔어요."],
+   examples:[{kr:"갔어요",rm:"gasseoyo",en:"I went"},{kr:"먹었어요",rm:"meogeosseoyo",en:"I ate"},{kr:"했어요",rm:"haesseoyo",en:"I did"},{kr:"부산에 살았어요",rm:"busane sarasseoyo",en:"I lived in Busan"}],
+   quiz:[{hint:"가다",q:"＿",a:"갔어요",opts:["갔어요","가었어요","갔해요"],en:"to go"},{hint:"먹다",q:"＿",a:"먹었어요",opts:["먹었어요","먹았어요","먹어요"],en:"to eat"},{hint:"공부하다",q:"＿",a:"공부했어요",opts:["공부했어요","공부하았어요","공부해요"],en:"to study"}]},
+  {id:"g_negation",title:"Not: 안 / 못",kr:"안/못",
+   points:["안 + verb = don't (by choice). 못 + verb = can't.","With 하다 verbs it goes before 해요: 공부 안 해요.","잘 못해요 = I'm not good at it."],
+   examples:[{kr:"안 가요",rm:"an gayo",en:"I'm not going"},{kr:"고기 안 먹어요",rm:"gogi an meogeoyo",en:"I don't eat meat"},{kr:"매운 거 못 먹어요",rm:"maeun geo mot meogeoyo",en:"I can't eat spicy food"},{kr:"한국어 잘 못해요",rm:"hangugeo jal motaeyo",en:"My Korean isn't good"}],
+   quiz:[{q:"매운 거 ＿ 먹어요",a:"못",opts:["못","안"],en:"I can't eat spicy food"},{q:"커피 ＿ 마셔요",a:"안",opts:["안","못"],en:"I don't drink coffee (my choice)"},{q:"오늘은 공부 ＿ 해요",a:"안",opts:["안","못","을"],en:"I'm not studying today"}]},
+  {id:"g_want",title:"Want to: -고 싶어요",kr:"-고 싶어요",
+   points:["Verb stem + 고 싶어요 = I want to…","Ask with a rising tone: 뭐 먹고 싶어요? (What do you want to eat?)"],
+   examples:[{kr:"가고 싶어요",rm:"gago sipeoyo",en:"I want to go"},{kr:"해운대에 가고 싶어요",rm:"haeundaee gago sipeoyo",en:"I want to go to Haeundae"},{kr:"한국어를 배우고 싶어요",rm:"hangugeoreul baeugo sipeoyo",en:"I want to learn Korean"}],
+   quiz:[{hint:"보다",q:"＿",a:"보고 싶어요",opts:["보고 싶어요","봐 싶어요","보 싶어요"],en:"to see"},{hint:"마시다",q:"＿",a:"마시고 싶어요",opts:["마시고 싶어요","마셔고 싶어요","마시 싶어요"],en:"to drink"},{q:"밀면 먹＿",a:"고 싶어요",opts:["고 싶어요","어요","고 있어요"],en:"I want to eat milmyeon"}]},
+  {id:"g_please",title:"Please: 주세요 / -(으)세요",kr:"주세요",
+   points:["Noun + 주세요 = please give me…","Verb (-아/어 form) + 주세요 = please do it for me: 기다려 주세요.","Stem + (으)세요 = polite instruction: 앉으세요 (please sit). 으 is added after a consonant."],
+   examples:[{kr:"물 주세요",rm:"mul juseyo",en:"Water, please"},{kr:"잠깐만 기다려 주세요",rm:"jamkkanman gidaryeo juseyo",en:"Please wait a moment"},{kr:"여기 앉으세요",rm:"yeogi anjeuseyo",en:"Please sit here"}],
+   quiz:[{q:"물 ＿",a:"주세요",opts:["주세요","있어요","이에요"],en:"Water, please"},{q:"천천히 말해 ＿",a:"주세요",opts:["주세요","싶어요","있어요"],en:"Please speak slowly"},{q:"여기 앉＿",a:"으세요",opts:["으세요","세요","아요"],en:"Please sit here"}]},
+  {id:"g_have",title:"Have / there is: 있어요 / 없어요",kr:"있어요/없어요",
+   points:["있어요 = there is / I have. 없어요 = there isn't / I don't have.","A rising tone makes it a question: 물 있어요? (Do you have water?)"],
+   examples:[{kr:"물 있어요?",rm:"mul isseoyo?",en:"Do you have water?"},{kr:"시간 없어요",rm:"sigan eopseoyo",en:"I don't have time"},{kr:"화장실이 어디에 있어요?",rm:"hwajangsiri eodie isseoyo?",en:"Where is the toilet?"}],
+   quiz:[{q:"영어 메뉴 ＿?",a:"있어요",opts:["있어요","없어요","이에요"],en:"Do you have an English menu?"},{q:"현금이 ＿",a:"없어요",opts:["없어요","있어요","아니에요"],en:"I don't have cash"},{q:"저기 약국이 ＿",a:"있어요",opts:["있어요","없어요","예요"],en:"There's a pharmacy over there"}]}
 ];
 /* Vocab IDs are permanent: progress is saved against them, so never rename one.
    v1 keyed progress by list position ("v_0", "v_1"…); this is the v1 list order,
@@ -746,11 +1001,13 @@ function romanizeSelection(ini,vow,fin){
 /* =====================================================================
    STATE / PERSISTENCE
    ===================================================================== */
+var APP_VERSION = "1.2";
+var APP_WHATS_NEW = "reading practice, sound rules and grammar";
 var STORAGE_KEY = "hangeullab_progress_v1";
 var SCHEMA = 2;
 var state = loadState();
 function defaultState(){
-  return { schema:SCHEMA, items:{}, streak:0, lastActiveDay:null, dailyCap:10, dailyIntroDay:null, dailyIntroCount:0, theme:"auto" };
+  return { schema:SCHEMA, items:{}, streak:0, lastActiveDay:null, dailyCap:10, dailyIntroDay:null, dailyIntroCount:0, theme:"auto", done:{} };
 }
 /* Brings saved progress (from storage or an imported backup) up to the current schema.
    Schema 1 (no field): vocab progress keyed "v_<list position>". Schema 2: permanent vocab IDs. */
@@ -851,9 +1108,9 @@ function gradeItem(id, grade){
    ===================================================================== */
 function $(sel,root){ return (root||document).querySelector(sel); }
 function $all(sel,root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
-function toast(msg){
+function toast(msg, ms){
   var t=$("#toast"); t.textContent=msg; t.classList.add("show");
-  clearTimeout(toast._h); toast._h=setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  clearTimeout(toast._h); toast._h=setTimeout(function(){ t.classList.remove("show"); }, ms || 2200);
 }
 function shuffle(arr){
   var a=arr.slice();
@@ -884,12 +1141,12 @@ VOCAB.forEach(function(v){ VOCAB_BY_ID[v.id]=v; });
 /* =====================================================================
    NAVIGATION
    ===================================================================== */
-var TAB_PARENT = { "builder":"hangul", "hangul-drill":"hangul", "vocab-drill":"vocab" };
+var TAB_PARENT = { "builder":"hangul", "hangul-drill":"hangul", "vocab-drill":"vocab", "reading":"read" };
 function goto(view){
   $all(".view").forEach(function(v){ v.classList.remove("active"); });
   var el = $("#view-"+view);
   if(el) el.classList.add("active");
-  var tabTarget = TAB_PARENT[view] || view;
+  var tabTarget = view==="lesson" ? (lessonCtx.kind==="rule" ? "read" : "grammar") : (TAB_PARENT[view] || view);
   $all("#tabs button").forEach(function(b){ b.classList.toggle("active", b.dataset.view===tabTarget); });
   window.scrollTo({top:0,behavior:"instant" in window ? "instant":"auto"});
   if(view==="home") renderHome();
@@ -897,6 +1154,8 @@ function goto(view){
   if(view==="builder") renderBuilder();
   if(view==="vocab") renderVocab();
   if(view==="speak") renderSpeak(true);
+  if(view==="read") renderReadView();
+  if(view==="grammar") renderGrammarView();
 }
 
 /* =====================================================================
@@ -927,6 +1186,11 @@ function renderHome(){
   $("#vocabMeta").textContent = vocabSeen.length+" of "+VOCAB.length+" introduced";
   $("#vocabDueMeta").textContent = vocabDue.length+" due";
   $("#vocabDrillCount").textContent = vocabDue.length;
+  var rulesDone = RULES.filter(function(r){ return state.done[r.id]; }).length, lessonsDone = LESSONS.filter(function(l){ return state.done[l.id]; }).length;
+  $("#readProgress").style.width = Math.round(100*rulesDone/RULES.length)+"%";
+  $("#readMeta").textContent = rulesDone+" of "+RULES.length+" sound rules done";
+  $("#grammarProgress").style.width = Math.round(100*lessonsDone/LESSONS.length)+"%";
+  $("#grammarMeta").textContent = lessonsDone+" of "+LESSONS.length+" lessons done";
   $("#vocabPill").textContent = vocabSeen.length===0 ? (hangulSeen.length<14?"Start with Hangeul":"Ready") : (vocabDue.length>0?vocabDue.length+" due":"On track");
   $("#vocabPill").className = "pill " + (vocabSeen.length===0?"learning":(vocabDue.length>0?"due":"mastered"));
 
@@ -1068,10 +1332,9 @@ var drill = { queue:[], pos:0, kind:null };
 function buildQueue(pool){
   var due = shuffle(pool.filter(function(id){ return isDue(id); }));
   var budget = introBudgetLeft();
+  /* New items are only marked seen (and charged to the daily budget) when their card is shown,
+     so leaving a drill early doesn't burn the day's allowance. */
   var fresh = pool.filter(function(id){ return !state.items[id] || !state.items[id].seen; }).slice(0, budget);
-  fresh.forEach(function(id){ markSeenNow(id); });
-  if(fresh.length) consumeIntroBudget(fresh.length);
-  saveState();
   return due.concat(fresh);
 }
 function startHangulDrill(){
@@ -1096,6 +1359,7 @@ function renderDrillCard(){
     return;
   }
   var id = drill.queue[drill.pos];
+  if(!state.items[id] || !state.items[id].seen){ markSeenNow(id); consumeIntroBudget(1); saveState(); }
   var total = drill.queue.length;
   var isHangul = drill.kind==="hangul";
   var d = byId(id);
@@ -1235,6 +1499,185 @@ function renderListenResults(){
   $all("[data-say]", $("#listenWrap")).forEach(function(el){ el.onclick=function(){ speak(el.dataset.say); }; });
   $("#listenAgain").onclick = function(){ startListen(listen.mode); };
   $("#listenDone").onclick = function(){ goto(listen.from); };
+}
+
+/* =====================================================================
+   SHARED ROUND PIECES (reading, sound-rule and grammar quizzes)
+   ===================================================================== */
+/* missed: [{say, label, sub}] */
+function renderRoundResults(wrap, score, n, missed, extra, onAgain, onDone){
+  touchStreak();
+  wrap.innerHTML =
+    '<div class="card" style="text-align:center;">'
+    + '<div class="eyebrow">Round complete</div>'
+    + '<div style="font-family:var(--font-display);font-size:44px;font-weight:600;margin:8px 0 4px;">'+score+' / '+n+'</div>'
+    + '<div style="font-size:13px;color:var(--ink-2);margin-bottom:16px;">'+(extra || (score===n ? "Every one right." : "Tap the ones you missed to hear them again."))+'</div>'
+    + (missed.length ? '<div class="examples" style="justify-content:center;margin-bottom:18px;">'+missed.map(function(m){
+        return '<div class="example-chip" data-say="'+m.say+'" style="cursor:pointer;">🔊 '+m.label+' <span class="rom">'+m.sub+'</span></div>';
+      }).join("")+'</div>' : '')
+    + '<div class="btn-row" style="justify-content:center;"><button class="btn" id="roundAgain">Another round</button><button class="btn ghost" id="roundDone">Done</button></div>'
+    + '</div>';
+  $all("[data-say]", wrap).forEach(function(el){ el.onclick=function(){ speak(el.dataset.say); }; });
+  $("#roundAgain").onclick = onAgain;
+  $("#roundDone").onclick = onDone;
+}
+function progressBar(pos, n){
+  return '<div class="drill-progress"><div class="progress-track"><div class="progress-fill" style="width:'+Math.round(100*pos/n)+'%"></div></div><span class="mono">'+(pos+1)+' / '+n+'</span></div>';
+}
+/* cfg: {wrap, qs:[{prompt, sub, options:[str], answer, audio, after, miss:{label,sub}}], small, onFinish(score,n)->extra text, onAgain, onDone} */
+function runQuiz(cfg){
+  var pos=0, score=0, missed=[];
+  function render(){
+    if(pos >= cfg.qs.length){
+      var extra = cfg.onFinish ? cfg.onFinish(score, cfg.qs.length) : "";
+      renderRoundResults(cfg.wrap, score, cfg.qs.length, missed, extra, cfg.onAgain, cfg.onDone);
+      return;
+    }
+    var q = cfg.qs[pos], opts = shuffle(q.options);
+    cfg.wrap.innerHTML = progressBar(pos, cfg.qs.length)
+      + '<div class="card" style="padding:22px 16px;margin-bottom:14px;"><div class="quiz-prompt">'+q.prompt+'</div>'
+      + (q.sub ? '<div class="listen-hint" style="margin:6px 0 0;">'+q.sub+'</div>' : '') + '</div>'
+      + '<div class="option-grid">'+opts.map(function(o,i){ return '<button class="option-btn kr'+(cfg.small?" words":"")+'" data-i="'+i+'">'+o+'</button>'; }).join("")+'</div>'
+      + '<div class="listen-feedback" id="quizFeedback"></div>'
+      + '<div class="btn-row" style="justify-content:center;"><button class="btn" id="quizNext" style="visibility:hidden;">'+(pos+1===cfg.qs.length?"See results":"Next →")+'</button></div>';
+    $all("[data-i]", cfg.wrap).forEach(function(btn){
+      btn.onclick = function(){
+        var right = opts[+btn.dataset.i]===q.answer;
+        $all("[data-i]", cfg.wrap).forEach(function(b){ b.disabled=true; if(opts[+b.dataset.i]===q.answer) b.classList.add("right"); });
+        if(right) score++; else { btn.classList.add("wrong"); missed.push({say:q.audio, label:q.miss.label, sub:q.miss.sub}); }
+        $("#quizFeedback").innerHTML = '<div style="font-weight:600;color:var('+(right?"--celadon":"--dancheong")+');margin-bottom:4px;">'+(right?"Yes":"Not quite")+'</div>'+q.after;
+        $("#quizNext").style.visibility = "visible";
+        speak(q.audio);
+      };
+    });
+    $("#quizNext").onclick = function(){ pos++; render(); };
+  }
+  render();
+}
+function markDone(id){ state.done[id] = Date.now(); saveState(); }
+
+/* =====================================================================
+   READING PRACTICE — sound it out, reveal, self-check
+   ===================================================================== */
+var reading = { mode:"all", qs:[], pos:0, score:0, missed:[] };
+function renderReadView(){
+  $("#readModes").innerHTML = READ_MODES.map(function(m){ return '<button data-m="'+m.id+'" class="'+(reading.mode===m.id?"active":"")+'">'+m.label+'</button>'; }).join("");
+  $all("button", $("#readModes")).forEach(function(b){ b.onclick=function(){ reading.mode=b.dataset.m; renderReadView(); }; });
+  $("#ruleList").innerHTML = RULES.map(function(r){
+    var done = state.done[r.id];
+    return '<div class="vocab-row" data-rule="'+r.id+'" style="cursor:pointer;"><span class="g kr" style="font-size:16px;">'+r.kr+'</span><span class="mid"><span class="en" style="color:var(--ink-1);font-weight:600;">'+r.title+'</span><br><span class="en">'+r.examples[0].kr+' → <span class="said">['+r.examples[0].said+']</span></span></span><span></span><span class="pill '+(done?"mastered":"new")+'">'+(done?"done":"new")+'</span></div>';
+  }).join("");
+  $all("[data-rule]").forEach(function(el){ el.onclick=function(){ openLesson("rule", el.dataset.rule); }; });
+}
+function startReading(){
+  reading.qs = takeRound(READING.filter(function(r){ return reading.mode==="all" || r.cat===reading.mode; }));
+  reading.pos = 0; reading.score = 0; reading.missed = [];
+  goto("reading");
+  renderReading();
+}
+function renderReading(){
+  var wrap = $("#readingWrap");
+  if(reading.pos >= reading.qs.length){
+    renderRoundResults(wrap, reading.score, reading.qs.length, reading.missed.map(function(r){ return {say:r.kr, label:r.kr, sub:r.en}; }), "",
+      startReading, function(){ goto("read"); });
+    return;
+  }
+  var r = reading.qs[reading.pos];
+  wrap.innerHTML = progressBar(reading.pos, reading.qs.length)
+    + '<div class="flashcard" id="readCard"><div class="front"><div class="front-glyph kr" style="font-size:46px;">'+r.kr+'</div><div class="front-sub">Sound it out, then tap to check</div></div>'
+    + '<div class="back"><span class="answer-kr kr">'+r.kr+'</span><span class="answer-rom mono">'+r.rm+'</span><span class="answer-en">'+r.en+'</span>'
+    + (r.note ? '<span style="font-size:12.5px;color:var(--ink-3);max-width:34ch;">'+r.note+'</span>' : '') + '</div></div>'
+    + '<div class="btn-row" style="justify-content:center;margin:12px 0;"><button class="sound-btn" id="readListen" style="visibility:hidden;">🔊</button></div>'
+    + '<div class="btn-row" id="readGrade" style="justify-content:center;visibility:hidden;"><button class="btn ghost" data-ok="0">Not yet</button><button class="btn" data-ok="1">Got it</button></div>';
+  $("#readCard").onclick = function(){
+    if(this.classList.contains("flipped")) return;
+    this.classList.add("flipped");
+    $("#readListen").style.visibility = "visible";
+    $("#readGrade").style.visibility = "visible";
+    speak(r.kr);
+  };
+  $("#readListen").onclick = function(){ speak(r.kr); };
+  $all("[data-ok]", wrap).forEach(function(b){
+    b.onclick = function(){
+      if(b.dataset.ok==="1") reading.score++; else reading.missed.push(r);
+      reading.pos++; renderReading();
+    };
+  });
+}
+
+/* =====================================================================
+   LESSONS — grammar lessons and sound rules share one page
+   ===================================================================== */
+var lessonCtx = { kind:"grammar", id:null };
+function renderGrammarView(){
+  $("#lessonList").innerHTML = LESSONS.map(function(l,i){
+    var done = state.done[l.id];
+    return '<div class="vocab-row" data-lesson="'+l.id+'" style="cursor:pointer;"><span class="g mono" style="font-size:13px;min-width:24px;color:var(--ink-3);">'+(i+1)+'</span><span class="mid"><span class="en" style="color:var(--ink-1);font-weight:600;">'+l.title+'</span><br><span class="en kr">'+l.examples[0].kr+'</span></span><span></span><span class="pill '+(done?"mastered":"new")+'">'+(done?"done":"new")+'</span></div>';
+  }).join("");
+  $all("[data-lesson]").forEach(function(el){ el.onclick=function(){ openLesson("grammar", el.dataset.lesson); }; });
+}
+function lessonList(kind){ return kind==="rule" ? RULES : LESSONS; }
+function openLesson(kind, id){
+  lessonCtx.kind = kind; lessonCtx.id = id;
+  var list = lessonList(kind), idx = list.findIndex(function(x){ return x.id===id; }), l = list[idx];
+  goto("lesson");
+  $("#lessonEyebrow").textContent = (kind==="rule" ? "Sound rule " : "Grammar ")+(idx+1)+" of "+list.length+" · "+l.kr;
+  $("#lessonTitle").textContent = l.title;
+  var rows = l.examples.map(function(e){
+    return '<div class="vocab-row"><span class="g kr" style="font-size:18px;min-width:auto;">'+e.kr+(e.said ? ' <span class="said">['+e.said+']</span>' : '')+'</span><span class="mid"><span class="rom mono">'+e.rm+'</span><br><span class="en">'+e.en+'</span></span>'
+      + '<button class="sound-btn" data-say="'+e.kr+'" style="width:32px;height:32px;font-size:13px;">🔊</button><span></span></div>';
+  }).join("");
+  var n = kind==="rule" ? l.examples.length : l.quiz.length;
+  $("#lessonBody").innerHTML = '<div class="card" style="margin-bottom:14px;"><ul class="lesson-points">'+l.points.map(function(p){ return "<li>"+p+"</li>"; }).join("")+'</ul></div>'
+    + '<div class="vocab-list" style="margin-bottom:14px;">'+rows+'</div>'
+    + '<div class="btn-row"><button class="btn" id="lessonPractise">Practise ('+n+' questions)</button>'
+    + (idx+1<list.length ? '<button class="btn ghost" id="lessonNext">Next: '+list[idx+1].title+' →</button>' : '') + '</div>';
+  $("#lessonQuiz").innerHTML = "";
+  $all("[data-say]", $("#lessonBody")).forEach(function(el){ el.onclick=function(){ speak(el.dataset.say); }; });
+  $("#lessonPractise").onclick = function(){ startLessonQuiz(kind, [l], l.id); };
+  if($("#lessonNext")) $("#lessonNext").onclick = function(){ openLesson(kind, list[idx+1].id); };
+}
+function ruleQuestions(rules){
+  var qs = [];
+  rules.forEach(function(r){ r.examples.forEach(function(e){
+    qs.push({ prompt:e.kr, sub:"How is it said?"+(rules.length>1 ? "" : ""), options:["["+e.said+"]","["+e.kr+"]","["+e.w+"]"], answer:"["+e.said+"]", audio:e.kr,
+      after:'<span class="mono">'+e.rm+'</span> · '+e.en+(rules.length>1 ? '<br><span style="font-size:12px;color:var(--ink-3);">'+r.title+'</span>' : ''),
+      miss:{label:e.kr+" ["+e.said+"]", sub:r.title} });
+  }); });
+  return qs;
+}
+function grammarQuestions(lessons){
+  var qs = [];
+  lessons.forEach(function(l){ l.quiz.forEach(function(it){
+    var full = it.q.replace("＿", it.a);
+    var gap = it.q.replace("＿", '<span class="blank">'+(it.q==="＿" ? "?" : "＿")+'</span>');
+    qs.push({ prompt:(it.hint ? it.hint+" → " : "")+gap, sub:it.en, options:it.opts, answer:it.a, audio:full,
+      after:'<span class="kr" style="font-size:17px;color:var(--ink-1);">'+full+'</span>', miss:{label:full, sub:it.en} });
+  }); });
+  return qs;
+}
+function startLessonQuiz(kind, items, doneId){
+  var qs = shuffle(kind==="rule" ? ruleQuestions(items) : grammarQuestions(items));
+  if(!doneId) qs = qs.slice(0, LISTEN_ROUND);
+  var small = qs.some(function(q){ return q.options.some(function(o){ return o.length>4; }); });
+  var wrap = $("#lessonQuiz");
+  runQuiz({ wrap:wrap, qs:qs, small:small,
+    onFinish:function(score, n){
+      if(doneId && score >= n-1){ markDone(doneId); return "Marked as done."; }
+      return doneId ? "Get all but one right to mark it done." : "";
+    },
+    onAgain:function(){ startLessonQuiz(kind, items, doneId); },
+    onDone:function(){ if(doneId) openLesson(kind, doneId); else goto("read"); }
+  });
+  wrap.scrollIntoView({behavior:"smooth", block:"start"});
+}
+function startMixedRules(){
+  lessonCtx.kind = "rule"; lessonCtx.id = null;
+  goto("lesson");
+  $("#lessonEyebrow").textContent = "Sound rules · mixed";
+  $("#lessonTitle").textContent = "How is it said?";
+  $("#lessonBody").innerHTML = '<p style="font-size:13px;color:var(--ink-2);margin:0;">Ten words from all the rules. Pick the pronunciation, then hear it.</p>';
+  startLessonQuiz("rule", RULES, null);
 }
 
 /* =====================================================================
@@ -1491,6 +1934,7 @@ function importText(text){
   } else if(incoming.lastActiveDay===state.lastActiveDay){
     state.streak=Math.max(state.streak||0, incoming.streak||0);
   }
+  for(var d in incoming.done){ if(!state.done[d] || incoming.done[d] > state.done[d]){ state.done[d]=incoming.done[d]; updated++; } }
   saveState();
   renderHome();
   toast("Backup loaded: "+added+" new, "+updated+" updated");
@@ -1534,6 +1978,16 @@ document.addEventListener("DOMContentLoaded", function(){
     b.onclick=function(){ listen.from = b.dataset.listen==="vocab" ? "vocab" : "hangul"; goto("listen"); startListen(b.dataset.listen); };
   });
   $("#listenBack").onclick=function(){ goto(listen.from); };
+  $("#btnStartReading").onclick=startReading;
+  $("#btnMixedRules").onclick=startMixedRules;
+  $("#lessonBack").onclick=function(){ goto(lessonCtx.kind==="rule" ? "read" : "grammar"); };
+
+  /* One-off notice the first time a new version opens (separate key from progress). */
+  try{
+    var seenVersion = localStorage.getItem("hangeullab_version");
+    if(seenVersion && seenVersion!==APP_VERSION) setTimeout(function(){ toast("Updated to v"+APP_VERSION+": "+APP_WHATS_NEW, 6000); }, 600);
+    localStorage.setItem("hangeullab_version", APP_VERSION);
+  }catch(e){}
   $("#letterOverlay").addEventListener("click", function(e){ if(e.target.id==="letterOverlay") closeLetterModal(); });
 
   renderHome();

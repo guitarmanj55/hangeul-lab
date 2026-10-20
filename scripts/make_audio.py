@@ -42,7 +42,11 @@ def compose(ini: str, vow: str) -> str:
 
 def collect_texts() -> list[str]:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
-    texts = re.findall(r'\bkr:"([^"]+)"', html)  # vocab and letter examples
+    texts = re.findall(r'\bkr:"([^"]+)"', html)  # vocab, letter examples, reading, rules, lessons
+    # Grammar quiz items: q has one ＿ gap that a fills; the app speaks the completed sentence.
+    texts += [q.replace("＿", a) for q, a in re.findall(r'\bq:"([^"]*)",a:"([^"]*)"', html)]
+    # Short labels like "은/는" or "ㄹ → ㄴ" are headings, not speech.
+    texts = [t for t in texts if "/" not in t and "→" not in t]
     # Every open syllable: covers letter sounds (가, 아...) and most of the builder.
     texts += [compose(i, v) for i in INITIALS for v in VOWELS]
     seen, out = set(), []
