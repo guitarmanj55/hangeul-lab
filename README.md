@@ -6,15 +6,30 @@ A personal Korean-learning app: read Hangeul first, then vocabulary, then speaki
 - **Vocab module:** 97 survival words and phrases in 8 categories
 - **Speaking practice:** listen, then say it aloud (mic scoring where the browser supports it)
 - **Spaced repetition:** a simplified SM-2 scheduler drives all reviews
+- **Recorded audio:** 522 natural-voice clips, so it sounds right on phones with no Korean voice installed
+- **Installable and offline:** add it to your home screen; after the first visit it works with no signal
 
 ## Run it
 
-It is a single static file. Open `index.html` in a browser, or serve the folder:
+It is a static site. Serve the folder and open http://localhost:8123:
 
 ```
-npx serve .
+python -m http.server 8123
 ```
+
+Opening `index.html` directly also works, but without offline mode.
+
+## Regenerate audio
+
+After changing letters or vocab in `index.html`:
+
+```
+pip install edge-tts
+python scripts/make_audio.py
+```
+
+Then bump `CACHE` in `sw.js` so installed copies pick up the new clips.
 
 ## Status
 
-v1 prototype, moved over from a Claude artifact. See `ROADMAP.md` for what is next.
+v1.1: recorded audio, installable, offline. See `ROADMAP.md` for what is next.

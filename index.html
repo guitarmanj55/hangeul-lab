@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>Hangeul Lab</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#25406e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hangeul Lab">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Noto+Serif+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -490,7 +497,7 @@ section.view.active{display:block; animation:rise .28s ease both;}
         <button class="btn ghost" id="btnSync">Save now</button>
       </div>
       <div class="settings-row">
-        <div><div class="lbl">Audio check</div><div class="sub" id="audioSub">Tests whether this device has a Korean voice.</div></div>
+        <div><div class="lbl">Audio check</div><div class="sub" id="audioSub">Tests the recorded clips, and whether this device has a Korean voice for the rest.</div></div>
         <button class="btn ghost" id="btnAudioTest">Test audio</button>
       </div>
       <div class="settings-row">
@@ -1165,6 +1172,25 @@ function letterSpeakText(h){
   if(h.kind==="consonant" || h.kind==="double") return composeSyllable(h.glyph,"ㅏ","") || h.glyph;
   return composeSyllable("ㅇ",h.glyph,"") || h.glyph;
 }
+/* Recorded clips live in audio/, named by an FNV-1a hash of the UTF-8 text.
+   scripts/make_audio.py uses the same hash, so the two must stay in step. */
+function clipUrl(text){
+  var bytes = new TextEncoder().encode(text), h = 0x811c9dc5;
+  for(var i=0;i<bytes.length;i++){ h ^= bytes[i]; h = Math.imul(h, 0x01000193) >>> 0; }
+  return "audio/" + ("0000000" + h.toString(16)).slice(-8) + ".mp3";
+}
+var clipPlayer = null;
+function playClip(text, onMissing, onPlaying){
+  if(clipPlayer) clipPlayer.pause();
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+  var a = new Audio(clipUrl(text)), failed = false;
+  clipPlayer = a;
+  function fail(){ if(failed || clipPlayer!==a) return; failed = true; onMissing(); }
+  a.onerror = fail;
+  if(onPlaying) a.onplaying = onPlaying;
+  var p = a.play();
+  if(p && p.catch) p.catch(function(e){ if(e.name!=="AbortError") fail(); });
+}
 var voiceWarned = false;
 function voiceStatus(){
   if(!("speechSynthesis" in window)) return {ok:false, msg:"This browser has no speech synthesis, so there is no audio to play."};
@@ -1174,14 +1200,19 @@ function voiceStatus(){
   if(n===0) return {ok:false, msg:"No voices have loaded yet. Try once more in a few seconds."};
   return {ok:false, msg:"No Korean voice is installed on this device ("+n+" other voices found). Add one in system settings: Android > Text-to-speech > Google > Install voice data > Korean; iPhone > Settings > Accessibility > Spoken Content > Voices > Korean."};
 }
+/* Recorded clip first; the device's own Korean voice only covers what has no clip
+   (mostly builder syllables with a final consonant). */
 function speak(text){
   if(!text) return;
-  if(!("speechSynthesis" in window)){ toast("This browser has no speech synthesis"); return; }
+  playClip(text, function(){ speakWithVoice(text); });
+}
+function speakWithVoice(text){
+  if(!("speechSynthesis" in window)){ toast("No recording for this one, and this browser has no speech synthesis"); return; }
   try{
     loadVoices();
     if(!koVoice && !voiceWarned && speechSynthesis.getVoices().length){
       voiceWarned = true;
-      toast("No Korean voice on this device. See Settings > Audio check");
+      toast("No recording for this one, and no Korean voice on this device");
     }
     speechSynthesis.cancel();
     if(speechSynthesis.paused) speechSynthesis.resume();
@@ -1249,8 +1280,13 @@ function wireSettings(){
   };
   $("#btnAudioTest").onclick=function(){
     var st = voiceStatus();
-    $("#audioSub").textContent = st.msg;
-    speak("안녕하세요");
+    $("#audioSub").textContent = "Checking recorded audio…";
+    playClip("안녕하세요", function(){
+      $("#audioSub").textContent = "Recorded audio didn't load. " + st.msg;
+      speakWithVoice("안녕하세요");
+    }, function(){
+      $("#audioSub").textContent = "Recorded audio is working. Builder syllables with a final consonant use the device voice: " + (st.ok ? st.msg : "none found, so those stay silent.");
+    });
   };
   $("#btnSync").onclick=function(){
     saveState();
@@ -1275,6 +1311,11 @@ document.addEventListener("DOMContentLoaded", function(){
   $("#letterOverlay").addEventListener("click", function(e){ if(e.target.id==="letterOverlay") closeLetterModal(); });
 
   renderHome();
+
+  /* Offline + installable. Service workers need http(s), so this is skipped when opened as a file. */
+  if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  }
 });
 </script>
 </body>

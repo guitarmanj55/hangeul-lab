@@ -11,9 +11,14 @@ Personal Korean-learning web app. Owner: Oli (British, learning Korean, previous
 
 ## Layout
 - `index.html` the whole app (data, SRS engine, UI)
-- `audio/` recorded clips (to be generated)
-- `scripts/` helper scripts (audio generator)
+- `audio/` recorded clips, named by an FNV-1a hash of the spoken text, plus `index.json` listing them. Generated, never hand-edited
+- `scripts/make_audio.py` builds `audio/` from the `kr:"..."` strings in `index.html` and every open syllable (edge-tts, voice ko-KR-SunHiNeural). Its hash must match `clipUrl()` in `index.html`
+- `scripts/make_icons.ps1` renders `icons/`
+- `manifest.webmanifest` and `sw.js` make it installable and offline. Bump `CACHE` in `sw.js` after regenerating audio
 - `ROADMAP.md` what to do next
 
+## After changing letters or vocab
+Run `python scripts/make_audio.py` (needs `pip install edge-tts`), then bump `CACHE` in `sw.js`.
+
 ## Testing
-Open `index.html` in a browser and click through: Hangeul grid, a drill, syllable builder, vocab, speaking, settings. Check both themes and a phone-width window.
+Serve the folder (`python -m http.server 8123`) rather than opening the file, so the service worker runs. Click through: Hangeul grid, a drill, syllable builder, vocab, speaking, settings. Check both themes and a phone-width window.

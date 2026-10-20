@@ -1,11 +1,11 @@
 # Roadmap
 
 ## Next (fixes the known problems)
-- [ ] Pre-recorded audio for every letter and word in `audio/`, so sound does not depend on the voices installed on the phone (the artifact version failed on a device with no Korean voice)
-- [ ] `scripts/` generator that builds the audio files from the word list, run once on the laptop
-- [ ] Play recorded audio first; fall back to browser speech only for the syllable builder
+- [x] Pre-recorded audio for every letter and word in `audio/`, so sound does not depend on the voices installed on the phone (the artifact version failed on a device with no Korean voice)
+- [x] `scripts/` generator that builds the audio files from the word list, run once on the laptop
+- [x] Play recorded audio first; fall back to browser speech only for the syllable builder (open syllables like 가 are recorded too; ones with a 받침 still use the device voice)
 - [ ] Deploy to GitHub Pages (or Vercel) so it has its own address
-- [ ] Installable on a phone home screen, working offline (web app manifest + service worker)
+- [x] Installable on a phone home screen, working offline (web app manifest + service worker)
 
 ## Then
 - [ ] Progress export/import, then cross-device sync
