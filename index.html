@@ -1,0 +1,1281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hangeul Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Noto+Serif+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --paper:#f7f3ec;
+  --paper-raised:#fffdf9;
+  --ink-1:#241f1a;
+  --ink-2:#5a5148;
+  --ink-3:#8a8074;
+  --line:#ddd4c4;
+  --line-soft:#e9e2d4;
+  --indigo:#25406e;
+  --indigo-ink:#1a2d4f;
+  --indigo-tint:#e7ebf3;
+  --dancheong:#bd4a2c;
+  --dancheong-tint:#f7e6df;
+  --celadon:#6f8f77;
+  --celadon-tint:#e6ede7;
+  --gold:#b8862f;
+  --gold-tint:#f4ead4;
+  --shadow: 0 1px 2px rgba(36,31,26,0.06), 0 6px 20px -8px rgba(36,31,26,0.18);
+  --radius: 3px;
+  --radius-lg: 6px;
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-kr-serif: 'Noto Serif KR', 'Nanum Myeongjo', serif;
+  --font-kr-sans: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#181511;
+    --paper-raised:#211d18;
+    --ink-1:#f1ebe0;
+    --ink-2:#c6bcac;
+    --ink-3:#8f8576;
+    --line:#39332a;
+    --line-soft:#2b2620;
+    --indigo:#7f9bd4;
+    --indigo-ink:#c3d2ee;
+    --indigo-tint:#202a3c;
+    --dancheong:#e08361;
+    --dancheong-tint:#3a2620;
+    --celadon:#93b79b;
+    --celadon-tint:#212e24;
+    --gold:#d9ac57;
+    --gold-tint:#332a17;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 30px -10px rgba(0,0,0,0.5);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#181511;
+  --paper-raised:#211d18;
+  --ink-1:#f1ebe0;
+  --ink-2:#c6bcac;
+  --ink-3:#8f8576;
+  --line:#39332a;
+  --line-soft:#2b2620;
+  --indigo:#7f9bd4;
+  --indigo-ink:#c3d2ee;
+  --indigo-tint:#202a3c;
+  --dancheong:#e08361;
+  --dancheong-tint:#3a2620;
+  --celadon:#93b79b;
+  --celadon-tint:#212e24;
+  --gold:#d9ac57;
+  --gold-tint:#332a17;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 30px -10px rgba(0,0,0,0.5);
+}
+
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink-1);
+  font-family:var(--font-kr-sans);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+}
+h1,h2,h3{font-family:var(--font-display); font-weight:600; text-wrap:balance; margin:0;}
+button{font-family:inherit;}
+a{color:inherit;}
+::selection{background:var(--indigo); color:var(--paper-raised);}
+:focus-visible{outline:2px solid var(--indigo); outline-offset:2px;}
+
+.kr{font-family:var(--font-kr-serif);}
+.mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
+.eyebrow{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:0.09em; text-transform:uppercase;
+  color:var(--ink-3);
+}
+
+/* ============ SHELL ============ */
+#app{max-width:920px; margin:0 auto; padding:0 20px 96px;}
+.topbar{
+  position:sticky; top:0; z-index:20; background:var(--paper); border-bottom:1px solid var(--line);
+  padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.topbar-inner{max-width:920px; margin:0 auto; width:100%; display:flex; align-items:center; justify-content:space-between;}
+.brand{display:flex; align-items:baseline; gap:10px;}
+.brand .mark{
+  font-family:var(--font-kr-serif); font-size:22px; font-weight:700; color:var(--indigo);
+  border:1.5px solid var(--indigo); width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center;
+  border-radius:var(--radius);
+}
+.brand .name{font-family:var(--font-display); font-size:18px; font-weight:600;}
+.brand .name .sub{font-family:var(--font-mono); font-size:10px; color:var(--ink-3); display:block; letter-spacing:0.08em; text-transform:uppercase; margin-top:1px;}
+.streak-chip{
+  display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:12px; color:var(--ink-2);
+  background:var(--paper-raised); border:1px solid var(--line); padding:6px 10px; border-radius:20px;
+}
+.streak-chip strong{color:var(--dancheong); font-weight:600;}
+
+nav.tabs{
+  display:flex; gap:2px; padding:4px; background:var(--paper-raised); border:1px solid var(--line);
+  border-radius:var(--radius-lg); margin:18px 0; overflow-x:auto;
+}
+nav.tabs button{
+  flex:1; white-space:nowrap; background:none; border:none; padding:9px 14px; font-size:13px; font-weight:500;
+  color:var(--ink-2); border-radius:4px; cursor:pointer; transition:background .15s, color .15s;
+}
+nav.tabs button.active{background:var(--indigo); color:var(--paper-raised);}
+nav.tabs button:not(.active):hover{background:var(--line-soft); color:var(--ink-1);}
+
+section.view{display:none;}
+section.view.active{display:block; animation:rise .28s ease both;}
+@keyframes rise{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+/* ============ PRIMITIVES ============ */
+.card{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius-lg);
+  padding:20px; box-shadow:var(--shadow);
+}
+.btn{
+  font-size:13px; font-weight:600; padding:10px 16px; border-radius:var(--radius); border:1px solid var(--indigo);
+  background:var(--indigo); color:#fff; cursor:pointer; transition:opacity .15s, transform .1s;
+}
+.btn:hover{opacity:.9;}
+.btn:active{transform:scale(.98);}
+.btn.ghost{background:none; color:var(--indigo); border-color:var(--line);}
+.btn.ghost:hover{border-color:var(--indigo); background:var(--indigo-tint);}
+.btn.danger{background:var(--dancheong); border-color:var(--dancheong);}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap;}
+
+.pill{
+  display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:10.5px;
+  letter-spacing:.04em; padding:3px 8px; border-radius:20px; text-transform:uppercase;
+}
+.pill.new{background:var(--indigo-tint); color:var(--indigo-ink);}
+.pill.due{background:var(--dancheong-tint); color:var(--dancheong);}
+.pill.mastered{background:var(--celadon-tint); color:var(--celadon);}
+.pill.learning{background:var(--gold-tint); color:var(--gold);}
+
+/* ============ DASHBOARD ============ */
+.hero{
+  display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-bottom:20px;
+}
+@media (max-width:640px){.hero{grid-template-columns:1fr;}}
+.hero-main{
+  background:var(--indigo); color:var(--paper-raised); border-radius:var(--radius-lg); padding:26px;
+  position:relative; overflow:hidden; box-shadow:var(--shadow);
+}
+.hero-main .glyphs{
+  position:absolute; right:-10px; top:-10px; font-family:var(--font-kr-serif); font-size:130px; font-weight:700;
+  opacity:.12; line-height:1; letter-spacing:-8px; user-select:none;
+}
+.hero-main h1{font-size:26px; color:#fff; position:relative;}
+.hero-main p{font-size:13.5px; color:#dfe6f2; max-width:38ch; margin:10px 0 18px; position:relative;}
+.hero-main .btn{background:#fff; color:var(--indigo-ink); border-color:#fff; position:relative;}
+
+.stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.stat{background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius-lg); padding:14px 16px;}
+.stat .n{font-family:var(--font-display); font-size:26px; font-weight:600; line-height:1;}
+.stat .l{font-size:11px; color:var(--ink-3); margin-top:4px;}
+
+.module-row{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:22px 0;}
+@media (max-width:640px){.module-row{grid-template-columns:1fr;}}
+.module-card{cursor:pointer; transition:border-color .15s, transform .1s;}
+.module-card:hover{border-color:var(--indigo); transform:translateY(-1px);}
+.module-card .top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;}
+.module-card .icon{
+  width:38px; height:38px; border-radius:var(--radius); display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-kr-serif); font-size:18px; font-weight:700;
+}
+.module-card h3{font-size:16px; margin-bottom:4px;}
+.module-card p{font-size:12.5px; color:var(--ink-2); margin:0 0 12px;}
+.progress-track{height:5px; background:var(--line-soft); border-radius:3px; overflow:hidden;}
+.progress-fill{height:100%; background:var(--indigo); border-radius:3px; transition:width .4s ease;}
+.module-card .meta{display:flex; justify-content:space-between; margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--ink-3);}
+
+.section-head{display:flex; align-items:baseline; justify-content:space-between; margin:28px 0 12px;}
+.section-head h2{font-size:17px;}
+.section-head .eyebrow{margin-bottom:2px; display:block;}
+
+/* ============ HANGUL GRID ============ */
+.letter-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(84px,1fr)); gap:10px;}
+.letter-tile{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius); padding:12px 8px;
+  text-align:center; cursor:pointer; transition:border-color .15s, background .15s;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.letter-tile:hover{border-color:var(--indigo);}
+.letter-tile .g{font-family:var(--font-kr-serif); font-size:30px; font-weight:600;}
+.letter-tile .r{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3);}
+.letter-tile.box0{box-shadow:inset 0 0 0 1px var(--line);}
+.letter-tile.box5{background:var(--celadon-tint); border-color:var(--celadon);}
+.letter-tile.tile-due{border-color:var(--dancheong); box-shadow:inset 0 0 0 1px var(--dancheong);}
+
+.group-label{font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); margin:18px 0 8px;}
+
+/* ============ LETTER DETAIL / MODAL ============ */
+.overlay{
+  position:fixed; inset:0; background:rgba(24,21,17,0.5); backdrop-filter:blur(2px); z-index:100;
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.overlay.open{display:flex;}
+.modal{
+  background:var(--paper-raised); border-radius:var(--radius-lg); box-shadow:var(--shadow); max-width:440px; width:100%;
+  padding:26px; max-height:88vh; overflow-y:auto; position:relative;
+}
+.modal .close{position:absolute; top:14px; right:14px; background:none; border:none; font-size:20px; color:var(--ink-3); cursor:pointer; line-height:1;}
+.modal .big-glyph{font-family:var(--font-kr-serif); font-size:80px; font-weight:700; text-align:center; color:var(--indigo); line-height:1; margin:6px 0 4px;}
+.modal .romanization{text-align:center; font-size:14px; color:var(--ink-2); margin:0 0 16px; padding:0 8px; line-height:1.5;}
+.modal .mnemonic{background:var(--gold-tint); border-left:3px solid var(--gold); padding:12px 14px; border-radius:0 4px 4px 0; font-size:13.5px; color:var(--ink-1); margin-bottom:14px;}
+.modal .examples{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;}
+.example-chip{background:var(--indigo-tint); color:var(--indigo-ink); font-family:var(--font-kr-serif); font-size:15px; padding:5px 10px; border-radius:4px; display:flex; align-items:center; gap:6px;}
+.example-chip .rom{font-family:var(--font-mono); font-size:10px; color:var(--ink-3);}
+
+/* ============ SYLLABLE BUILDER ============ */
+.builder{display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start;}
+@media (max-width:640px){.builder{grid-template-columns:1fr;}}
+.builder-stage{text-align:center; padding:26px 20px;}
+.syllable-box{
+  width:150px; height:150px; margin:0 auto 14px; border:2px solid var(--line); border-radius:var(--radius);
+  display:flex; align-items:center; justify-content:center; background:var(--paper);
+  font-family:var(--font-kr-serif); font-size:76px; font-weight:600; color:var(--indigo); position:relative;
+}
+.builder-picker h4{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); margin:0 0 8px; font-family:var(--font-mono);}
+.chip-grid{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px;}
+.chip{
+  font-family:var(--font-kr-serif); font-size:16px; padding:6px 11px; border-radius:4px; border:1px solid var(--line);
+  background:var(--paper-raised); cursor:pointer;
+}
+.chip.on{background:var(--indigo); color:#fff; border-color:var(--indigo);}
+.chip.none{font-family:var(--font-mono); font-size:11px;}
+
+/* ============ DRILL / FLASHCARD ============ */
+.drill-wrap{max-width:480px; margin:0 auto;}
+.drill-progress{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+.drill-progress .progress-track{flex:1;}
+.drill-progress span{font-family:var(--font-mono); font-size:11px; color:var(--ink-3); white-space:nowrap;}
+.flashcard{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow);
+  min-height:250px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  padding:30px 24px; cursor:pointer; position:relative;
+}
+.flashcard .front-glyph{font-family:var(--font-kr-serif); font-size:64px; font-weight:600; margin-bottom:6px;}
+.flashcard .front-sub{font-size:14px; color:var(--ink-2);}
+.flashcard .tap-hint{position:absolute; bottom:14px; font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3); letter-spacing:.04em;}
+.flashcard .back{display:none;}
+.flashcard.flipped .front{display:none;}
+.flashcard.flipped .back{display:flex; flex-direction:column; align-items:center; gap:10px;}
+.flashcard .back .answer-kr{font-family:var(--font-kr-serif); font-size:40px; font-weight:600; color:var(--indigo);}
+.flashcard .back .answer-rom{font-family:var(--font-mono); font-size:14px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em;}
+.flashcard .back .answer-en{font-size:16px; color:var(--ink-1);}
+.grade-row{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px;}
+.grade-btn{
+  padding:12px 4px; border-radius:var(--radius); border:1px solid var(--line); background:var(--paper-raised);
+  cursor:pointer; text-align:center; font-size:12px; font-weight:600;
+}
+.grade-btn .k{display:block; font-family:var(--font-mono); font-size:9.5px; color:var(--ink-3); margin-top:2px; font-weight:400;}
+.grade-btn.again{color:var(--dancheong); border-color:var(--dancheong-tint);}
+.grade-btn.again:hover{background:var(--dancheong-tint);}
+.grade-btn.hard{color:var(--gold); border-color:var(--gold-tint);}
+.grade-btn.hard:hover{background:var(--gold-tint);}
+.grade-btn.good{color:var(--indigo); border-color:var(--indigo-tint);}
+.grade-btn.good:hover{background:var(--indigo-tint);}
+.grade-btn.easy{color:var(--celadon); border-color:var(--celadon-tint);}
+.grade-btn.easy:hover{background:var(--celadon-tint);}
+.sound-btn{
+  width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--paper-raised);
+  cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:15px; color:var(--indigo);
+}
+.session-empty{text-align:center; padding:50px 20px; color:var(--ink-2);}
+.session-empty .g{font-family:var(--font-kr-serif); font-size:52px; color:var(--celadon); margin-bottom:10px;}
+
+/* ============ VOCAB LIST ============ */
+.category-strip{display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:16px;}
+.category-strip button{
+  flex:0 0 auto; font-size:12.5px; padding:8px 13px; border-radius:20px; border:1px solid var(--line);
+  background:var(--paper-raised); color:var(--ink-2); cursor:pointer; white-space:nowrap;
+}
+.category-strip button.active{background:var(--ink-1); color:var(--paper-raised); border-color:var(--ink-1);}
+.vocab-list{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden;}
+.vocab-row{background:var(--paper-raised); display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:14px; padding:12px 14px;}
+.vocab-row .g{font-family:var(--font-kr-serif); font-size:20px; min-width:70px;}
+.vocab-row .mid{min-width:0;}
+.vocab-row .mid .rom{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3); text-transform:uppercase;}
+.vocab-row .mid .en{font-size:13px; color:var(--ink-2);}
+
+/* ============ SPEAKING ============ */
+.speak-card{text-align:center; padding:32px 24px;}
+.speak-card .target-kr{font-family:var(--font-kr-serif); font-size:44px; font-weight:600; margin-bottom:6px;}
+.speak-card .target-rom{font-family:var(--font-mono); color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em; font-size:13px; margin-bottom:2px;}
+.speak-card .target-en{color:var(--ink-2); font-size:14px; margin-bottom:20px;}
+.mic-btn{
+  width:74px; height:74px; border-radius:50%; border:2px solid var(--indigo); background:var(--indigo-tint);
+  color:var(--indigo); font-size:26px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+  transition:transform .12s, background .15s;
+}
+.mic-btn.listening{background:var(--dancheong); border-color:var(--dancheong); color:#fff; animation:pulse 1.2s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(189,74,44,.4);} 70%{box-shadow:0 0 0 14px rgba(189,74,44,0);} 100%{box-shadow:0 0 0 0 rgba(189,74,44,0);}}
+.speak-result{margin-top:18px; min-height:70px;}
+.speak-result .heard{font-family:var(--font-kr-serif); font-size:20px; margin-bottom:6px;}
+.speak-result .verdict{font-family:var(--font-mono); font-size:12px; letter-spacing:.04em; text-transform:uppercase; padding:4px 10px; border-radius:20px; display:inline-block;}
+.verdict.good{background:var(--celadon-tint); color:var(--celadon);}
+.verdict.close{background:var(--gold-tint); color:var(--gold);}
+.verdict.off{background:var(--dancheong-tint); color:var(--dancheong);}
+.unsupported-note{font-size:12.5px; color:var(--ink-3); background:var(--line-soft); border-radius:var(--radius); padding:10px 12px; margin-top:14px;}
+
+/* ============ SETTINGS ============ */
+.settings-row{display:flex; justify-content:space-between; align-items:center; padding:13px 0; border-bottom:1px solid var(--line-soft);}
+.settings-row:last-child{border-bottom:none;}
+.settings-row .lbl{font-size:13.5px;}
+.settings-row .sub{font-size:11.5px; color:var(--ink-3); margin-top:2px;}
+.sync-status{font-family:var(--font-mono); font-size:11px; color:var(--ink-3);}
+.toast{
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink-1);
+  color:var(--paper); font-size:12.5px; padding:10px 18px; border-radius:20px; opacity:0; pointer-events:none;
+  transition:opacity .25s, transform .25s; z-index:200; box-shadow:var(--shadow);
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar"><div class="topbar-inner">
+    <div class="brand">
+      <span class="mark">한</span>
+      <span class="name">Hangeul Lab<span class="sub">reading &middot; vocab &middot; speech</span></span>
+    </div>
+    <div class="streak-chip" id="streakChip">🔥 <strong id="streakN">0</strong>&nbsp;day streak</div>
+  </div></header>
+
+  <nav class="tabs" id="tabs">
+    <button data-view="home" class="active">Home</button>
+    <button data-view="hangul">Hangeul</button>
+    <button data-view="vocab">Vocab</button>
+    <button data-view="speak">Speaking</button>
+    <button data-view="settings">Settings</button>
+  </nav>
+
+  <!-- HOME -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <div class="hero-main">
+        <div class="glyphs">한글</div>
+        <h1 id="heroHeadline">Read Hangeul first.<br>Everything else follows.</h1>
+        <p id="heroSub">You're building this the right way round &mdash; letters, then syllable blocks, then the words you'll actually use.</p>
+        <button class="btn" id="heroCta">Continue learning →</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="n mono" id="statDue">0</div><div class="l">due for review</div></div>
+        <div class="stat"><div class="n mono" id="statMastered">0</div><div class="l">items mastered</div></div>
+        <div class="stat"><div class="n mono" id="statLetters">0/40</div><div class="l">Hangeul letters seen</div></div>
+        <div class="stat"><div class="n mono" id="statWords">0/0</div><div class="l">vocab seen</div></div>
+      </div>
+    </div>
+
+    <div class="module-row">
+      <div class="card module-card" data-goto="hangul">
+        <div class="top"><div class="icon" style="background:var(--indigo-tint); color:var(--indigo-ink);">가</div><span class="pill new" id="hangulPill">Start here</span></div>
+        <h3>Hangeul letters</h3>
+        <p>14 consonants, 10 vowels, and the doubled/compound forms &mdash; with shape mnemonics and a syllable builder.</p>
+        <div class="progress-track"><div class="progress-fill" id="hangulProgress" style="width:0%"></div></div>
+        <div class="meta"><span id="hangulMeta">0 of 40 introduced</span><span id="hangulDueMeta">0 due</span></div>
+      </div>
+      <div class="card module-card" data-goto="vocab">
+        <div class="top"><div class="icon" style="background:var(--dancheong-tint); color:var(--dancheong);">말</div><span class="pill" id="vocabPill">Locked</span></div>
+        <h3>Survival vocab</h3>
+        <p>Greetings, numbers, food, transport, money, and emergency phrases &mdash; the words you need on the ground.</p>
+        <div class="progress-track"><div class="progress-fill" id="vocabProgress" style="width:0%"></div></div>
+        <div class="meta"><span id="vocabMeta">0 of 0 introduced</span><span id="vocabDueMeta">0 due</span></div>
+      </div>
+    </div>
+
+    <div class="section-head"><h2>Today</h2></div>
+    <div class="card" id="todayCard">
+      <div id="todayBody"></div>
+    </div>
+  </section>
+
+  <!-- HANGUL -->
+  <section class="view" id="view-hangul">
+    <div class="section-head"><div><span class="eyebrow">Module 1</span><h2>Hangeul letters</h2></div>
+      <div class="btn-row"><button class="btn ghost" id="btnSyllableBuilder">Syllable builder</button><button class="btn" id="btnHangulDrill">Review (<span id="hangulDrillCount">0</span>)</button></div>
+    </div>
+    <div id="hangulGroups"></div>
+  </section>
+
+  <!-- SYLLABLE BUILDER (as its own view) -->
+  <section class="view" id="view-builder">
+    <div class="section-head"><div><span class="eyebrow">How blocks work</span><h2>Syllable builder</h2></div>
+      <button class="btn ghost" data-goto="hangul">← Back to letters</button>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--ink-2);max-width:60ch;margin-top:0;">Every Hangeul syllable is one initial consonant (초성), one vowel (중성), and an optional final consonant (받침) &mdash; stacked into a single square block. Build one and hear it.</p>
+      <div class="builder">
+        <div class="builder-stage">
+          <div class="syllable-box" id="builderBox">가</div>
+          <div class="mono" style="color:var(--ink-3);font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;" id="builderRoman">ga</div>
+          <button class="btn ghost" id="builderPlay">🔊 Hear it</button>
+        </div>
+        <div class="builder-picker">
+          <h4>Initial consonant (초성)</h4>
+          <div class="chip-grid" id="pickInitial"></div>
+          <h4>Vowel (중성)</h4>
+          <div class="chip-grid" id="pickVowel"></div>
+          <h4>Final consonant (받침, optional)</h4>
+          <div class="chip-grid" id="pickFinal"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HANGUL DRILL -->
+  <section class="view" id="view-hangul-drill">
+    <div class="section-head"><div><span class="eyebrow">Review</span><h2>Letter recall</h2></div>
+      <button class="btn ghost" data-goto="hangul">← Back</button>
+    </div>
+    <div class="drill-wrap" id="hangulDrillWrap"></div>
+  </section>
+
+  <!-- VOCAB -->
+  <section class="view" id="view-vocab">
+    <div class="section-head"><div><span class="eyebrow">Module 2</span><h2>Survival vocab</h2></div>
+      <button class="btn" id="btnVocabDrill">Review (<span id="vocabDrillCount">0</span>)</button>
+    </div>
+    <div class="category-strip" id="categoryStrip"></div>
+    <div class="vocab-list" id="vocabList"></div>
+  </section>
+
+  <!-- VOCAB DRILL -->
+  <section class="view" id="view-vocab-drill">
+    <div class="section-head"><div><span class="eyebrow">Review</span><h2 id="vocabDrillTitle">Vocab recall</h2></div>
+      <button class="btn ghost" data-goto="vocab">← Back</button>
+    </div>
+    <div class="drill-wrap" id="vocabDrillWrap"></div>
+  </section>
+
+  <!-- SPEAKING -->
+  <section class="view" id="view-speak">
+    <div class="section-head"><div><span class="eyebrow">Module 3</span><h2>Speaking practice</h2></div></div>
+    <div class="category-strip" id="speakCategoryStrip"></div>
+    <div class="card speak-card">
+      <div class="target-kr kr" id="speakKr">안녕하세요</div>
+      <div class="target-rom mono" id="speakRom">annyeonghaseyo</div>
+      <div class="target-en" id="speakEn">Hello</div>
+      <div class="btn-row" style="justify-content:center;margin-bottom:22px;">
+        <button class="sound-btn" id="speakListenBtn" title="Hear native pronunciation">🔊</button>
+        <button class="btn ghost" id="speakNextBtn">Next word →</button>
+      </div>
+      <div id="micArea">
+        <button class="mic-btn" id="micBtn">🎙️</button>
+        <div style="font-size:11.5px;color:var(--ink-3);margin-top:8px;" id="micHint">Tap, then say the word aloud</div>
+      </div>
+      <div class="speak-result" id="speakResult"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="view-settings">
+    <div class="section-head"><h2>Settings &amp; progress</h2></div>
+    <div class="card">
+      <div class="settings-row">
+        <div><div class="lbl">Progress storage</div><div class="sub" id="syncSub">Saved automatically in this browser only. It won't follow you to another device or browser.</div></div>
+        <button class="btn ghost" id="btnSync">Save now</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Audio check</div><div class="sub" id="audioSub">Tests whether this device has a Korean voice.</div></div>
+        <button class="btn ghost" id="btnAudioTest">Test audio</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Appearance</div><div class="sub">Follows your system by default</div></div>
+        <div class="btn-row"><button class="btn ghost" id="themeAuto">Auto</button><button class="btn ghost" id="themeLight">Light</button><button class="btn ghost" id="themeDark">Dark</button></div>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Daily new-item cap</div><div class="sub">How many new letters/words to introduce per day</div></div>
+        <div class="btn-row"><button class="btn ghost" data-cap="5">5</button><button class="btn ghost" data-cap="10">10</button><button class="btn ghost" data-cap="15">15</button></div>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Reset progress</div><div class="sub">Clears all review history. Cannot be undone.</div></div>
+        <button class="btn danger" id="btnReset">Reset</button>
+      </div>
+    </div>
+    <div class="section-head"><h2>About the method</h2></div>
+    <div class="card" style="font-size:13px; color:var(--ink-2); line-height:1.7;">
+      <p style="margin-top:0;">Hangeul was designed in 1443 to be learned in a day &mdash; each letter shape reflects the mouth or tongue position used to say it. This app leans on that: shape mnemonics for recognition, a block builder for how letters combine, then spaced repetition (a simplified SM-2 scheduler, the same family of algorithm behind Anki) so recall sticks instead of fading in a week.</p>
+      <p style="margin-bottom:0;">Reading comes first by design &mdash; vocab drills always show Hangeul, never romanization, as the primary prompt. Speaking practice layers on once a word is recognisable on sight.</p>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="letterOverlay"><div class="modal" id="letterModal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   DATA — HANGEUL LETTERS
+   ===================================================================== */
+var HANGUL = [
+  {id:"h_g",glyph:"ㄱ",kind:"consonant",roman:"g / k",name:"Giyeok",sound:"Like the \"g\" in \"go\" at the start of a block, softening to a \"k\" at the end.",mnemonic:"A single bent line, like a knee kicking left. It's the simplest stroke in the whole alphabet.",examples:[{kr:"가방",rm:"gabang",en:"bag"}]},
+  {id:"h_n",glyph:"ㄴ",kind:"consonant",roman:"n",name:"Nieun",sound:"Like the \"n\" in \"no\".",mnemonic:"An open right angle — picture the tongue tip touching just behind the front teeth.",examples:[{kr:"나무",rm:"namu",en:"tree"}]},
+  {id:"h_d",glyph:"ㄷ",kind:"consonant",roman:"d / t",name:"Digeut",sound:"Like the \"d\" in \"do\", hardening toward \"t\" at the end of a block.",mnemonic:"A box open at the top right, like a table seen side-on.",examples:[{kr:"다리",rm:"dari",en:"leg / bridge"}]},
+  {id:"h_r",glyph:"ㄹ",kind:"consonant",roman:"r / l",name:"Rieul",sound:"Between an English \"r\" and \"l\" — one quick tap of the tongue.",mnemonic:"A little zig-zag, like a winding river or a folded ribbon.",examples:[{kr:"라면",rm:"ramyeon",en:"ramen"}]},
+  {id:"h_m",glyph:"ㅁ",kind:"consonant",roman:"m",name:"Mieum",sound:"Like the \"m\" in \"mom\".",mnemonic:"A closed square, like a sealed mouth.",examples:[{kr:"물",rm:"mul",en:"water"}]},
+  {id:"h_b",glyph:"ㅂ",kind:"consonant",roman:"b / p",name:"Bieup",sound:"Like the \"b\" in \"boy\", hardening toward \"p\" at the end.",mnemonic:"Two legs holding up a flat seat, like a stool.",examples:[{kr:"밥",rm:"bap",en:"rice / a meal"}]},
+  {id:"h_s",glyph:"ㅅ",kind:"consonant",roman:"s",name:"Siot",sound:"Like the \"s\" in \"sun\", softening toward \"sh\" before certain vowels.",mnemonic:"A person sitting cross-legged, or a pair of scissors.",examples:[{kr:"사람",rm:"saram",en:"person"}]},
+  {id:"h_ng",glyph:"ㅇ",kind:"consonant",roman:"– / ng",name:"Ieung",sound:"Silent at the start of a block (it just carries the vowel) — sounds like \"ng\" at the end.",mnemonic:"A plain circle. Empty at the front of a word, full \"ng\" once it lands at the back.",examples:[{kr:"아이",rm:"ai",en:"child"}]},
+  {id:"h_j",glyph:"ㅈ",kind:"consonant",roman:"j",name:"Jieut",sound:"Like the \"j\" in \"jam\".",mnemonic:"ㅅ with a line through it, like a stitch or a zipper.",examples:[{kr:"자다",rm:"jada",en:"to sleep"}]},
+  {id:"h_ch",glyph:"ㅊ",kind:"consonant",roman:"ch",name:"Chieut",sound:"An aspirated \"ch\", with a small puff of air.",mnemonic:"ㅈ wearing a little hat.",examples:[{kr:"차",rm:"cha",en:"tea / car"}]},
+  {id:"h_k",glyph:"ㅋ",kind:"consonant",roman:"k",name:"Kieuk",sound:"A hard, aspirated \"k\" — more breath than ㄱ.",mnemonic:"ㄱ with one extra stroke, like a key.",examples:[{kr:"커피",rm:"keopi",en:"coffee"}]},
+  {id:"h_t",glyph:"ㅌ",kind:"consonant",roman:"t",name:"Tieut",sound:"A hard, aspirated \"t\" — more breath than ㄷ.",mnemonic:"ㄷ with a shelf added, like a table with a rail underneath.",examples:[{kr:"토끼",rm:"tokki",en:"rabbit"}]},
+  {id:"h_p",glyph:"ㅍ",kind:"consonant",roman:"p",name:"Pieup",sound:"A hard, aspirated \"p\" — more breath than ㅂ.",mnemonic:"A table with two legs and a flat top, shaped like an H.",examples:[{kr:"파도",rm:"pado",en:"wave"}]},
+  {id:"h_h",glyph:"ㅎ",kind:"consonant",roman:"h",name:"Hieut",sound:"Like the \"h\" in \"hello\".",mnemonic:"A circle under a small cap and a roof — a person's head, hatted.",examples:[{kr:"하늘",rm:"haneul",en:"sky"}]},
+  {id:"h_kk",glyph:"ㄲ",kind:"double",roman:"kk",name:"Ssang-giyeok",sound:"A tense, clenched \"g\" — hold it, don't release air.",mnemonic:"Two ㄱ side by side — say it twice as firmly.",examples:[{kr:"까치",rm:"kkachi",en:"magpie"}]},
+  {id:"h_tt",glyph:"ㄸ",kind:"double",roman:"tt",name:"Ssang-digeut",sound:"A tense, clenched \"d\".",mnemonic:"Two ㄷ side by side.",examples:[{kr:"딸기",rm:"ttalgi",en:"strawberry"}]},
+  {id:"h_pp",glyph:"ㅃ",kind:"double",roman:"pp",name:"Ssang-bieup",sound:"A tense, clenched \"b\".",mnemonic:"Two ㅂ side by side.",examples:[{kr:"빵",rm:"ppang",en:"bread"}]},
+  {id:"h_ss",glyph:"ㅆ",kind:"double",roman:"ss",name:"Ssang-siot",sound:"A tense, hissed \"s\".",mnemonic:"Two ㅅ side by side.",examples:[{kr:"쌀",rm:"ssal",en:"uncooked rice"}]},
+  {id:"h_jj",glyph:"ㅉ",kind:"double",roman:"jj",name:"Ssang-jieut",sound:"A tense, clenched \"j\".",mnemonic:"Two ㅈ side by side.",examples:[{kr:"짜다",rm:"jjada",en:"salty"}]},
+  {id:"h_a",glyph:"ㅏ",kind:"vowel",roman:"a",name:"A",sound:"\"ah\", as in \"father\".",mnemonic:"A vertical line with a short branch to the right, like a mouth open toward the light.",examples:[{kr:"아빠",rm:"appa",en:"dad"}]},
+  {id:"h_ya",glyph:"ㅑ",kind:"vowel",roman:"ya",name:"Ya",sound:"\"yah\".",mnemonic:"Same as ㅏ, with a second branch — the \"y\" doubles the stroke.",examples:[{kr:"야구",rm:"yagu",en:"baseball"}]},
+  {id:"h_eo",glyph:"ㅓ",kind:"vowel",roman:"eo",name:"Eo",sound:"\"uh\", as in \"love\".",mnemonic:"A vertical line with the branch pointing left instead of right.",examples:[{kr:"어머니",rm:"eomeoni",en:"mother"}]},
+  {id:"h_yeo",glyph:"ㅕ",kind:"vowel",roman:"yeo",name:"Yeo",sound:"\"yuh\".",mnemonic:"ㅓ with a second branch.",examples:[{kr:"여름",rm:"yeoreum",en:"summer"}]},
+  {id:"h_o",glyph:"ㅗ",kind:"vowel",roman:"o",name:"O",sound:"\"oh\".",mnemonic:"A horizontal line with a branch pointing up, like the sun rising.",examples:[{kr:"오늘",rm:"oneul",en:"today"}]},
+  {id:"h_yo",glyph:"ㅛ",kind:"vowel",roman:"yo",name:"Yo",sound:"\"yoh\".",mnemonic:"ㅗ with a second branch.",examples:[{kr:"요일",rm:"yoil",en:"day of the week"}]},
+  {id:"h_u",glyph:"ㅜ",kind:"vowel",roman:"u",name:"U",sound:"\"oo\", as in \"moon\".",mnemonic:"A horizontal line with a branch pointing down, like the sun setting.",examples:[{kr:"우유",rm:"uyu",en:"milk"}]},
+  {id:"h_yu",glyph:"ㅠ",kind:"vowel",roman:"yu",name:"Yu",sound:"\"yoo\".",mnemonic:"ㅜ with a second branch.",examples:[{kr:"유자차",rm:"yujacha",en:"citron tea"}]},
+  {id:"h_eu",glyph:"ㅡ",kind:"vowel",roman:"eu",name:"Eu",sound:"No real English equivalent — unrounded, like \"oo\" said with a smile instead of pursed lips.",mnemonic:"A flat horizontal line, like the earth's horizon.",examples:[{kr:"그림",rm:"geurim",en:"picture"}]},
+  {id:"h_i",glyph:"ㅣ",kind:"vowel",roman:"i",name:"I",sound:"\"ee\", as in \"see\".",mnemonic:"A single vertical line, like a standing person.",examples:[{kr:"이름",rm:"ireum",en:"name"}]},
+  {id:"h_ae",glyph:"ㅐ",kind:"compound",roman:"ae",name:"Ae",sound:"\"eh\", as in \"bed\".",mnemonic:"ㅏ plus ㅣ fused together.",examples:[{kr:"개",rm:"gae",en:"dog"}]},
+  {id:"h_yae",glyph:"ㅒ",kind:"compound",roman:"yae",name:"Yae",sound:"\"yeh\".",mnemonic:"ㅑ plus ㅣ.",examples:[{kr:"얘기",rm:"yaegi",en:"talk / story"}]},
+  {id:"h_e",glyph:"ㅔ",kind:"compound",roman:"e",name:"E",sound:"Also \"eh\" — in modern speech this and ㅐ sound almost identical.",mnemonic:"ㅓ plus ㅣ.",examples:[{kr:"세계",rm:"segye",en:"world"}]},
+  {id:"h_ye",glyph:"ㅖ",kind:"compound",roman:"ye",name:"Ye",sound:"\"yeh\" — merges with ㅒ in casual speech.",mnemonic:"ㅕ plus ㅣ.",examples:[{kr:"예의",rm:"yeui",en:"manners"}]},
+  {id:"h_wa",glyph:"ㅘ",kind:"compound",roman:"wa",name:"Wa",sound:"\"wah\".",mnemonic:"ㅗ plus ㅏ.",examples:[{kr:"과일",rm:"gwail",en:"fruit"}]},
+  {id:"h_wae",glyph:"ㅙ",kind:"compound",roman:"wae",name:"Wae",sound:"\"weh\".",mnemonic:"ㅗ plus ㅐ.",examples:[{kr:"왜",rm:"wae",en:"why"}]},
+  {id:"h_oe",glyph:"ㅚ",kind:"compound",roman:"oe",name:"Oe",sound:"\"weh\" — merges with ㅙ / ㅞ in casual speech.",mnemonic:"ㅗ plus ㅣ.",examples:[{kr:"회사",rm:"hoesa",en:"company"}]},
+  {id:"h_wo",glyph:"ㅝ",kind:"compound",roman:"wo",name:"Wo",sound:"\"wuh\", like \"won\".",mnemonic:"ㅜ plus ㅓ.",examples:[{kr:"원",rm:"won",en:"won (currency)"}]},
+  {id:"h_we",glyph:"ㅞ",kind:"compound",roman:"we",name:"We",sound:"\"weh\".",mnemonic:"ㅜ plus ㅔ.",examples:[{kr:"웨딩",rm:"weding",en:"wedding"}]},
+  {id:"h_wi",glyph:"ㅟ",kind:"compound",roman:"wi",name:"Wi",sound:"\"wee\".",mnemonic:"ㅜ plus ㅣ.",examples:[{kr:"위",rm:"wi",en:"above / stomach"}]},
+  {id:"h_ui",glyph:"ㅢ",kind:"compound",roman:"ui",name:"Ui",sound:"A quick glide from \"eu\" to \"ee\" — often just \"ee\" in casual speech.",mnemonic:"ㅡ plus ㅣ.",examples:[{kr:"의사",rm:"uisa",en:"doctor"}]}
+];
+var HANGUL_GROUPS = [
+  {kind:"consonant",label:"Basic consonants — 자음"},
+  {kind:"double",label:"Double consonants — 된소리"},
+  {kind:"vowel",label:"Basic vowels — 모음"},
+  {kind:"compound",label:"Compound vowels — 이중모음"}
+];
+
+/* =====================================================================
+   DATA — SURVIVAL VOCAB
+   ===================================================================== */
+var CATEGORIES = [
+  {id:"greet",label:"Greetings"},
+  {id:"numbers",label:"Numbers"},
+  {id:"food",label:"Food & dining"},
+  {id:"transport",label:"Directions & transport"},
+  {id:"shopping",label:"Shopping & money"},
+  {id:"emergency",label:"Emergency & help"},
+  {id:"time",label:"Time & days"},
+  {id:"phrases",label:"Everyday phrases"}
+];
+var VOCAB = [
+  {cat:"greet",kr:"안녕하세요",rm:"annyeonghaseyo",en:"Hello"},
+  {cat:"greet",kr:"안녕히 가세요",rm:"annyeonghi gaseyo",en:"Goodbye (to someone leaving)"},
+  {cat:"greet",kr:"안녕히 계세요",rm:"annyeonghi gyeseyo",en:"Goodbye (to someone staying)"},
+  {cat:"greet",kr:"감사합니다",rm:"gamsahamnida",en:"Thank you"},
+  {cat:"greet",kr:"고맙습니다",rm:"gomapseumnida",en:"Thank you (also common)"},
+  {cat:"greet",kr:"죄송합니다",rm:"joesonghamnida",en:"I'm sorry"},
+  {cat:"greet",kr:"괜찮아요",rm:"gwaenchanhayo",en:"It's okay / I'm fine"},
+  {cat:"greet",kr:"네",rm:"ne",en:"Yes"},
+  {cat:"greet",kr:"아니요",rm:"aniyo",en:"No"},
+  {cat:"greet",kr:"저기요",rm:"jeogiyo",en:"Excuse me (to get attention)"},
+  {cat:"greet",kr:"이름이 뭐예요?",rm:"ireumi mwoyeyo?",en:"What's your name?"},
+  {cat:"greet",kr:"제 이름은 ~예요",rm:"je ireumeun ~yeyo",en:"My name is ~"},
+  {cat:"greet",kr:"반갑습니다",rm:"bangapseumnida",en:"Nice to meet you"},
+  {cat:"greet",kr:"영어 할 줄 아세요?",rm:"yeongeo hal jul aseyo?",en:"Do you speak English?"},
+  {cat:"numbers",kr:"일",rm:"il",en:"one (Sino-Korean)"},
+  {cat:"numbers",kr:"이",rm:"i",en:"two (Sino-Korean)"},
+  {cat:"numbers",kr:"삼",rm:"sam",en:"three (Sino-Korean)"},
+  {cat:"numbers",kr:"사",rm:"sa",en:"four (Sino-Korean)"},
+  {cat:"numbers",kr:"오",rm:"o",en:"five (Sino-Korean)"},
+  {cat:"numbers",kr:"육",rm:"yuk",en:"six (Sino-Korean)"},
+  {cat:"numbers",kr:"칠",rm:"chil",en:"seven (Sino-Korean)"},
+  {cat:"numbers",kr:"팔",rm:"pal",en:"eight (Sino-Korean)"},
+  {cat:"numbers",kr:"구",rm:"gu",en:"nine (Sino-Korean)"},
+  {cat:"numbers",kr:"십",rm:"sip",en:"ten (Sino-Korean, for money & phone numbers)"},
+  {cat:"numbers",kr:"하나",rm:"hana",en:"one (native, for counting objects/age)"},
+  {cat:"numbers",kr:"둘",rm:"dul",en:"two (native)"},
+  {cat:"numbers",kr:"셋",rm:"set",en:"three (native)"},
+  {cat:"numbers",kr:"넷",rm:"net",en:"four (native)"},
+  {cat:"numbers",kr:"다섯",rm:"daseot",en:"five (native)"},
+  {cat:"food",kr:"물",rm:"mul",en:"water"},
+  {cat:"food",kr:"밥",rm:"bap",en:"rice / a meal"},
+  {cat:"food",kr:"맛있어요",rm:"masisseoyo",en:"It's delicious"},
+  {cat:"food",kr:"매워요",rm:"maewoyo",en:"It's spicy"},
+  {cat:"food",kr:"메뉴",rm:"menyu",en:"menu"},
+  {cat:"food",kr:"주문할게요",rm:"jumunhalgeyo",en:"I'd like to order"},
+  {cat:"food",kr:"이거 주세요",rm:"igeo juseyo",en:"This one, please"},
+  {cat:"food",kr:"계산서 주세요",rm:"gyesanseo juseyo",en:"The bill, please"},
+  {cat:"food",kr:"얼마예요?",rm:"eolmayeyo?",en:"How much is it?"},
+  {cat:"food",kr:"맛있게 드세요",rm:"masitge deuseyo",en:"Enjoy your meal"},
+  {cat:"food",kr:"김치",rm:"gimchi",en:"kimchi"},
+  {cat:"food",kr:"커피",rm:"keopi",en:"coffee"},
+  {cat:"food",kr:"채식주의자예요",rm:"chaesikjuuijayeyo",en:"I'm a vegetarian"},
+  {cat:"food",kr:"포장이요",rm:"pojangiyo",en:"To go / takeout, please"},
+  {cat:"transport",kr:"지하철역",rm:"jihacheollyeok",en:"subway station"},
+  {cat:"transport",kr:"버스 정류장",rm:"beoseu jeongnyujang",en:"bus stop"},
+  {cat:"transport",kr:"공항",rm:"gonghang",en:"airport"},
+  {cat:"transport",kr:"왼쪽",rm:"oenjjok",en:"left"},
+  {cat:"transport",kr:"오른쪽",rm:"oreunjjok",en:"right"},
+  {cat:"transport",kr:"직진하세요",rm:"jikjinhaseyo",en:"Go straight"},
+  {cat:"transport",kr:"화장실이 어디예요?",rm:"hwajangsiri eodiyeyo?",en:"Where's the bathroom?"},
+  {cat:"transport",kr:"출구",rm:"chulgu",en:"exit"},
+  {cat:"transport",kr:"입구",rm:"ipgu",en:"entrance"},
+  {cat:"transport",kr:"표",rm:"pyo",en:"ticket"},
+  {cat:"transport",kr:"택시",rm:"taeksi",en:"taxi"},
+  {cat:"transport",kr:"얼마나 걸려요?",rm:"eolmana geollyeoyo?",en:"How long does it take?"},
+  {cat:"transport",kr:"여기요",rm:"yeogiyo",en:"Here / over here"},
+  {cat:"shopping",kr:"이거 얼마예요?",rm:"igeo eolmayeyo?",en:"How much is this?"},
+  {cat:"shopping",kr:"비싸요",rm:"bissayo",en:"It's expensive"},
+  {cat:"shopping",kr:"싸요",rm:"ssayo",en:"It's cheap"},
+  {cat:"shopping",kr:"현금",rm:"hyeongeum",en:"cash"},
+  {cat:"shopping",kr:"카드",rm:"kadeu",en:"card"},
+  {cat:"shopping",kr:"할인",rm:"halin",en:"discount"},
+  {cat:"shopping",kr:"입어 봐도 돼요?",rm:"ibeo bwado dwaeyo?",en:"Can I try it on?"},
+  {cat:"shopping",kr:"영수증",rm:"yeongsujeung",en:"receipt"},
+  {cat:"shopping",kr:"환불",rm:"hwanbul",en:"refund"},
+  {cat:"shopping",kr:"사이즈",rm:"saijeu",en:"size"},
+  {cat:"shopping",kr:"다른 색깔 있어요?",rm:"dareun saekkkal isseoyo?",en:"Do you have another colour?"},
+  {cat:"emergency",kr:"도와주세요",rm:"dowajuseyo",en:"Help me / Please help"},
+  {cat:"emergency",kr:"병원",rm:"byeongwon",en:"hospital"},
+  {cat:"emergency",kr:"경찰서",rm:"gyeongchalseo",en:"police station"},
+  {cat:"emergency",kr:"길을 잃었어요",rm:"gireul ireosseoyo",en:"I'm lost"},
+  {cat:"emergency",kr:"아파요",rm:"apayo",en:"It hurts / I'm in pain"},
+  {cat:"emergency",kr:"여권을 잃어버렸어요",rm:"yeogwoneul ireobeoryeosseoyo",en:"I lost my passport"},
+  {cat:"emergency",kr:"119에 전화해 주세요",rm:"iril-gue jeonhwahae juseyo",en:"Please call 119 (Korea's emergency number)"},
+  {cat:"emergency",kr:"알레르기가 있어요",rm:"allereugiga isseoyo",en:"I have an allergy"},
+  {cat:"emergency",kr:"천천히 말해 주세요",rm:"cheoncheonhi malhae juseyo",en:"Please speak slowly"},
+  {cat:"emergency",kr:"이해가 안 돼요",rm:"ihaega an dwaeyo",en:"I don't understand"},
+  {cat:"time",kr:"오늘",rm:"oneul",en:"today"},
+  {cat:"time",kr:"내일",rm:"naeil",en:"tomorrow"},
+  {cat:"time",kr:"어제",rm:"eoje",en:"yesterday"},
+  {cat:"time",kr:"지금",rm:"jigeum",en:"now"},
+  {cat:"time",kr:"아침",rm:"achim",en:"morning"},
+  {cat:"time",kr:"저녁",rm:"jeonyeok",en:"evening"},
+  {cat:"time",kr:"월요일",rm:"woryoil",en:"Monday"},
+  {cat:"time",kr:"화요일",rm:"hwayoil",en:"Tuesday"},
+  {cat:"time",kr:"주말",rm:"jumal",en:"weekend"},
+  {cat:"time",kr:"몇 시예요?",rm:"myeot siyeyo?",en:"What time is it?"},
+  {cat:"phrases",kr:"잠깐만요",rm:"jamkkanmanyo",en:"Just a moment / hold on"},
+  {cat:"phrases",kr:"다시 한번 말해 주세요",rm:"dasi hanbeon malhae juseyo",en:"Please say that again"},
+  {cat:"phrases",kr:"이거 뭐예요?",rm:"igeo mwoyeyo?",en:"What is this?"},
+  {cat:"phrases",kr:"같이 가요",rm:"gachi gayo",en:"Let's go together"},
+  {cat:"phrases",kr:"정말요?",rm:"jeongmallyo?",en:"Really?"},
+  {cat:"phrases",kr:"화이팅!",rm:"hwaiting!",en:"You've got this! (go for it)"},
+  {cat:"phrases",kr:"괜찮으세요?",rm:"gwaenchaneuseyo?",en:"Are you okay?"},
+  {cat:"phrases",kr:"사진 찍어도 돼요?",rm:"sajin jjigeodo dwaeyo?",en:"Can I take a photo?"},
+  {cat:"phrases",kr:"와이파이 비밀번호가 뭐예요?",rm:"waipai bimilbeonhoga mwoyeyo?",en:"What's the wifi password?"},
+  {cat:"phrases",kr:"건배!",rm:"geonbae!",en:"Cheers!"}
+];
+VOCAB.forEach(function(v,i){ v.id="v_"+i; });
+
+/* =====================================================================
+   HANGEUL SYLLABLE COMPOSITION
+   ===================================================================== */
+var INITIALS = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+var VOWELS_ORDER = ["ㅏ","ㅐ","ㅑ","ㅒ","ㅓ","ㅔ","ㅕ","ㅖ","ㅗ","ㅘ","ㅙ","ㅚ","ㅛ","ㅜ","ㅝ","ㅞ","ㅟ","ㅠ","ㅡ","ㅢ","ㅣ"];
+var FINALS_ORDER = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+var BUILDER_FINALS = ["","ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ","ㄲ","ㅆ"];
+function composeSyllable(ini,vow,fin){
+  var i=INITIALS.indexOf(ini), v=VOWELS_ORDER.indexOf(vow), f=FINALS_ORDER.indexOf(fin||"");
+  if(i<0||v<0||f<0) return "";
+  return String.fromCharCode(0xAC00 + i*588 + v*28 + f);
+}
+function romanizeSelection(ini,vow,fin){
+  var map={"ㄱ":"g","ㄲ":"kk","ㄴ":"n","ㄷ":"d","ㄸ":"tt","ㄹ":"r","ㅁ":"m","ㅂ":"b","ㅃ":"pp","ㅅ":"s","ㅆ":"ss","ㅇ":"","ㅈ":"j","ㅉ":"jj","ㅊ":"ch","ㅋ":"k","ㅌ":"t","ㅍ":"p","ㅎ":"h",
+    "ㅏ":"a","ㅐ":"ae","ㅑ":"ya","ㅒ":"yae","ㅓ":"eo","ㅔ":"e","ㅕ":"yeo","ㅖ":"ye","ㅗ":"o","ㅘ":"wa","ㅙ":"wae","ㅚ":"oe","ㅛ":"yo","ㅜ":"u","ㅝ":"wo","ㅞ":"we","ㅟ":"wi","ㅠ":"yu","ㅡ":"eu","ㅢ":"ui","ㅣ":"i"};
+  var s=(map[ini]||"")+(map[vow]||"");
+  if(fin){ s += (map[fin]||"").slice(0,1); }
+  return s;
+}
+
+/* =====================================================================
+   STATE / PERSISTENCE
+   ===================================================================== */
+var STORAGE_KEY = "hangeullab_progress_v1";
+var state = loadState();
+function defaultState(){
+  return { items:{}, streak:0, lastActiveDay:null, dailyCap:10, dailyIntroDay:null, dailyIntroCount:0, theme:"auto" };
+}
+function loadState(){
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    var parsed = JSON.parse(raw);
+    var d = defaultState();
+    for(var k in d){ if(!(k in parsed)) parsed[k]=d[k]; }
+    return parsed;
+  }catch(e){ return defaultState(); }
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function todayStr(){ var d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function yesterdayStr(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function touchStreak(){
+  var t=todayStr();
+  if(state.lastActiveDay===t) return;
+  if(state.lastActiveDay===yesterdayStr()) state.streak=(state.streak||0)+1;
+  else state.streak=1;
+  state.lastActiveDay=t;
+  saveState();
+}
+function introBudgetLeft(){
+  var t=todayStr();
+  if(state.dailyIntroDay!==t){ state.dailyIntroDay=t; state.dailyIntroCount=0; }
+  return Math.max(0, state.dailyCap - state.dailyIntroCount);
+}
+function consumeIntroBudget(n){
+  var t=todayStr();
+  if(state.dailyIntroDay!==t){ state.dailyIntroDay=t; state.dailyIntroCount=0; }
+  state.dailyIntroCount += n;
+}
+
+/* =====================================================================
+   SRS ENGINE (simplified SM-2)
+   ===================================================================== */
+function ensureItem(id){
+  if(!state.items[id]) state.items[id]={ef:2.5,interval:0,reps:0,due:0,lastReview:0,lapses:0,seen:false};
+  return state.items[id];
+}
+function markSeenNow(id){
+  var it=ensureItem(id);
+  if(!it.seen){ it.seen=true; it.due=Date.now(); it.ef=2.5; it.reps=0; it.interval=0; }
+  return it;
+}
+function isDue(id){
+  var it=state.items[id];
+  return !!(it && it.seen && it.due<=Date.now());
+}
+function isMastered(id){
+  var it=state.items[id];
+  return !!(it && it.reps>=5 && it.interval>=21);
+}
+function gradeItem(id, grade){
+  var it=ensureItem(id);
+  var now=Date.now();
+  if(grade===0){
+    it.lapses=(it.lapses||0)+1;
+    it.reps=0;
+    it.interval=0;
+    it.ef=Math.max(1.3, it.ef-0.2);
+    it.due = now + 12*60*60*1000; // resurfaces later today/tomorrow
+  } else {
+    it.reps=(it.reps||0)+1;
+    if(it.reps===1) it.interval=1;
+    else if(it.reps===2) it.interval = grade===1?2:(grade===3?4:3);
+    else it.interval = Math.max(1, Math.round(it.interval * it.ef * (grade===1?0.85:(grade===3?1.3:1))));
+    if(grade===1) it.ef=Math.max(1.3, it.ef-0.15);
+    if(grade===3) it.ef=it.ef+0.1;
+    it.due = now + it.interval*24*60*60*1000;
+  }
+  it.lastReview=now;
+  it.seen=true;
+  touchStreak();
+  saveState();
+}
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function $(sel,root){ return (root||document).querySelector(sel); }
+function $all(sel,root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+function toast(msg){
+  var t=$("#toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toast._h); toast._h=setTimeout(function(){ t.classList.remove("show"); }, 2200);
+}
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+  return a;
+}
+function levenshtein(a,b){
+  var m=a.length,n=b.length;
+  if(m===0) return n; if(n===0) return m;
+  var dp=[]; for(var i=0;i<=m;i++) dp.push([i]);
+  for(var j=0;j<=n;j++) dp[0][j]=j;
+  for(i=1;i<=m;i++) for(j=1;j<=n;j++){
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j-1],dp[i-1][j],dp[i][j-1]);
+  }
+  return dp[m][n];
+}
+function similarity(a,b){
+  a=(a||"").replace(/[\s.,!?~]/g,""); b=(b||"").replace(/[\s.,!?~]/g,"");
+  if(!a.length && !b.length) return 1;
+  var d=levenshtein(a,b);
+  return 1 - d/Math.max(a.length,b.length,1);
+}
+function byId(id){ return HANGUL_BY_ID[id] || VOCAB_BY_ID[id]; }
+var HANGUL_BY_ID={}, VOCAB_BY_ID={};
+HANGUL.forEach(function(h){ HANGUL_BY_ID[h.id]=h; });
+VOCAB.forEach(function(v){ VOCAB_BY_ID[v.id]=v; });
+
+/* =====================================================================
+   NAVIGATION
+   ===================================================================== */
+var TAB_PARENT = { "builder":"hangul", "hangul-drill":"hangul", "vocab-drill":"vocab" };
+function goto(view){
+  $all(".view").forEach(function(v){ v.classList.remove("active"); });
+  var el = $("#view-"+view);
+  if(el) el.classList.add("active");
+  var tabTarget = TAB_PARENT[view] || view;
+  $all("#tabs button").forEach(function(b){ b.classList.toggle("active", b.dataset.view===tabTarget); });
+  window.scrollTo({top:0,behavior:"instant" in window ? "instant":"auto"});
+  if(view==="home") renderHome();
+  if(view==="hangul") renderHangul();
+  if(view==="builder") renderBuilder();
+  if(view==="vocab") renderVocab();
+  if(view==="speak") renderSpeak(true);
+}
+
+/* =====================================================================
+   RENDER — HOME
+   ===================================================================== */
+function renderHome(){
+  var hangulSeen = HANGUL.filter(function(h){ return state.items[h.id] && state.items[h.id].seen; });
+  var hangulDue = HANGUL.filter(function(h){ return isDue(h.id); });
+  var hangulMastered = HANGUL.filter(function(h){ return isMastered(h.id); });
+  var vocabSeen = VOCAB.filter(function(v){ return state.items[v.id] && state.items[v.id].seen; });
+  var vocabDue = VOCAB.filter(function(v){ return isDue(v.id); });
+  var vocabMastered = VOCAB.filter(function(v){ return isMastered(v.id); });
+
+  $("#streakN").textContent = state.streak||0;
+  $("#statDue").textContent = hangulDue.length+vocabDue.length;
+  $("#statMastered").textContent = hangulMastered.length+vocabMastered.length;
+  $("#statLetters").textContent = hangulSeen.length+"/"+HANGUL.length;
+  $("#statWords").textContent = vocabSeen.length+"/"+VOCAB.length;
+
+  $("#hangulProgress").style.width = Math.round(100*hangulSeen.length/HANGUL.length)+"%";
+  $("#hangulMeta").textContent = hangulSeen.length+" of "+HANGUL.length+" introduced";
+  $("#hangulDueMeta").textContent = hangulDue.length+" due";
+  $("#hangulDrillCount").textContent = hangulDue.length;
+  $("#hangulPill").textContent = hangulSeen.length===0 ? "Start here" : (hangulDue.length>0 ? hangulDue.length+" due" : "On track");
+  $("#hangulPill").className = "pill " + (hangulSeen.length===0?"new":(hangulDue.length>0?"due":"mastered"));
+
+  $("#vocabProgress").style.width = Math.round(100*vocabSeen.length/VOCAB.length)+"%";
+  $("#vocabMeta").textContent = vocabSeen.length+" of "+VOCAB.length+" introduced";
+  $("#vocabDueMeta").textContent = vocabDue.length+" due";
+  $("#vocabDrillCount").textContent = vocabDue.length;
+  $("#vocabPill").textContent = vocabSeen.length===0 ? (hangulSeen.length<14?"Start with Hangeul":"Ready") : (vocabDue.length>0?vocabDue.length+" due":"On track");
+  $("#vocabPill").className = "pill " + (vocabSeen.length===0?"learning":(vocabDue.length>0?"due":"mastered"));
+
+  var totalDue = hangulDue.length+vocabDue.length;
+  if(totalDue>0){
+    $("#heroHeadline").innerHTML = "You have "+totalDue+" review"+(totalDue===1?"":"s")+" waiting.";
+    $("#heroSub").textContent = "A few minutes now keeps everything fresh — short, daily reviews beat long, rare ones.";
+    $("#heroCta").textContent = "Start reviewing →";
+  } else if(hangulSeen.length < HANGUL.length){
+    $("#heroHeadline").innerHTML = "Read Hangeul first.<br>Everything else follows.";
+    $("#heroSub").textContent = "You're building this the right way round — letters, then syllable blocks, then the words you'll actually use.";
+    $("#heroCta").textContent = "Continue learning →";
+  } else {
+    $("#heroHeadline").innerHTML = "All caught up.";
+    $("#heroSub").textContent = "Every letter's introduced and nothing's due. Explore the syllable builder or add a few new words.";
+    $("#heroCta").textContent = "Browse vocab →";
+  }
+  $("#heroCta").onclick = function(){
+    if(totalDue>0) goto(hangulDue.length>0 ? "hangul-drill":"vocab-drill"), (hangulDue.length>0? startHangulDrill(): startVocabDrill());
+    else if(hangulSeen.length < HANGUL.length) goto("hangul");
+    else goto("vocab");
+  };
+
+  var todayBody = $("#todayBody");
+  if(totalDue===0 && hangulSeen.length===HANGUL.length && vocabSeen.length===VOCAB.length){
+    todayBody.innerHTML = '<div class="session-empty" style="padding:10px 0;"><div class="g">잘했어요</div>Nothing due, and you\'ve introduced everything. Just keep reviewing to hold onto it.</div>';
+  } else if(totalDue===0){
+    todayBody.innerHTML = '<p style="margin:0;font-size:13px;color:var(--ink-2);">Nothing due right now. New items unlock as you review — up to <strong class="mono">'+state.dailyCap+'</strong> new per day (change this in Settings).</p>';
+  } else {
+    var lines = hangulDue.slice(0,4).map(function(h){ return '<div class="vocab-row" style="grid-template-columns:auto 1fr;"><span class="g kr">'+h.glyph+'</span><span class="mid"><span class="en">'+h.name+' &middot; letter review</span></span></div>'; })
+      .concat(vocabDue.slice(0,4).map(function(v){ return '<div class="vocab-row" style="grid-template-columns:auto 1fr;"><span class="g kr" style="font-size:16px;min-width:auto;">'+v.kr+'</span><span class="mid"><span class="en">'+v.en+'</span></span></div>'; }));
+    todayBody.innerHTML = '<div class="vocab-list" style="margin-bottom:14px;">'+lines.join("")+'</div><div class="btn-row">'
+      + (hangulDue.length? '<button class="btn" id="goHangulDrill">Review '+hangulDue.length+' letter'+(hangulDue.length===1?"":"s")+'</button>':"")
+      + (vocabDue.length? '<button class="btn ghost" id="goVocabDrill">Review '+vocabDue.length+' word'+(vocabDue.length===1?"":"s")+'</button>':"")
+      + '</div>';
+    var gh=$("#goHangulDrill"); if(gh) gh.onclick=function(){ goto("hangul-drill"); startHangulDrill(); };
+    var gv=$("#goVocabDrill"); if(gv) gv.onclick=function(){ goto("vocab-drill"); startVocabDrill(); };
+  }
+}
+
+/* =====================================================================
+   RENDER — HANGEUL GRID + MODAL
+   ===================================================================== */
+function renderHangul(){
+  var wrap = $("#hangulGroups");
+  wrap.innerHTML = HANGUL_GROUPS.map(function(g){
+    var letters = HANGUL.filter(function(h){ return h.kind===g.kind; });
+    var tiles = letters.map(function(h){
+      var it = state.items[h.id];
+      var cls = "letter-tile";
+      if(it && it.seen){ cls += isMastered(h.id) ? " box5":" box0"; if(isDue(h.id)) cls += " tile-due"; }
+      return '<div class="'+cls+'" data-letter="'+h.id+'"><span class="g kr">'+h.glyph+'</span><span class="r mono">'+h.roman+'</span></div>';
+    }).join("");
+    return '<div class="group-label">'+g.label+'</div><div class="letter-grid">'+tiles+'</div>';
+  }).join("");
+  $all("[data-letter]", wrap).forEach(function(el){
+    el.onclick = function(){ openLetterModal(el.dataset.letter); };
+  });
+  var due = HANGUL.filter(function(h){ return isDue(h.id); });
+  $("#hangulDrillCount").textContent = due.length;
+}
+function openLetterModal(id){
+  var h = HANGUL_BY_ID[id];
+  markSeenNow(id); saveState();
+  var ex = h.examples.map(function(e){ return '<div class="example-chip" data-say="'+e.kr+'">'+e.kr+' <span class="rom">'+e.rm+' &middot; '+e.en+'</span></div>'; }).join("");
+  $("#letterModal").innerHTML =
+    '<button class="close" id="modalClose">&times;</button>'
+    + '<div class="eyebrow" style="text-align:center;">'+h.name+' &middot; '+h.roman+'</div>'
+    + '<div class="big-glyph kr">'+h.glyph+'</div>'
+    + '<div class="romanization">'+h.sound+'</div>'
+    + '<div class="mnemonic">'+h.mnemonic+'</div>'
+    + '<div class="eyebrow" style="margin-bottom:6px;">In a word</div>'
+    + '<div class="examples">'+ex+'</div>'
+    + '<div class="btn-row" style="margin-top:18px;"><button class="btn ghost" id="modalListen">🔊 Hear "'+h.glyph+'"</button></div>';
+  $("#letterOverlay").classList.add("open");
+  $("#modalClose").onclick = closeLetterModal;
+  $("#modalListen").onclick = function(){ speak(letterSpeakText(h)); };
+  $all("[data-say]", $("#letterModal")).forEach(function(el){ el.onclick=function(){ speak(el.dataset.say); }; });
+  renderHangul();
+  renderHome();
+}
+function closeLetterModal(){ $("#letterOverlay").classList.remove("open"); }
+
+/* =====================================================================
+   RENDER — SYLLABLE BUILDER
+   ===================================================================== */
+var builderSel = { ini:"ㄱ", vow:"ㅏ", fin:"" };
+function renderBuilder(){
+  var wrap1=$("#pickInitial"), wrap2=$("#pickVowel"), wrap3=$("#pickFinal");
+  wrap1.innerHTML = INITIALS.map(function(c){ return '<div class="chip kr'+(builderSel.ini===c?" on":"")+'" data-set="ini" data-v="'+c+'">'+c+'</div>'; }).join("");
+  wrap2.innerHTML = VOWELS_ORDER.map(function(c){ return '<div class="chip kr'+(builderSel.vow===c?" on":"")+'" data-set="vow" data-v="'+c+'">'+c+'</div>'; }).join("");
+  wrap3.innerHTML = '<div class="chip none'+(builderSel.fin===""?" on":"")+'" data-set="fin" data-v="">none</div>' + BUILDER_FINALS.slice(1).map(function(c){ return '<div class="chip kr'+(builderSel.fin===c?" on":"")+'" data-set="fin" data-v="'+c+'">'+c+'</div>'; }).join("");
+  $all(".chip", $("#view-builder")).forEach(function(el){
+    el.onclick = function(){
+      builderSel[el.dataset.set==="ini"?"ini":(el.dataset.set==="vow"?"vow":"fin")] = el.dataset.v;
+      renderBuilder();
+      speak(composeSyllable(builderSel.ini,builderSel.vow,builderSel.fin));
+    };
+  });
+  var syl = composeSyllable(builderSel.ini, builderSel.vow, builderSel.fin);
+  $("#builderBox").textContent = syl;
+  $("#builderRoman").textContent = romanizeSelection(builderSel.ini,builderSel.vow,builderSel.fin);
+  $("#builderPlay").onclick = function(){ speak(syl); };
+}
+
+/* =====================================================================
+   RENDER — VOCAB LIST
+   ===================================================================== */
+var vocabFilter = "all";
+function renderVocab(){
+  var strip = $("#categoryStrip");
+  strip.innerHTML = ['<button data-c="all" class="'+(vocabFilter==="all"?"active":"")+'">All</button>']
+    .concat(CATEGORIES.map(function(c){ return '<button data-c="'+c.id+'" class="'+(vocabFilter===c.id?"active":"")+'">'+c.label+'</button>'; })).join("");
+  $all("button", strip).forEach(function(b){ b.onclick=function(){ vocabFilter=b.dataset.c; renderVocab(); }; });
+
+  var items = VOCAB.filter(function(v){ return vocabFilter==="all" || v.cat===vocabFilter; });
+  $("#vocabList").innerHTML = items.map(function(v){
+    var it = state.items[v.id];
+    var pill = "new", pillLabel="new";
+    if(it && it.seen){
+      if(isMastered(v.id)){ pill="mastered"; pillLabel="mastered"; }
+      else if(isDue(v.id)){ pill="due"; pillLabel="due"; }
+      else { pill="learning"; pillLabel="learning"; }
+    }
+    return '<div class="vocab-row"><span class="g kr">'+v.kr+'</span><span class="mid"><span class="rom mono">'+v.rm+'</span><br><span class="en">'+v.en+'</span></span>'
+      + '<button class="sound-btn" data-say="'+v.kr+'" style="width:32px;height:32px;font-size:13px;">🔊</button>'
+      + '<span class="pill '+pill+'">'+pillLabel+'</span></div>';
+  }).join("");
+  $all("[data-say]", $("#vocabList")).forEach(function(el){ el.onclick=function(){ speak(el.dataset.say); }; });
+
+  var due = VOCAB.filter(function(v){ return isDue(v.id); });
+  $("#vocabDrillCount").textContent = due.length;
+}
+
+/* =====================================================================
+   DRILL SESSIONS (generic)
+   ===================================================================== */
+var drill = { queue:[], pos:0, kind:null };
+function buildQueue(pool){
+  var due = shuffle(pool.filter(function(id){ return isDue(id); }));
+  var budget = introBudgetLeft();
+  var fresh = pool.filter(function(id){ return !state.items[id] || !state.items[id].seen; }).slice(0, budget);
+  fresh.forEach(function(id){ markSeenNow(id); });
+  if(fresh.length) consumeIntroBudget(fresh.length);
+  saveState();
+  return due.concat(fresh);
+}
+function startHangulDrill(){
+  drill.kind="hangul";
+  drill.queue = buildQueue(HANGUL.map(function(h){ return h.id; }));
+  drill.pos = 0;
+  renderDrillCard();
+}
+function startVocabDrill(){
+  drill.kind="vocab";
+  drill.queue = buildQueue(VOCAB.map(function(v){ return v.id; }));
+  drill.pos = 0;
+  renderDrillCard();
+}
+function drillWrapEl(){ return drill.kind==="hangul" ? $("#hangulDrillWrap") : $("#vocabDrillWrap"); }
+function renderDrillCard(){
+  var wrap = drillWrapEl();
+  if(drill.pos >= drill.queue.length){
+    wrap.innerHTML = '<div class="session-empty"><div class="g">🌱</div>All caught up here for now.<div style="margin-top:14px;"><button class="btn ghost" id="drillBack">Back</button></div></div>';
+    $("#drillBack").onclick = function(){ goto(drill.kind==="hangul"?"hangul":"vocab"); };
+    renderHome();
+    return;
+  }
+  var id = drill.queue[drill.pos];
+  var total = drill.queue.length;
+  var isHangul = drill.kind==="hangul";
+  var d = byId(id);
+  var frontGlyph = isHangul ? d.glyph : d.kr;
+  var frontSub = isHangul ? "" : "";
+  var backKr = isHangul ? d.glyph : d.kr;
+  var backRom = isHangul ? (d.roman+" &middot; "+d.name) : d.rm;
+  var backEn = isHangul ? d.sound : d.en;
+
+  wrap.innerHTML =
+    '<div class="drill-progress"><div class="progress-track"><div class="progress-fill" style="width:'+Math.round(100*drill.pos/total)+'%"></div></div><span class="mono">'+(drill.pos+1)+' / '+total+'</span></div>'
+    + '<div class="flashcard" id="flashcard">'
+      + '<div class="front"><div class="front-glyph kr">'+frontGlyph+'</div><div class="front-sub">'+frontSub+'</div><span class="tap-hint">tap to reveal</span></div>'
+      + '<div class="back"><span class="answer-kr kr">'+backKr+'</span><span class="answer-rom mono">'+backRom+'</span><span class="answer-en">'+backEn+'</span>'
+        + (isHangul ? '<div class="examples" style="justify-content:center;margin-top:8px;">'+d.examples.map(function(e){return '<span class="example-chip">'+e.kr+' <span class="rom">'+e.rm+"</span></span>";}).join("")+'</div>' : '')
+      + '</div>'
+    + '</div>'
+    + '<div class="btn-row" style="justify-content:center;margin:12px 0;"><button class="sound-btn" id="drillListen">🔊</button></div>'
+    + '<div class="grade-row" id="gradeRow" style="visibility:hidden;">'
+      + '<button class="grade-btn again" data-g="0">Again<span class="k">forgot</span></button>'
+      + '<button class="grade-btn hard" data-g="1">Hard<span class="k">shaky</span></button>'
+      + '<button class="grade-btn good" data-g="2">Good<span class="k">got it</span></button>'
+      + '<button class="grade-btn easy" data-g="3">Easy<span class="k">instant</span></button>'
+    + '</div>';
+
+  var card = $("#flashcard");
+  card.onclick = function(e){
+    if(e.target.closest(".back")) return;
+    card.classList.toggle("flipped");
+    $("#gradeRow").style.visibility = card.classList.contains("flipped") ? "visible":"hidden";
+  };
+  $("#drillListen").onclick = function(ev){ ev.stopPropagation(); speak(isHangul?letterSpeakText(d):d.kr); };
+  $all("[data-g]", $("#gradeRow")).forEach(function(btn){
+    btn.onclick = function(ev){
+      ev.stopPropagation();
+      gradeItem(id, parseInt(btn.dataset.g,10));
+      drill.pos++;
+      renderDrillCard();
+    };
+  });
+}
+
+/* =====================================================================
+   SPEAKING PRACTICE
+   ===================================================================== */
+var speakFilter = "all";
+var speakCurrent = null;
+function speakPool(){ return VOCAB.filter(function(v){ return speakFilter==="all" || v.cat===speakFilter; }); }
+function renderSpeak(reset){
+  var strip = $("#speakCategoryStrip");
+  strip.innerHTML = ['<button data-c="all" class="'+(speakFilter==="all"?"active":"")+'">All</button>']
+    .concat(CATEGORIES.map(function(c){ return '<button data-c="'+c.id+'" class="'+(speakFilter===c.id?"active":"")+'">'+c.label+'</button>'; })).join("");
+  $all("button", strip).forEach(function(b){ b.onclick=function(){ speakFilter=b.dataset.c; speakCurrent=null; renderSpeak(true); }; });
+  if(reset || !speakCurrent) nextSpeakItem();
+  else renderSpeakCard();
+}
+function nextSpeakItem(){
+  var pool = speakPool();
+  if(!pool.length){ speakCurrent=null; renderSpeakCard(); return; }
+  var choices = pool.filter(function(v){ return !speakCurrent || v.id!==speakCurrent.id; });
+  speakCurrent = choices[Math.floor(Math.random()*choices.length)] || pool[0];
+  $("#speakResult").innerHTML = "";
+  renderSpeakCard();
+}
+function renderSpeakCard(){
+  if(!speakCurrent) return;
+  $("#speakKr").textContent = speakCurrent.kr;
+  $("#speakRom").textContent = speakCurrent.rm;
+  $("#speakEn").textContent = speakCurrent.en;
+}
+function setupSpeakingControls(){
+  $("#speakListenBtn").onclick = function(){ speak(speakCurrent.kr); };
+  $("#speakNextBtn").onclick = nextSpeakItem;
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var micBtn = $("#micBtn");
+  if(!SR){
+    micBtn.disabled = true;
+    $("#micHint").innerHTML = "";
+    $("#speakResult").innerHTML = '<div class="unsupported-note">Speech recognition isn\'t available in this browser. Play the audio, then repeat it out loud yourself — that still builds the muscle memory, just without a score. This tends to work best in Chrome, opened directly on the published page rather than in an embedded preview.</div>';
+    return;
+  }
+  var recognizing = false;
+  micBtn.onclick = function(){
+    if(recognizing) return;
+    var rec = new SR();
+    rec.lang = "ko-KR";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    recognizing = true;
+    micBtn.classList.add("listening");
+    $("#micHint").textContent = "Listening…";
+    $("#speakResult").innerHTML = "";
+    rec.onresult = function(ev){
+      var heard = ev.results[0][0].transcript;
+      var sim = similarity(heard, speakCurrent.kr);
+      var verdict = sim>=0.85 ? "good" : (sim>=0.5 ? "close":"off");
+      var verdictText = verdict==="good" ? "Sounded right" : (verdict==="close" ? "Close — try again" : "Not quite yet");
+      $("#speakResult").innerHTML = '<div class="heard kr">'+heard+'</div><span class="verdict '+verdict+'">'+verdictText+'</span>';
+    };
+    rec.onerror = function(ev){
+      var msg = "Couldn't hear that — try again.";
+      if(ev.error==="not-allowed" || ev.error==="service-not-allowed") msg = "Mic access was blocked. Allow microphone permission for this page, or use listen-and-repeat instead.";
+      if(ev.error==="no-speech") msg = "Didn't catch anything — tap the mic and speak right after.";
+      $("#speakResult").innerHTML = '<div class="unsupported-note">'+msg+'</div>';
+    };
+    rec.onend = function(){ recognizing=false; micBtn.classList.remove("listening"); $("#micHint").textContent="Tap, then say the word aloud"; };
+    try{ rec.start(); }catch(e){ recognizing=false; micBtn.classList.remove("listening"); }
+  };
+}
+
+/* =====================================================================
+   TEXT-TO-SPEECH
+   ===================================================================== */
+var koVoice = null;
+function loadVoices(){
+  if(!("speechSynthesis" in window)) return;
+  var voices = speechSynthesis.getVoices();
+  koVoice = voices.find(function(v){ return v.lang==="ko-KR"; }) || voices.find(function(v){ return v.lang && v.lang.indexOf("ko")===0; }) || null;
+}
+/* A bare jamo like ㄱ or ㅏ is not a syllable, so many Korean voices read it as silence.
+   Speak a real syllable carrying that sound instead: consonant + ㅏ, vowel after silent ㅇ. */
+function letterSpeakText(h){
+  if(h.kind==="consonant" || h.kind==="double") return composeSyllable(h.glyph,"ㅏ","") || h.glyph;
+  return composeSyllable("ㅇ",h.glyph,"") || h.glyph;
+}
+var voiceWarned = false;
+function voiceStatus(){
+  if(!("speechSynthesis" in window)) return {ok:false, msg:"This browser has no speech synthesis, so there is no audio to play."};
+  loadVoices();
+  var n = speechSynthesis.getVoices().length;
+  if(koVoice) return {ok:true, msg:"Korean voice found: "+koVoice.name+" ("+koVoice.lang+")"};
+  if(n===0) return {ok:false, msg:"No voices have loaded yet. Try once more in a few seconds."};
+  return {ok:false, msg:"No Korean voice is installed on this device ("+n+" other voices found). Add one in system settings: Android > Text-to-speech > Google > Install voice data > Korean; iPhone > Settings > Accessibility > Spoken Content > Voices > Korean."};
+}
+function speak(text){
+  if(!text) return;
+  if(!("speechSynthesis" in window)){ toast("This browser has no speech synthesis"); return; }
+  try{
+    loadVoices();
+    if(!koVoice && !voiceWarned && speechSynthesis.getVoices().length){
+      voiceWarned = true;
+      toast("No Korean voice on this device. See Settings > Audio check");
+    }
+    speechSynthesis.cancel();
+    if(speechSynthesis.paused) speechSynthesis.resume();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "ko-KR";
+    if(koVoice) u.voice = koVoice;
+    u.rate = 0.85;
+    u.volume = 1;
+    u.onerror = function(ev){
+      if(ev && ev.error && ev.error!=="canceled" && ev.error!=="interrupted") toast("Audio failed: "+ev.error);
+    };
+    /* Chrome drops a speak() that follows cancel() in the same tick, so wait a beat. */
+    setTimeout(function(){ try{ speechSynthesis.speak(u); }catch(e){ toast("Audio failed to start"); } }, 80);
+  }catch(e){ toast("Audio failed to start"); }
+}
+if("speechSynthesis" in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+/* =====================================================================
+   SETTINGS
+   ===================================================================== */
+function applyTheme(){
+  if(state.theme==="light") document.documentElement.setAttribute("data-theme","light");
+  else if(state.theme==="dark") document.documentElement.setAttribute("data-theme","dark");
+  else document.documentElement.removeAttribute("data-theme");
+  $all("#themeAuto,#themeLight,#themeDark").forEach(function(b){});
+  ["themeAuto","themeLight","themeDark"].forEach(function(id){
+    var b=$("#"+id); if(!b) return;
+    var match = (id==="themeAuto"&&state.theme==="auto")||(id==="themeLight"&&state.theme==="light")||(id==="themeDark"&&state.theme==="dark");
+    b.style.background = match ? "var(--indigo-tint)" : "";
+    b.style.borderColor = match ? "var(--indigo)" : "";
+    b.style.color = match ? "var(--indigo-ink)" : "";
+  });
+}
+function renderSettingsCaps(){
+  $all("[data-cap]").forEach(function(b){
+    var match = parseInt(b.dataset.cap,10)===state.dailyCap;
+    b.style.background = match ? "var(--indigo-tint)" : "";
+    b.style.borderColor = match ? "var(--indigo)" : "";
+    b.style.color = match ? "var(--indigo-ink)" : "";
+  });
+}
+function wireSettings(){
+  $("#themeAuto").onclick=function(){ state.theme="auto"; saveState(); applyTheme(); };
+  $("#themeLight").onclick=function(){ state.theme="light"; saveState(); applyTheme(); };
+  $("#themeDark").onclick=function(){ state.theme="dark"; saveState(); applyTheme(); };
+  $all("[data-cap]").forEach(function(b){
+    b.onclick=function(){ state.dailyCap=parseInt(b.dataset.cap,10); saveState(); renderSettingsCaps(); toast("Daily new-item cap set to "+state.dailyCap); };
+  });
+  var resetArmed=false, resetBtn=$("#btnReset"), resetLabel=resetBtn.textContent;
+  resetBtn.onclick=function(){
+    if(!resetArmed){
+      resetArmed=true; resetBtn.textContent="Click again to confirm";
+      setTimeout(function(){ resetArmed=false; resetBtn.textContent=resetLabel; }, 4000);
+      return;
+    }
+    state = defaultState();
+    saveState();
+    resetArmed=false; resetBtn.textContent=resetLabel;
+    toast("Progress reset");
+    renderHome(); renderHangul(); renderVocab();
+    goto("home");
+  };
+  $("#btnAudioTest").onclick=function(){
+    var st = voiceStatus();
+    $("#audioSub").textContent = st.msg;
+    speak("안녕하세요");
+  };
+  $("#btnSync").onclick=function(){
+    saveState();
+    toast("Saved to this browser");
+  };
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+document.addEventListener("DOMContentLoaded", function(){
+  applyTheme();
+  renderSettingsCaps();
+  wireSettings();
+  setupSpeakingControls();
+
+  $all("#tabs button").forEach(function(b){ b.onclick=function(){ goto(b.dataset.view); }; });
+  $all("[data-goto]").forEach(function(b){ b.onclick=function(){ goto(b.dataset.goto); }; });
+  $("#btnSyllableBuilder").onclick=function(){ goto("builder"); };
+  $("#btnHangulDrill").onclick=function(){ goto("hangul-drill"); startHangulDrill(); };
+  $("#btnVocabDrill").onclick=function(){ goto("vocab-drill"); startVocabDrill(); };
+  $("#letterOverlay").addEventListener("click", function(e){ if(e.target.id==="letterOverlay") closeLetterModal(); });
+
+  renderHome();
+});
+</script>
+</body>
+</html>
