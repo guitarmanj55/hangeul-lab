@@ -5,7 +5,8 @@ Personal Korean-learning web app. Owner: Oli (British, learning Korean, previous
 ## Rules
 - Vocab drills always show Hangeul as the prompt, never romanization
 - Keep it a dependency-free static site unless there is a clear reason; no build step for now
-- Progress lives in localStorage under `hangeullab_progress_v1`; do not change that key or the saved shape without a migration
+- Progress lives in localStorage under `hangeullab_progress_v1`; do not change that key or the saved shape without a migration. Saved state carries `schema` (now 2); add migrations to `migrateState()`, which also runs on imported backups
+- Every vocab entry has a permanent `id`; progress is saved against it. Give new words a new id, never rename or reuse one, and never edit `LEGACY_VOCAB_IDS`
 - Light and dark themes both stay working; colours come from the CSS tokens at the top of `index.html`
 - Fonts: Fraunces (display), Noto Serif/Sans KR (Korean), IBM Plex Mono (romanization and numbers)
 

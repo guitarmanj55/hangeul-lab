@@ -301,6 +301,22 @@ section.view.active{display:block; animation:rise .28s ease both;}
   width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--paper-raised);
   cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:15px; color:var(--indigo);
 }
+.listen-play{width:84px; height:84px; font-size:30px; margin:0 auto; display:flex;}
+.listen-hint{font-size:12.5px; color:var(--ink-3); text-align:center; margin:10px 0 18px;}
+.option-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px;}
+.option-btn{overflow-wrap:anywhere; word-break:keep-all;}
+.option-btn{
+  font-family:var(--font-kr-serif); font-size:30px; font-weight:600; padding:16px 8px; min-height:76px;
+  border-radius:var(--radius-lg); border:1px solid var(--line); background:var(--paper-raised); color:var(--ink-1);
+  cursor:pointer; transition:border-color .15s, background .15s;
+}
+.option-btn.words{font-size:19px;}
+.option-btn:hover:not(:disabled){border-color:var(--indigo);}
+.option-btn:disabled{cursor:default;}
+.option-btn.right{background:var(--celadon-tint); border-color:var(--celadon); color:var(--celadon);}
+.option-btn.wrong{background:var(--dancheong-tint); border-color:var(--dancheong); color:var(--dancheong);}
+.listen-feedback{text-align:center; min-height:64px; margin:14px 0 4px; font-size:13.5px; color:var(--ink-2);}
+.listen-feedback .mono{color:var(--ink-3); font-size:12px; text-transform:uppercase; letter-spacing:.05em;}
 .session-empty{text-align:center; padding:50px 20px; color:var(--ink-2);}
 .session-empty .g{font-family:var(--font-kr-serif); font-size:52px; color:var(--celadon); margin-bottom:10px;}
 
@@ -413,7 +429,7 @@ section.view.active{display:block; animation:rise .28s ease both;}
   <!-- HANGUL -->
   <section class="view" id="view-hangul">
     <div class="section-head"><div><span class="eyebrow">Module 1</span><h2>Hangeul letters</h2></div>
-      <div class="btn-row"><button class="btn ghost" id="btnSyllableBuilder">Syllable builder</button><button class="btn" id="btnHangulDrill">Review (<span id="hangulDrillCount">0</span>)</button></div>
+      <div class="btn-row"><button class="btn ghost" id="btnSyllableBuilder">Syllable builder</button><button class="btn ghost" data-listen="letters">Listening</button><button class="btn" id="btnHangulDrill">Review (<span id="hangulDrillCount">0</span>)</button></div>
     </div>
     <div id="hangulGroups"></div>
   </section>
@@ -454,7 +470,7 @@ section.view.active{display:block; animation:rise .28s ease both;}
   <!-- VOCAB -->
   <section class="view" id="view-vocab">
     <div class="section-head"><div><span class="eyebrow">Module 2</span><h2>Survival vocab</h2></div>
-      <button class="btn" id="btnVocabDrill">Review (<span id="vocabDrillCount">0</span>)</button>
+      <div class="btn-row"><button class="btn ghost" data-listen="vocab">Listening</button><button class="btn" id="btnVocabDrill">Review (<span id="vocabDrillCount">0</span>)</button></div>
     </div>
     <div class="category-strip" id="categoryStrip"></div>
     <div class="vocab-list" id="vocabList"></div>
@@ -466,6 +482,15 @@ section.view.active{display:block; animation:rise .28s ease both;}
       <button class="btn ghost" data-goto="vocab">← Back</button>
     </div>
     <div class="drill-wrap" id="vocabDrillWrap"></div>
+  </section>
+
+  <!-- LISTENING -->
+  <section class="view" id="view-listen">
+    <div class="section-head"><div><span class="eyebrow">Ear training</span><h2>Listening</h2></div>
+      <button class="btn ghost" id="listenBack">← Back</button>
+    </div>
+    <div class="category-strip" id="listenModes"></div>
+    <div class="drill-wrap" id="listenWrap"></div>
   </section>
 
   <!-- SPEAKING -->
@@ -493,8 +518,12 @@ section.view.active{display:block; animation:rise .28s ease both;}
     <div class="section-head"><h2>Settings &amp; progress</h2></div>
     <div class="card">
       <div class="settings-row">
-        <div><div class="lbl">Progress storage</div><div class="sub" id="syncSub">Saved automatically in this browser only. It won't follow you to another device or browser.</div></div>
-        <button class="btn ghost" id="btnSync">Save now</button>
+        <div><div class="lbl">Back up progress</div><div class="sub">Progress saves automatically, but only in this browser. Back it up, or copy it to move it to another device.</div></div>
+        <div class="btn-row"><button class="btn ghost" id="btnExportFile">Download</button><button class="btn ghost" id="btnExportCopy">Copy</button></div>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Restore or merge</div><div class="sub">Load a backup. It merges with what's here, keeping the most recent review of each item.</div></div>
+        <div class="btn-row"><button class="btn ghost" id="btnImportFile">Open file</button><button class="btn ghost" id="btnImportPaste">Paste</button><input type="file" id="importFileInput" accept=".json,application/json,text/plain" hidden></div>
       </div>
       <div class="settings-row">
         <div><div class="lbl">Audio check</div><div class="sub" id="audioSub">Tests the recorded clips, and whether this device has a Korean voice for the rest.</div></div>
@@ -591,105 +620,108 @@ var CATEGORIES = [
   {id:"phrases",label:"Everyday phrases"}
 ];
 var VOCAB = [
-  {cat:"greet",kr:"안녕하세요",rm:"annyeonghaseyo",en:"Hello"},
-  {cat:"greet",kr:"안녕히 가세요",rm:"annyeonghi gaseyo",en:"Goodbye (to someone leaving)"},
-  {cat:"greet",kr:"안녕히 계세요",rm:"annyeonghi gyeseyo",en:"Goodbye (to someone staying)"},
-  {cat:"greet",kr:"감사합니다",rm:"gamsahamnida",en:"Thank you"},
-  {cat:"greet",kr:"고맙습니다",rm:"gomapseumnida",en:"Thank you (also common)"},
-  {cat:"greet",kr:"죄송합니다",rm:"joesonghamnida",en:"I'm sorry"},
-  {cat:"greet",kr:"괜찮아요",rm:"gwaenchanhayo",en:"It's okay / I'm fine"},
-  {cat:"greet",kr:"네",rm:"ne",en:"Yes"},
-  {cat:"greet",kr:"아니요",rm:"aniyo",en:"No"},
-  {cat:"greet",kr:"저기요",rm:"jeogiyo",en:"Excuse me (to get attention)"},
-  {cat:"greet",kr:"이름이 뭐예요?",rm:"ireumi mwoyeyo?",en:"What's your name?"},
-  {cat:"greet",kr:"제 이름은 ~예요",rm:"je ireumeun ~yeyo",en:"My name is ~"},
-  {cat:"greet",kr:"반갑습니다",rm:"bangapseumnida",en:"Nice to meet you"},
-  {cat:"greet",kr:"영어 할 줄 아세요?",rm:"yeongeo hal jul aseyo?",en:"Do you speak English?"},
-  {cat:"numbers",kr:"일",rm:"il",en:"one (Sino-Korean)"},
-  {cat:"numbers",kr:"이",rm:"i",en:"two (Sino-Korean)"},
-  {cat:"numbers",kr:"삼",rm:"sam",en:"three (Sino-Korean)"},
-  {cat:"numbers",kr:"사",rm:"sa",en:"four (Sino-Korean)"},
-  {cat:"numbers",kr:"오",rm:"o",en:"five (Sino-Korean)"},
-  {cat:"numbers",kr:"육",rm:"yuk",en:"six (Sino-Korean)"},
-  {cat:"numbers",kr:"칠",rm:"chil",en:"seven (Sino-Korean)"},
-  {cat:"numbers",kr:"팔",rm:"pal",en:"eight (Sino-Korean)"},
-  {cat:"numbers",kr:"구",rm:"gu",en:"nine (Sino-Korean)"},
-  {cat:"numbers",kr:"십",rm:"sip",en:"ten (Sino-Korean, for money & phone numbers)"},
-  {cat:"numbers",kr:"하나",rm:"hana",en:"one (native, for counting objects/age)"},
-  {cat:"numbers",kr:"둘",rm:"dul",en:"two (native)"},
-  {cat:"numbers",kr:"셋",rm:"set",en:"three (native)"},
-  {cat:"numbers",kr:"넷",rm:"net",en:"four (native)"},
-  {cat:"numbers",kr:"다섯",rm:"daseot",en:"five (native)"},
-  {cat:"food",kr:"물",rm:"mul",en:"water"},
-  {cat:"food",kr:"밥",rm:"bap",en:"rice / a meal"},
-  {cat:"food",kr:"맛있어요",rm:"masisseoyo",en:"It's delicious"},
-  {cat:"food",kr:"매워요",rm:"maewoyo",en:"It's spicy"},
-  {cat:"food",kr:"메뉴",rm:"menyu",en:"menu"},
-  {cat:"food",kr:"주문할게요",rm:"jumunhalgeyo",en:"I'd like to order"},
-  {cat:"food",kr:"이거 주세요",rm:"igeo juseyo",en:"This one, please"},
-  {cat:"food",kr:"계산서 주세요",rm:"gyesanseo juseyo",en:"The bill, please"},
-  {cat:"food",kr:"얼마예요?",rm:"eolmayeyo?",en:"How much is it?"},
-  {cat:"food",kr:"맛있게 드세요",rm:"masitge deuseyo",en:"Enjoy your meal"},
-  {cat:"food",kr:"김치",rm:"gimchi",en:"kimchi"},
-  {cat:"food",kr:"커피",rm:"keopi",en:"coffee"},
-  {cat:"food",kr:"채식주의자예요",rm:"chaesikjuuijayeyo",en:"I'm a vegetarian"},
-  {cat:"food",kr:"포장이요",rm:"pojangiyo",en:"To go / takeout, please"},
-  {cat:"transport",kr:"지하철역",rm:"jihacheollyeok",en:"subway station"},
-  {cat:"transport",kr:"버스 정류장",rm:"beoseu jeongnyujang",en:"bus stop"},
-  {cat:"transport",kr:"공항",rm:"gonghang",en:"airport"},
-  {cat:"transport",kr:"왼쪽",rm:"oenjjok",en:"left"},
-  {cat:"transport",kr:"오른쪽",rm:"oreunjjok",en:"right"},
-  {cat:"transport",kr:"직진하세요",rm:"jikjinhaseyo",en:"Go straight"},
-  {cat:"transport",kr:"화장실이 어디예요?",rm:"hwajangsiri eodiyeyo?",en:"Where's the bathroom?"},
-  {cat:"transport",kr:"출구",rm:"chulgu",en:"exit"},
-  {cat:"transport",kr:"입구",rm:"ipgu",en:"entrance"},
-  {cat:"transport",kr:"표",rm:"pyo",en:"ticket"},
-  {cat:"transport",kr:"택시",rm:"taeksi",en:"taxi"},
-  {cat:"transport",kr:"얼마나 걸려요?",rm:"eolmana geollyeoyo?",en:"How long does it take?"},
-  {cat:"transport",kr:"여기요",rm:"yeogiyo",en:"Here / over here"},
-  {cat:"shopping",kr:"이거 얼마예요?",rm:"igeo eolmayeyo?",en:"How much is this?"},
-  {cat:"shopping",kr:"비싸요",rm:"bissayo",en:"It's expensive"},
-  {cat:"shopping",kr:"싸요",rm:"ssayo",en:"It's cheap"},
-  {cat:"shopping",kr:"현금",rm:"hyeongeum",en:"cash"},
-  {cat:"shopping",kr:"카드",rm:"kadeu",en:"card"},
-  {cat:"shopping",kr:"할인",rm:"halin",en:"discount"},
-  {cat:"shopping",kr:"입어 봐도 돼요?",rm:"ibeo bwado dwaeyo?",en:"Can I try it on?"},
-  {cat:"shopping",kr:"영수증",rm:"yeongsujeung",en:"receipt"},
-  {cat:"shopping",kr:"환불",rm:"hwanbul",en:"refund"},
-  {cat:"shopping",kr:"사이즈",rm:"saijeu",en:"size"},
-  {cat:"shopping",kr:"다른 색깔 있어요?",rm:"dareun saekkkal isseoyo?",en:"Do you have another colour?"},
-  {cat:"emergency",kr:"도와주세요",rm:"dowajuseyo",en:"Help me / Please help"},
-  {cat:"emergency",kr:"병원",rm:"byeongwon",en:"hospital"},
-  {cat:"emergency",kr:"경찰서",rm:"gyeongchalseo",en:"police station"},
-  {cat:"emergency",kr:"길을 잃었어요",rm:"gireul ireosseoyo",en:"I'm lost"},
-  {cat:"emergency",kr:"아파요",rm:"apayo",en:"It hurts / I'm in pain"},
-  {cat:"emergency",kr:"여권을 잃어버렸어요",rm:"yeogwoneul ireobeoryeosseoyo",en:"I lost my passport"},
-  {cat:"emergency",kr:"119에 전화해 주세요",rm:"iril-gue jeonhwahae juseyo",en:"Please call 119 (Korea's emergency number)"},
-  {cat:"emergency",kr:"알레르기가 있어요",rm:"allereugiga isseoyo",en:"I have an allergy"},
-  {cat:"emergency",kr:"천천히 말해 주세요",rm:"cheoncheonhi malhae juseyo",en:"Please speak slowly"},
-  {cat:"emergency",kr:"이해가 안 돼요",rm:"ihaega an dwaeyo",en:"I don't understand"},
-  {cat:"time",kr:"오늘",rm:"oneul",en:"today"},
-  {cat:"time",kr:"내일",rm:"naeil",en:"tomorrow"},
-  {cat:"time",kr:"어제",rm:"eoje",en:"yesterday"},
-  {cat:"time",kr:"지금",rm:"jigeum",en:"now"},
-  {cat:"time",kr:"아침",rm:"achim",en:"morning"},
-  {cat:"time",kr:"저녁",rm:"jeonyeok",en:"evening"},
-  {cat:"time",kr:"월요일",rm:"woryoil",en:"Monday"},
-  {cat:"time",kr:"화요일",rm:"hwayoil",en:"Tuesday"},
-  {cat:"time",kr:"주말",rm:"jumal",en:"weekend"},
-  {cat:"time",kr:"몇 시예요?",rm:"myeot siyeyo?",en:"What time is it?"},
-  {cat:"phrases",kr:"잠깐만요",rm:"jamkkanmanyo",en:"Just a moment / hold on"},
-  {cat:"phrases",kr:"다시 한번 말해 주세요",rm:"dasi hanbeon malhae juseyo",en:"Please say that again"},
-  {cat:"phrases",kr:"이거 뭐예요?",rm:"igeo mwoyeyo?",en:"What is this?"},
-  {cat:"phrases",kr:"같이 가요",rm:"gachi gayo",en:"Let's go together"},
-  {cat:"phrases",kr:"정말요?",rm:"jeongmallyo?",en:"Really?"},
-  {cat:"phrases",kr:"화이팅!",rm:"hwaiting!",en:"You've got this! (go for it)"},
-  {cat:"phrases",kr:"괜찮으세요?",rm:"gwaenchaneuseyo?",en:"Are you okay?"},
-  {cat:"phrases",kr:"사진 찍어도 돼요?",rm:"sajin jjigeodo dwaeyo?",en:"Can I take a photo?"},
-  {cat:"phrases",kr:"와이파이 비밀번호가 뭐예요?",rm:"waipai bimilbeonhoga mwoyeyo?",en:"What's the wifi password?"},
-  {cat:"phrases",kr:"건배!",rm:"geonbae!",en:"Cheers!"}
+  {id:"v_annyeonghaseyo",cat:"greet",kr:"안녕하세요",rm:"annyeonghaseyo",en:"Hello"},
+  {id:"v_annyeonghi_gaseyo",cat:"greet",kr:"안녕히 가세요",rm:"annyeonghi gaseyo",en:"Goodbye (to someone leaving)"},
+  {id:"v_annyeonghi_gyeseyo",cat:"greet",kr:"안녕히 계세요",rm:"annyeonghi gyeseyo",en:"Goodbye (to someone staying)"},
+  {id:"v_gamsahamnida",cat:"greet",kr:"감사합니다",rm:"gamsahamnida",en:"Thank you"},
+  {id:"v_gomapseumnida",cat:"greet",kr:"고맙습니다",rm:"gomapseumnida",en:"Thank you (also common)"},
+  {id:"v_joesonghamnida",cat:"greet",kr:"죄송합니다",rm:"joesonghamnida",en:"I'm sorry"},
+  {id:"v_gwaenchanhayo",cat:"greet",kr:"괜찮아요",rm:"gwaenchanhayo",en:"It's okay / I'm fine"},
+  {id:"v_ne",cat:"greet",kr:"네",rm:"ne",en:"Yes"},
+  {id:"v_aniyo",cat:"greet",kr:"아니요",rm:"aniyo",en:"No"},
+  {id:"v_jeogiyo",cat:"greet",kr:"저기요",rm:"jeogiyo",en:"Excuse me (to get attention)"},
+  {id:"v_ireumi_mwoyeyo",cat:"greet",kr:"이름이 뭐예요?",rm:"ireumi mwoyeyo?",en:"What's your name?"},
+  {id:"v_je_ireumeun_yeyo",cat:"greet",kr:"제 이름은 ~예요",rm:"je ireumeun ~yeyo",en:"My name is ~"},
+  {id:"v_bangapseumnida",cat:"greet",kr:"반갑습니다",rm:"bangapseumnida",en:"Nice to meet you"},
+  {id:"v_yeongeo_hal_jul_aseyo",cat:"greet",kr:"영어 할 줄 아세요?",rm:"yeongeo hal jul aseyo?",en:"Do you speak English?"},
+  {id:"v_il",cat:"numbers",kr:"일",rm:"il",en:"one (Sino-Korean)"},
+  {id:"v_i",cat:"numbers",kr:"이",rm:"i",en:"two (Sino-Korean)"},
+  {id:"v_sam",cat:"numbers",kr:"삼",rm:"sam",en:"three (Sino-Korean)"},
+  {id:"v_sa",cat:"numbers",kr:"사",rm:"sa",en:"four (Sino-Korean)"},
+  {id:"v_o",cat:"numbers",kr:"오",rm:"o",en:"five (Sino-Korean)"},
+  {id:"v_yuk",cat:"numbers",kr:"육",rm:"yuk",en:"six (Sino-Korean)"},
+  {id:"v_chil",cat:"numbers",kr:"칠",rm:"chil",en:"seven (Sino-Korean)"},
+  {id:"v_pal",cat:"numbers",kr:"팔",rm:"pal",en:"eight (Sino-Korean)"},
+  {id:"v_gu",cat:"numbers",kr:"구",rm:"gu",en:"nine (Sino-Korean)"},
+  {id:"v_sip",cat:"numbers",kr:"십",rm:"sip",en:"ten (Sino-Korean, for money & phone numbers)"},
+  {id:"v_hana",cat:"numbers",kr:"하나",rm:"hana",en:"one (native, for counting objects/age)"},
+  {id:"v_dul",cat:"numbers",kr:"둘",rm:"dul",en:"two (native)"},
+  {id:"v_set",cat:"numbers",kr:"셋",rm:"set",en:"three (native)"},
+  {id:"v_net",cat:"numbers",kr:"넷",rm:"net",en:"four (native)"},
+  {id:"v_daseot",cat:"numbers",kr:"다섯",rm:"daseot",en:"five (native)"},
+  {id:"v_mul",cat:"food",kr:"물",rm:"mul",en:"water"},
+  {id:"v_bap",cat:"food",kr:"밥",rm:"bap",en:"rice / a meal"},
+  {id:"v_masisseoyo",cat:"food",kr:"맛있어요",rm:"masisseoyo",en:"It's delicious"},
+  {id:"v_maewoyo",cat:"food",kr:"매워요",rm:"maewoyo",en:"It's spicy"},
+  {id:"v_menyu",cat:"food",kr:"메뉴",rm:"menyu",en:"menu"},
+  {id:"v_jumunhalgeyo",cat:"food",kr:"주문할게요",rm:"jumunhalgeyo",en:"I'd like to order"},
+  {id:"v_igeo_juseyo",cat:"food",kr:"이거 주세요",rm:"igeo juseyo",en:"This one, please"},
+  {id:"v_gyesanseo_juseyo",cat:"food",kr:"계산서 주세요",rm:"gyesanseo juseyo",en:"The bill, please"},
+  {id:"v_eolmayeyo",cat:"food",kr:"얼마예요?",rm:"eolmayeyo?",en:"How much is it?"},
+  {id:"v_masitge_deuseyo",cat:"food",kr:"맛있게 드세요",rm:"masitge deuseyo",en:"Enjoy your meal"},
+  {id:"v_gimchi",cat:"food",kr:"김치",rm:"gimchi",en:"kimchi"},
+  {id:"v_keopi",cat:"food",kr:"커피",rm:"keopi",en:"coffee"},
+  {id:"v_chaesikjuuijayeyo",cat:"food",kr:"채식주의자예요",rm:"chaesikjuuijayeyo",en:"I'm a vegetarian"},
+  {id:"v_pojangiyo",cat:"food",kr:"포장이요",rm:"pojangiyo",en:"To go / takeout, please"},
+  {id:"v_jihacheollyeok",cat:"transport",kr:"지하철역",rm:"jihacheollyeok",en:"subway station"},
+  {id:"v_beoseu_jeongnyujang",cat:"transport",kr:"버스 정류장",rm:"beoseu jeongnyujang",en:"bus stop"},
+  {id:"v_gonghang",cat:"transport",kr:"공항",rm:"gonghang",en:"airport"},
+  {id:"v_oenjjok",cat:"transport",kr:"왼쪽",rm:"oenjjok",en:"left"},
+  {id:"v_oreunjjok",cat:"transport",kr:"오른쪽",rm:"oreunjjok",en:"right"},
+  {id:"v_jikjinhaseyo",cat:"transport",kr:"직진하세요",rm:"jikjinhaseyo",en:"Go straight"},
+  {id:"v_hwajangsiri_eodiyeyo",cat:"transport",kr:"화장실이 어디예요?",rm:"hwajangsiri eodiyeyo?",en:"Where's the bathroom?"},
+  {id:"v_chulgu",cat:"transport",kr:"출구",rm:"chulgu",en:"exit"},
+  {id:"v_ipgu",cat:"transport",kr:"입구",rm:"ipgu",en:"entrance"},
+  {id:"v_pyo",cat:"transport",kr:"표",rm:"pyo",en:"ticket"},
+  {id:"v_taeksi",cat:"transport",kr:"택시",rm:"taeksi",en:"taxi"},
+  {id:"v_eolmana_geollyeoyo",cat:"transport",kr:"얼마나 걸려요?",rm:"eolmana geollyeoyo?",en:"How long does it take?"},
+  {id:"v_yeogiyo",cat:"transport",kr:"여기요",rm:"yeogiyo",en:"Here / over here"},
+  {id:"v_igeo_eolmayeyo",cat:"shopping",kr:"이거 얼마예요?",rm:"igeo eolmayeyo?",en:"How much is this?"},
+  {id:"v_bissayo",cat:"shopping",kr:"비싸요",rm:"bissayo",en:"It's expensive"},
+  {id:"v_ssayo",cat:"shopping",kr:"싸요",rm:"ssayo",en:"It's cheap"},
+  {id:"v_hyeongeum",cat:"shopping",kr:"현금",rm:"hyeongeum",en:"cash"},
+  {id:"v_kadeu",cat:"shopping",kr:"카드",rm:"kadeu",en:"card"},
+  {id:"v_halin",cat:"shopping",kr:"할인",rm:"halin",en:"discount"},
+  {id:"v_ibeo_bwado_dwaeyo",cat:"shopping",kr:"입어 봐도 돼요?",rm:"ibeo bwado dwaeyo?",en:"Can I try it on?"},
+  {id:"v_yeongsujeung",cat:"shopping",kr:"영수증",rm:"yeongsujeung",en:"receipt"},
+  {id:"v_hwanbul",cat:"shopping",kr:"환불",rm:"hwanbul",en:"refund"},
+  {id:"v_saijeu",cat:"shopping",kr:"사이즈",rm:"saijeu",en:"size"},
+  {id:"v_dareun_saekkkal_isseoyo",cat:"shopping",kr:"다른 색깔 있어요?",rm:"dareun saekkkal isseoyo?",en:"Do you have another colour?"},
+  {id:"v_dowajuseyo",cat:"emergency",kr:"도와주세요",rm:"dowajuseyo",en:"Help me / Please help"},
+  {id:"v_byeongwon",cat:"emergency",kr:"병원",rm:"byeongwon",en:"hospital"},
+  {id:"v_gyeongchalseo",cat:"emergency",kr:"경찰서",rm:"gyeongchalseo",en:"police station"},
+  {id:"v_gireul_ireosseoyo",cat:"emergency",kr:"길을 잃었어요",rm:"gireul ireosseoyo",en:"I'm lost"},
+  {id:"v_apayo",cat:"emergency",kr:"아파요",rm:"apayo",en:"It hurts / I'm in pain"},
+  {id:"v_yeogwoneul_ireobeoryeosseoyo",cat:"emergency",kr:"여권을 잃어버렸어요",rm:"yeogwoneul ireobeoryeosseoyo",en:"I lost my passport"},
+  {id:"v_iril_gue_jeonhwahae_juseyo",cat:"emergency",kr:"119에 전화해 주세요",rm:"iril-gue jeonhwahae juseyo",en:"Please call 119 (Korea's emergency number)"},
+  {id:"v_allereugiga_isseoyo",cat:"emergency",kr:"알레르기가 있어요",rm:"allereugiga isseoyo",en:"I have an allergy"},
+  {id:"v_cheoncheonhi_malhae_juseyo",cat:"emergency",kr:"천천히 말해 주세요",rm:"cheoncheonhi malhae juseyo",en:"Please speak slowly"},
+  {id:"v_ihaega_an_dwaeyo",cat:"emergency",kr:"이해가 안 돼요",rm:"ihaega an dwaeyo",en:"I don't understand"},
+  {id:"v_oneul",cat:"time",kr:"오늘",rm:"oneul",en:"today"},
+  {id:"v_naeil",cat:"time",kr:"내일",rm:"naeil",en:"tomorrow"},
+  {id:"v_eoje",cat:"time",kr:"어제",rm:"eoje",en:"yesterday"},
+  {id:"v_jigeum",cat:"time",kr:"지금",rm:"jigeum",en:"now"},
+  {id:"v_achim",cat:"time",kr:"아침",rm:"achim",en:"morning"},
+  {id:"v_jeonyeok",cat:"time",kr:"저녁",rm:"jeonyeok",en:"evening"},
+  {id:"v_woryoil",cat:"time",kr:"월요일",rm:"woryoil",en:"Monday"},
+  {id:"v_hwayoil",cat:"time",kr:"화요일",rm:"hwayoil",en:"Tuesday"},
+  {id:"v_jumal",cat:"time",kr:"주말",rm:"jumal",en:"weekend"},
+  {id:"v_myeot_siyeyo",cat:"time",kr:"몇 시예요?",rm:"myeot siyeyo?",en:"What time is it?"},
+  {id:"v_jamkkanmanyo",cat:"phrases",kr:"잠깐만요",rm:"jamkkanmanyo",en:"Just a moment / hold on"},
+  {id:"v_dasi_hanbeon_malhae_juseyo",cat:"phrases",kr:"다시 한번 말해 주세요",rm:"dasi hanbeon malhae juseyo",en:"Please say that again"},
+  {id:"v_igeo_mwoyeyo",cat:"phrases",kr:"이거 뭐예요?",rm:"igeo mwoyeyo?",en:"What is this?"},
+  {id:"v_gachi_gayo",cat:"phrases",kr:"같이 가요",rm:"gachi gayo",en:"Let's go together"},
+  {id:"v_jeongmallyo",cat:"phrases",kr:"정말요?",rm:"jeongmallyo?",en:"Really?"},
+  {id:"v_hwaiting",cat:"phrases",kr:"화이팅!",rm:"hwaiting!",en:"You've got this! (go for it)"},
+  {id:"v_gwaenchaneuseyo",cat:"phrases",kr:"괜찮으세요?",rm:"gwaenchaneuseyo?",en:"Are you okay?"},
+  {id:"v_sajin_jjigeodo_dwaeyo",cat:"phrases",kr:"사진 찍어도 돼요?",rm:"sajin jjigeodo dwaeyo?",en:"Can I take a photo?"},
+  {id:"v_waipai_bimilbeonhoga_mwoyeyo",cat:"phrases",kr:"와이파이 비밀번호가 뭐예요?",rm:"waipai bimilbeonhoga mwoyeyo?",en:"What's the wifi password?"},
+  {id:"v_geonbae",cat:"phrases",kr:"건배!",rm:"geonbae!",en:"Cheers!"}
 ];
-VOCAB.forEach(function(v,i){ v.id="v_"+i; });
+/* Vocab IDs are permanent: progress is saved against them, so never rename one.
+   v1 keyed progress by list position ("v_0", "v_1"…); this is the v1 list order,
+   used once by migrateState() to move old progress onto the permanent IDs. Frozen. */
+var LEGACY_VOCAB_IDS = ["v_annyeonghaseyo","v_annyeonghi_gaseyo","v_annyeonghi_gyeseyo","v_gamsahamnida","v_gomapseumnida","v_joesonghamnida","v_gwaenchanhayo","v_ne","v_aniyo","v_jeogiyo","v_ireumi_mwoyeyo","v_je_ireumeun_yeyo","v_bangapseumnida","v_yeongeo_hal_jul_aseyo","v_il","v_i","v_sam","v_sa","v_o","v_yuk","v_chil","v_pal","v_gu","v_sip","v_hana","v_dul","v_set","v_net","v_daseot","v_mul","v_bap","v_masisseoyo","v_maewoyo","v_menyu","v_jumunhalgeyo","v_igeo_juseyo","v_gyesanseo_juseyo","v_eolmayeyo","v_masitge_deuseyo","v_gimchi","v_keopi","v_chaesikjuuijayeyo","v_pojangiyo","v_jihacheollyeok","v_beoseu_jeongnyujang","v_gonghang","v_oenjjok","v_oreunjjok","v_jikjinhaseyo","v_hwajangsiri_eodiyeyo","v_chulgu","v_ipgu","v_pyo","v_taeksi","v_eolmana_geollyeoyo","v_yeogiyo","v_igeo_eolmayeyo","v_bissayo","v_ssayo","v_hyeongeum","v_kadeu","v_halin","v_ibeo_bwado_dwaeyo","v_yeongsujeung","v_hwanbul","v_saijeu","v_dareun_saekkkal_isseoyo","v_dowajuseyo","v_byeongwon","v_gyeongchalseo","v_gireul_ireosseoyo","v_apayo","v_yeogwoneul_ireobeoryeosseoyo","v_iril_gue_jeonhwahae_juseyo","v_allereugiga_isseoyo","v_cheoncheonhi_malhae_juseyo","v_ihaega_an_dwaeyo","v_oneul","v_naeil","v_eoje","v_jigeum","v_achim","v_jeonyeok","v_woryoil","v_hwayoil","v_jumal","v_myeot_siyeyo","v_jamkkanmanyo","v_dasi_hanbeon_malhae_juseyo","v_igeo_mwoyeyo","v_gachi_gayo","v_jeongmallyo","v_hwaiting","v_gwaenchaneuseyo","v_sajin_jjigeodo_dwaeyo","v_waipai_bimilbeonhoga_mwoyeyo","v_geonbae"];
 
 /* =====================================================================
    HANGEUL SYLLABLE COMPOSITION
@@ -715,18 +747,35 @@ function romanizeSelection(ini,vow,fin){
    STATE / PERSISTENCE
    ===================================================================== */
 var STORAGE_KEY = "hangeullab_progress_v1";
+var SCHEMA = 2;
 var state = loadState();
 function defaultState(){
-  return { items:{}, streak:0, lastActiveDay:null, dailyCap:10, dailyIntroDay:null, dailyIntroCount:0, theme:"auto" };
+  return { schema:SCHEMA, items:{}, streak:0, lastActiveDay:null, dailyCap:10, dailyIntroDay:null, dailyIntroCount:0, theme:"auto" };
+}
+/* Brings saved progress (from storage or an imported backup) up to the current schema.
+   Schema 1 (no field): vocab progress keyed "v_<list position>". Schema 2: permanent vocab IDs. */
+function migrateState(s){
+  if(!s.schema || s.schema < 2){
+    var items = {};
+    for(var id in s.items){
+      var m = /^v_(\d+)$/.exec(id);
+      if(m){ if(LEGACY_VOCAB_IDS[+m[1]]) items[LEGACY_VOCAB_IDS[+m[1]]] = s.items[id]; }
+      else items[id] = s.items[id];
+    }
+    s.items = items;
+    s.schema = 2;
+  }
+  var d = defaultState();
+  for(var k in d){ if(!(k in s)) s[k]=d[k]; }
+  return s;
 }
 function loadState(){
   try{
     var raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return defaultState();
     var parsed = JSON.parse(raw);
-    var d = defaultState();
-    for(var k in d){ if(!(k in parsed)) parsed[k]=d[k]; }
-    return parsed;
+    if(!parsed.schema){ try{ localStorage.setItem(STORAGE_KEY+"_schema1_backup", raw); }catch(e){} }
+    return migrateState(parsed);
   }catch(e){ return defaultState(); }
 }
 function saveState(){
@@ -1090,6 +1139,105 @@ function renderDrillCard(){
 }
 
 /* =====================================================================
+   LISTENING — hear it, pick what you heard. Practice rounds; no SRS grading.
+   ===================================================================== */
+/* Sounds English speakers mix up. "Tricky sounds" drills within these groups. */
+var CONFUSABLE = [["ㄱ","ㅋ","ㄲ"],["ㄷ","ㅌ","ㄸ"],["ㅂ","ㅍ","ㅃ"],["ㅈ","ㅊ","ㅉ"],["ㅅ","ㅆ"],["ㅓ","ㅗ","ㅜ","ㅡ"],["ㅕ","ㅛ"]];
+/* Pairs that sound the same in modern speech: never offered against each other. */
+var MERGED = [["ㅐ","ㅔ"],["ㅒ","ㅖ"],["ㅙ","ㅚ","ㅞ"]];
+var LISTEN_MODES = [{id:"letters",label:"Letters"},{id:"tricky",label:"Tricky sounds"},{id:"vocab",label:"Words"}];
+var LISTEN_ROUND = 10;
+var listen = { mode:"letters", from:"hangul", qs:[], pos:0, score:0, missed:[] };
+
+function groupOf(groups, glyph){ return groups.find(function(g){ return g.indexOf(glyph)>=0; }) || [glyph]; }
+function letterFamily(h){ return (h.kind==="consonant"||h.kind==="double") ? "c" : "v"; }
+function seenOr(all){
+  var seen = all.filter(function(x){ return state.items[x.id] && state.items[x.id].seen; });
+  return seen.length>=4 ? seen : all;
+}
+function takeRound(pool){
+  var out=[];
+  while(out.length<LISTEN_ROUND) out = out.concat(shuffle(pool));
+  return out.slice(0, LISTEN_ROUND);
+}
+function letterQuestion(h, trickyOnly){
+  var group = groupOf(CONFUSABLE, h.glyph), merged = groupOf(MERGED, h.glyph);
+  var opts = [h].concat(shuffle(group.filter(function(g){ return g!==h.glyph; }).map(function(g){ return HANGUL.find(function(x){ return x.glyph===g; }); })));
+  if(!trickyOnly){
+    var fill = shuffle(HANGUL.filter(function(x){ return letterFamily(x)===letterFamily(h) && opts.indexOf(x)<0 && merged.indexOf(x.glyph)<0; }));
+    opts = opts.slice(0,4).concat(fill).slice(0,4);
+  }
+  return { answer:h, options:shuffle(opts), audio:letterSpeakText(h) };
+}
+function vocabQuestion(v){
+  var sameCat = shuffle(VOCAB.filter(function(x){ return x.cat===v.cat && x!==v; }));
+  var others = shuffle(VOCAB.filter(function(x){ return x.cat!==v.cat; }));
+  return { answer:v, options:shuffle([v].concat(sameCat.concat(others).slice(0,3))), audio:v.kr };
+}
+function startListen(mode){
+  listen.mode = mode; listen.pos = 0; listen.score = 0; listen.missed = [];
+  if(mode==="vocab") listen.qs = takeRound(seenOr(VOCAB)).map(vocabQuestion);
+  else if(mode==="tricky"){
+    var tricky = HANGUL.filter(function(h){ return CONFUSABLE.some(function(g){ return g.indexOf(h.glyph)>=0; }); });
+    listen.qs = takeRound(tricky).map(function(h){ return letterQuestion(h, true); });
+  }
+  else listen.qs = takeRound(seenOr(HANGUL)).map(function(h){ return letterQuestion(h, false); });
+  $all("#tabs button").forEach(function(b){ b.classList.toggle("active", b.dataset.view===(mode==="vocab"?"vocab":"hangul")); });
+  renderListen();
+}
+function renderListen(){
+  $("#listenModes").innerHTML = LISTEN_MODES.map(function(m){ return '<button data-m="'+m.id+'" class="'+(listen.mode===m.id?"active":"")+'">'+m.label+'</button>'; }).join("");
+  $all("button", $("#listenModes")).forEach(function(b){ b.onclick=function(){ startListen(b.dataset.m); }; });
+  var wrap = $("#listenWrap");
+  if(listen.pos >= listen.qs.length){ renderListenResults(); return; }
+  var q = listen.qs[listen.pos], isWord = listen.mode==="vocab";
+  wrap.innerHTML =
+    '<div class="drill-progress"><div class="progress-track"><div class="progress-fill" style="width:'+Math.round(100*listen.pos/listen.qs.length)+'%"></div></div><span class="mono">'+(listen.pos+1)+' / '+listen.qs.length+'</span></div>'
+    + '<button class="sound-btn listen-play" id="listenPlay" title="Play again">🔊</button>'
+    + '<div class="listen-hint">'+(isWord ? "Which word did you hear?" : "Which letter did you hear?")+'</div>'
+    + '<div class="option-grid">'+q.options.map(function(o,i){ return '<button class="option-btn kr'+(isWord?" words":"")+'" data-i="'+i+'">'+(isWord?o.kr:o.glyph)+'</button>'; }).join("")+'</div>'
+    + '<div class="listen-feedback" id="listenFeedback"></div>'
+    + '<div class="btn-row" style="justify-content:center;"><button class="btn" id="listenNext" style="visibility:hidden;">'+(listen.pos+1===listen.qs.length?"See results":"Next →")+'</button></div>';
+  $("#listenPlay").onclick = function(){ speak(q.audio); };
+  $all("[data-i]", wrap).forEach(function(btn){
+    btn.onclick = function(){
+      var picked = q.options[+btn.dataset.i], right = picked===q.answer;
+      $all("[data-i]", wrap).forEach(function(b){
+        b.disabled = true;
+        if(q.options[+b.dataset.i]===q.answer) b.classList.add("right");
+      });
+      if(right) listen.score++;
+      else { btn.classList.add("wrong"); listen.missed.push(q); speak(q.audio); }
+      var a = q.answer;
+      $("#listenFeedback").innerHTML = '<div style="font-weight:600;color:var('+(right?"--celadon":"--dancheong")+');margin-bottom:4px;">'+(right?"Yes":"It was this one")+'</div>'
+        + (isWord ? '<span class="mono">'+a.rm+'</span><br>'+a.en : '<span class="mono">'+a.roman+' &middot; '+a.name+'</span>');
+      $("#listenNext").style.visibility = "visible";
+    };
+  });
+  $("#listenNext").onclick = function(){ listen.pos++; renderListen(); };
+  speak(q.audio);
+}
+function renderListenResults(){
+  touchStreak();
+  var isWord = listen.mode==="vocab", n = listen.qs.length;
+  var missed = [], seen = {};
+  listen.missed.forEach(function(q){ if(!seen[q.answer.id]){ seen[q.answer.id]=1; missed.push(q); } });
+  $("#listenWrap").innerHTML =
+    '<div class="card" style="text-align:center;">'
+    + '<div class="eyebrow">Round complete</div>'
+    + '<div class="mono" style="font-family:var(--font-display);font-size:44px;font-weight:600;margin:8px 0 4px;">'+listen.score+' / '+n+'</div>'
+    + '<div style="font-size:13px;color:var(--ink-2);margin-bottom:16px;">'+(listen.score===n ? "Every one right. Your ear is getting there." : "Tap the ones you missed to hear them again.")+'</div>'
+    + (missed.length ? '<div class="examples" style="justify-content:center;margin-bottom:18px;">'+missed.map(function(q){
+        return '<div class="example-chip" data-say="'+q.audio+'" style="cursor:pointer;">🔊 '+(isWord?q.answer.kr:q.answer.glyph)+' <span class="rom">'+(isWord?q.answer.en:q.answer.roman)+'</span></div>';
+      }).join("")+'</div>' : '')
+    + '<div class="btn-row" style="justify-content:center;"><button class="btn" id="listenAgain">Another round</button><button class="btn ghost" id="listenDone">Done</button></div>'
+    + '</div>';
+  $all("[data-say]", $("#listenWrap")).forEach(function(el){ el.onclick=function(){ speak(el.dataset.say); }; });
+  $("#listenAgain").onclick = function(){ startListen(listen.mode); };
+  $("#listenDone").onclick = function(){ goto(listen.from); };
+}
+
+/* =====================================================================
    SPEAKING PRACTICE
    ===================================================================== */
 var speakFilter = "all";
@@ -1288,9 +1436,83 @@ function wireSettings(){
       $("#audioSub").textContent = "Recorded audio is working. Builder syllables with a final consonant use the device voice: " + (st.ok ? st.msg : "none found, so those stay silent.");
     });
   };
-  $("#btnSync").onclick=function(){
-    saveState();
-    toast("Saved to this browser");
+  $("#btnExportFile").onclick=function(){
+    var d=new Date(), pad=function(n){ return (n<10?"0":"")+n; };
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([exportText()],{type:"application/json"}));
+    a.download="hangeul-lab-progress-"+d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  };
+  $("#btnExportCopy").onclick=function(){
+    var text=exportText();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast("Copied. Paste it into Settings on the other device"); }, function(){ openTextModal("Copy your progress", text, null); });
+    } else openTextModal("Copy your progress", text, null);
+  };
+  $("#btnImportFile").onclick=function(){ $("#importFileInput").click(); };
+  $("#importFileInput").onchange=function(){
+    var f=this.files[0]; this.value="";
+    if(!f) return;
+    var r=new FileReader();
+    r.onload=function(){ importText(r.result); };
+    r.readAsText(f);
+  };
+  $("#btnImportPaste").onclick=function(){ openTextModal("Paste a backup", "", importText); };
+}
+
+/* =====================================================================
+   BACKUP — EXPORT / IMPORT
+   ===================================================================== */
+function exportText(){
+  saveState();
+  return JSON.stringify({app:"hangeul-lab", exported:new Date().toISOString(), progress:state});
+}
+/* Merge, not replace: for each item keep whichever copy was reviewed most recently,
+   so moving progress between two devices in either direction never loses reviews.
+   Theme and daily cap stay as set on this device. */
+function importText(text){
+  var incoming;
+  try{
+    var parsed=JSON.parse(String(text).trim());
+    incoming = parsed && parsed.progress ? parsed.progress : parsed;
+    if(!incoming || typeof incoming.items!=="object") throw new Error("no items");
+    incoming = migrateState(incoming);
+  }catch(e){ toast("That doesn't look like a Hangeul Lab backup"); return false; }
+  var added=0, updated=0;
+  for(var id in incoming.items){
+    if(!HANGUL_BY_ID[id] && !VOCAB_BY_ID[id]) continue;
+    var mine=state.items[id], theirs=incoming.items[id];
+    if(!mine){ state.items[id]=theirs; added++; }
+    else if((theirs.lastReview||0) > (mine.lastReview||0)){ state.items[id]=theirs; updated++; }
+  }
+  if(incoming.lastActiveDay && (!state.lastActiveDay || dayValue(incoming.lastActiveDay) > dayValue(state.lastActiveDay))){
+    state.lastActiveDay=incoming.lastActiveDay; state.streak=incoming.streak||0;
+  } else if(incoming.lastActiveDay===state.lastActiveDay){
+    state.streak=Math.max(state.streak||0, incoming.streak||0);
+  }
+  saveState();
+  renderHome();
+  toast("Backup loaded: "+added+" new, "+updated+" updated");
+  return true;
+}
+function dayValue(s){ var p=String(s).split("-"); return (+p[0])*10000+(+p[1])*100+(+p[2]); }
+function openTextModal(title, text, onSubmit){
+  $("#letterModal").innerHTML =
+    '<button class="close" id="modalClose">&times;</button>'
+    + '<h3 style="font-size:17px;margin-bottom:10px;">'+title+'</h3>'
+    + (onSubmit ? '<p style="font-size:12.5px;color:var(--ink-2);margin:0 0 10px;">Paste the text you copied from Settings on your other device.</p>'
+                : '<p style="font-size:12.5px;color:var(--ink-2);margin:0 0 10px;">Select all of this, copy it, then use Paste in Settings on the other device.</p>')
+    + '<textarea id="backupText" spellcheck="false" style="width:100%;height:160px;font-family:var(--font-mono);font-size:11px;background:var(--paper);color:var(--ink-1);border:1px solid var(--line);border-radius:var(--radius);padding:8px;resize:vertical;"></textarea>'
+    + '<div class="btn-row" style="margin-top:12px;justify-content:flex-end;">'
+    + (onSubmit ? '<button class="btn" id="backupGo">Load backup</button>' : '<button class="btn ghost" id="backupGo">Done</button>')
+    + '</div>';
+  var ta=$("#backupText"); ta.value=text;
+  $("#letterOverlay").classList.add("open");
+  if(text){ ta.focus(); ta.select(); }
+  $("#modalClose").onclick = closeLetterModal;
+  $("#backupGo").onclick = function(){
+    if(!onSubmit || onSubmit(ta.value)) closeLetterModal();
   };
 }
 
@@ -1308,6 +1530,10 @@ document.addEventListener("DOMContentLoaded", function(){
   $("#btnSyllableBuilder").onclick=function(){ goto("builder"); };
   $("#btnHangulDrill").onclick=function(){ goto("hangul-drill"); startHangulDrill(); };
   $("#btnVocabDrill").onclick=function(){ goto("vocab-drill"); startVocabDrill(); };
+  $all("[data-listen]").forEach(function(b){
+    b.onclick=function(){ listen.from = b.dataset.listen==="vocab" ? "vocab" : "hangul"; goto("listen"); startListen(b.dataset.listen); };
+  });
+  $("#listenBack").onclick=function(){ goto(listen.from); };
   $("#letterOverlay").addEventListener("click", function(e){ if(e.target.id==="letterOverlay") closeLetterModal(); });
 
   renderHome();
