@@ -1,6 +1,9 @@
 # Roadmap
 
 ## Done
+### v1.2.2
+- [x] iPhone home-screen app: scoring mic hidden (iOS blocks it there); Record & compare plays through one tap-unlocked player so iOS doesn't block playback
+
 ### v1.2.1
 - [x] Mic scoring no longer sticks on "Listening": start and overall timeouts, tap to stop, interim results, clear error reasons
 - [x] Record & compare: record yourself, hear the native clip then yours

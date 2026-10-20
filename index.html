@@ -1009,8 +1009,8 @@ function romanizeSelection(ini,vow,fin){
 /* =====================================================================
    STATE / PERSISTENCE
    ===================================================================== */
-var APP_VERSION = "1.2.1";
-var APP_WHATS_NEW = "microphone fixes and Record & compare";
+var APP_VERSION = "1.2.2";
+var APP_WHATS_NEW = "Record & compare works properly on iPhone";
 var STORAGE_KEY = "hangeullab_progress_v1";
 var SCHEMA = 2;
 var state = loadState();
@@ -1722,14 +1722,15 @@ function setupSpeakingControls(){
   $("#speakNextBtn").onclick = nextSpeakItem;
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   var micBtn = $("#micBtn");
-  if(!SR){
-    micBtn.disabled = true;
-    $("#micHint").innerHTML = "";
-    $("#speakResult").innerHTML = '<div class="unsupported-note">Speech recognition isn\'t available in this browser. Play the audio, then repeat it out loud yourself — that still builds the muscle memory, just without a score. This tends to work best in Chrome, opened directly on the published page rather than in an embedded preview.</div>';
+  /* iPhone home-screen apps expose speech recognition but iOS rarely lets it run there,
+     so don't offer it: Record & compare is the speaking tool on that platform. */
+  var iosHomeScreen = navigator.standalone===true;
+  if(!SR || iosHomeScreen){
+    $("#micArea").innerHTML = '<div class="unsupported-note">'+(iosHomeScreen
+      ? "Pronunciation scoring isn't available in the iPhone home-screen app (iOS doesn't allow it). Record yourself below and compare with the native speaker instead."
+      : "Pronunciation scoring isn't available in this browser. Record yourself below and compare with the native speaker instead.")+'</div>';
     return;
   }
-  /* iPhone home-screen apps expose speech recognition but it often never starts. */
-  if(navigator.standalone===true) $("#micHint").textContent = "Tap, then say it. On iPhone, scoring may not work from the home-screen app; Record & compare always does";
   /* Every session ends one way or another: a result, an error, tap-to-stop, or a timeout.
      The old version waited for onend, which some devices never send, so it stuck on "Listening…". */
   var session = null;
@@ -1803,7 +1804,30 @@ function resetRecording(){
 function setupRecordCompare(){
   var btn=$("#recBtn"), play=$("#recPlay");
   if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder)){ btn.disabled=true; btn.textContent="Recording isn't supported here"; return; }
+  /* iOS only lets audio play from a tap, and a recording finishes asynchronously (or on the
+     6-second timer). So one player is unlocked by the tap and reused for both clips. */
+  var player = new Audio(), unlocked = false;
+  player.setAttribute("playsinline", "");
+  function unlock(){
+    if(unlocked) return;
+    unlocked = true;
+    player.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
+    var p = player.play(); if(p && p.catch) p.catch(function(){});
+  }
+  function playSrc(src, then){
+    player.onended = then || null;
+    player.onerror = then || null;
+    player.src = src;
+    var p = player.play(); if(p && p.catch) p.catch(function(){ if(then) then(); });
+  }
+  function compareNow(){
+    if(!recording.url) return;
+    if(clipPlayer) clipPlayer.pause();
+    playSrc(clipUrl(speakCurrent.kr), function(){ setTimeout(function(){ playSrc(recording.url, null); }, 350); });
+  }
+  play.onclick = function(){ unlock(); compareNow(); };
   btn.onclick = function(){
+    unlock();
     if(recording.rec && recording.rec.state==="recording"){ recording.rec.stop(); return; }
     navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
       resetRecording();
@@ -1817,20 +1841,13 @@ function setupRecordCompare(){
         if(!chunks.length) return;
         recording.url = URL.createObjectURL(new Blob(chunks, {type: mr.mimeType || "audio/mp4"}));
         play.hidden = false;
-        playMine();
+        compareNow();
       };
       mr.start();
       btn.textContent = "⏹ Stop"; btn.classList.add("danger");
       recording.timer = setTimeout(function(){ if(mr.state==="recording") mr.stop(); }, 6000);
     }).catch(function(){ toast("Microphone access was blocked", 3500); });
   };
-  /* Native clip first, then yours, so you hear them back to back. */
-  function playMine(){
-    if(!recording.url) return;
-    playClip(speakCurrent.kr, function(){ new Audio(recording.url).play(); }, null);
-    if(clipPlayer) clipPlayer.onended = function(){ new Audio(recording.url).play(); };
-  }
-  play.onclick = playMine;
 }
 
 /* =====================================================================

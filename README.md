@@ -38,4 +38,4 @@ Then bump `CACHE` in `sw.js` so installed copies pick up the new clips.
 
 ## Status
 
-v1.2.1: reading practice, sound rules, grammar, more vocab. See `ROADMAP.md` for ideas beyond that.
+v1.2.2: reading practice, sound rules, grammar, more vocab. See `ROADMAP.md` for ideas beyond that.
