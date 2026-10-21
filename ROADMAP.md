@@ -1,6 +1,9 @@
 # Roadmap
 
 ## Done
+### v1.5.1
+- [x] Service worker asks the server for the page and data.js every time, so an update never mixes old and new files
+
 ### v1.5: Reviews cover everything
 - [x] Today's reviews are one mixed session: letters, words, reading items and grammar sentences
 - [x] Reading practice feeds the reviews (first sight comes back tomorrow; misses sooner)

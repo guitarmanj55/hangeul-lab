@@ -2,7 +2,7 @@
    The page and data.js are network-first so updates arrive as soon as you're online; audio,
    icons and fonts are cache-first. Bump CACHE when audio/ is regenerated so the
    new clips are precached for offline use. */
-var CACHE = "hangeullab-v5";
+var CACHE = "hangeullab-v6";
 var SHELL = [
   "./",
   "index.html",
@@ -15,7 +15,8 @@ var SHELL = [
 
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(CACHE).then(function(cache){
-    return cache.addAll(SHELL).then(function(){
+    /* no-cache: revalidate with the server, so the browser's HTTP cache can't hand back an older page or data.js. */
+    return cache.addAll(SHELL.map(function(u){ return new Request(u, {cache:"no-cache"}); })).then(function(){
       return fetch("audio/index.json", {cache:"no-cache"}).then(function(r){ return r.json(); }).then(function(idx){
         var urls = Object.keys(idx.clips).map(function(h){ return "audio/" + h + ".mp3"; });
         /* One missing clip shouldn't block install, so add them individually. */
@@ -40,7 +41,9 @@ function cacheFirst(req){
   });
 }
 function networkFirst(req){
-  return fetch(req).then(function(res){
+  /* GitHub Pages lets browsers reuse files for 10 minutes; no-cache asks the server each time (a cheap check when unchanged),
+     so index.html and data.js never come from different releases. */
+  return fetch(req.url, {cache:"no-cache", credentials:"same-origin"}).then(function(res){
     if(res.ok){ var copy = res.clone(); caches.open(CACHE).then(function(c){ c.put(req, copy); }); }
     return res;
   }).catch(function(){
