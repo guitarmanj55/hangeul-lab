@@ -5,7 +5,7 @@ Personal Korean-learning web app. Owner: Oli (British, learning Korean, previous
 ## Rules
 - Vocab drills always show Hangeul as the prompt, never romanization
 - Keep it a dependency-free static site unless there is a clear reason; no build step for now
-- Progress lives in localStorage under `hangeullab_progress_v1`; do not change that key or the saved shape without a migration. Saved state carries `schema` (now 2); add migrations to `migrateState()`, which also runs on imported backups
+- Progress lives in localStorage under `hangeullab_progress_v1`; do not change that key or the saved shape without a migration. Saved state carries `schema` (now 2); add migrations to `SRS.migrate()` in `srs.js` (called by `migrateState()`), which also runs on imported backups. New fields with a default in `defaultState()` (like `lastBackupAt`) are filled in for old saves without a schema bump
 - Every vocab entry has a permanent `id`; progress is saved against it. Give new words a new id, never rename or reuse one, and never edit `LEGACY_VOCAB_IDS`
 - Lesson and sound-rule completion lives in `state.done` ({id: timestamp}); reading, rule and lesson ids must stay stable too
 - Grammar quiz sentences are review items saved as `gq_<lesson id>_<quiz index>` in `state.items`: only append quiz items to a lesson, never reorder or remove one. Reading items are reviewed under their own `r_` ids
@@ -16,15 +16,18 @@ Personal Korean-learning web app. Owner: Oli (British, learning Korean, previous
 
 ## Layout
 - `data.js` all the content: letters, vocab, reading, rules, lessons, beginner words, dialogues, the course and plain-English summaries. Loaded with a plain `<script>` before the app code. Edit content here
-- `index.html` the app itself (SRS engine, UI, CSS)
+- `srs.js` pure logic with no DOM: SRS scheduling, migrations, backup merging, the backup reminder. Plain `<script>` (sets `window.SRS`), also `require`-able by Node. Tests in `srs.test.js`
+- `index.html` the app itself (UI, CSS, thin wrappers around `SRS`)
 - `audio/` recorded clips, named by an FNV-1a hash of the spoken text, plus `index.json` listing them. Generated, never hand-edited
 - `scripts/make_audio.py` builds `audio/` from the `kr:"..."` strings and grammar quiz `q`/`a` pairs in `data.js` and `index.html`, and every open syllable (edge-tts, voice ko-KR-SunHiNeural). Its hash must match `clipUrl()` in `index.html`
 - `scripts/make_icons.ps1` renders `icons/`
-- `manifest.webmanifest` and `sw.js` make it installable and offline. `index.html` and `data.js` are network-first. Bump `CACHE` in `sw.js` after regenerating audio or adding a file to `SHELL`
+- `manifest.webmanifest` and `sw.js` make it installable and offline. `index.html`, `data.js` and `srs.js` are network-first. Bump `CACHE` in `sw.js` after regenerating audio or adding a file to `SHELL`
 - `ROADMAP.md` what to do next
 
 ## After changing letters or vocab
-Content lives in `data.js`. Run `python scripts/make_audio.py` (needs `pip install edge-tts`), then bump `CACHE` in `sw.js`.
+Content lives in `data.js`. Run `scripts/make_audio.py` with `C:\Users\OJacq\AppData\Local\Programs\Python\Python312\python.exe` (Python is not on PATH; needs `pip install edge-tts`), then bump `CACHE` in `sw.js`.
 
 ## Testing
-Click through all four bottom tabs (Today, Course, Practise, Me), the Course steps (meet, check, conversation, lesson) and each Practise tile. Serve the folder (`python -m http.server 8123`) rather than opening the file, so the service worker runs. Click through: Hangeul grid, a drill, syllable builder, vocab, speaking, settings. Check both themes and a phone-width window.
+Run `node --test` for the logic in `srs.js` (Node 24 is installed). Keep scheduling, migration and merge rules in `srs.js` with a test beside them.
+
+Click through all four bottom tabs (Today, Course, Practise, Me), the Course steps (meet, check, conversation, lesson) and each Practise tile. Serve the folder (`python -m http.server 8123`, with the full Python path above) rather than opening the file, so the service worker runs. Click through: Hangeul grid, a drill, syllable builder, vocab, speaking, settings. Check both themes and a phone-width window.

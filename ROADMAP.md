@@ -1,6 +1,12 @@
 # Roadmap
 
 ## Done
+### v1.6: Safer progress
+- [x] Weekly backup reminder on Today and in Me (download or copy counts as a backup)
+- [x] A failed save shows a warning instead of failing silently; the app asks the phone to keep its storage
+- [x] Restoring a backup brings back reading and grammar reviews too (they were skipped before)
+- [x] SRS scheduling, migrations and backup merging moved to `srs.js` with `node --test` tests
+
 ### v1.5.1
 - [x] Service worker asks the server for the page and data.js every time, so an update never mixes old and new files
 

@@ -1,0 +1,92 @@
+/* Hangeul Lab pure logic: the SRS scheduler, saved-progress migrations, backup merging and the
+   backup reminder. No DOM or browser globals, so `node --test` can run srs.test.js against it.
+   Loaded with a plain <script> before the app code (sets window.SRS); Node gets module.exports. */
+(function(root){
+  var DAY = 24*60*60*1000;
+  var REMINDER_DAYS = 7;
+
+  function newCard(){ return {ef:2.5, interval:0, reps:0, due:0, lastReview:0, lapses:0, seen:false}; }
+
+  /* First sight: due straight away, scheduling starts fresh. */
+  function markSeen(it, now){
+    if(!it.seen){ it.seen=true; it.due=now; it.ef=2.5; it.reps=0; it.interval=0; }
+    return it;
+  }
+  function isDue(it, now){ return !!(it && it.seen && it.due<=now); }
+  function isMastered(it){ return !!(it && it.reps>=5 && it.interval>=21); }
+
+  /* Simplified SM-2. grade: 0 = missed, 1 = hard, 2 = good, 3 = easy. */
+  function grade(it, g, now){
+    if(g===0){
+      it.lapses=(it.lapses||0)+1;
+      it.reps=0;
+      it.interval=0;
+      it.ef=Math.max(1.3, it.ef-0.2);
+      it.due = now + 12*60*60*1000; // resurfaces later today/tomorrow
+    } else {
+      it.reps=(it.reps||0)+1;
+      if(it.reps===1) it.interval=1;
+      else if(it.reps===2) it.interval = g===1?2:(g===3?4:3);
+      else it.interval = Math.max(1, Math.round(it.interval * it.ef * (g===1?0.85:(g===3?1.3:1))));
+      if(g===1) it.ef=Math.max(1.3, it.ef-0.15);
+      if(g===3) it.ef=it.ef+0.1;
+      it.due = now + it.interval*DAY;
+    }
+    it.lastReview=now;
+    it.seen=true;
+    return it;
+  }
+
+  /* Brings saved progress (from storage or an imported backup) up to the current schema.
+     Schema 1 (no field): vocab progress keyed "v_<list position>". Schema 2: permanent vocab IDs.
+     Fields missing from older saves are filled from `defaults`. */
+  function migrate(s, defaults, legacyIds){
+    if(!s.schema || s.schema < 2){
+      var items = {};
+      for(var id in s.items){
+        var m = /^v_(\d+)$/.exec(id);
+        if(m){ if(legacyIds[+m[1]]) items[legacyIds[+m[1]]] = s.items[id]; }
+        else items[id] = s.items[id];
+      }
+      s.items = items;
+      s.schema = 2;
+    }
+    for(var k in defaults){ if(!(k in s)) s[k]=defaults[k]; }
+    return s;
+  }
+
+  /* "2026-10-2" -> 20261002, so day strings without zero padding still compare. */
+  function dayValue(s){ var p=String(s).split("-"); return (+p[0])*10000+(+p[1])*100+(+p[2]); }
+
+  /* Merge, not replace: for each item keep whichever copy was reviewed most recently, so moving
+     progress between two devices in either direction never loses reviews. Items `isKnown` rejects
+     (content that no longer exists) are skipped. Theme and daily cap stay as set on this device. */
+  function merge(state, incoming, isKnown){
+    var added=0, updated=0;
+    for(var id in incoming.items){
+      if(!isKnown(id)) continue;
+      var mine=state.items[id], theirs=incoming.items[id];
+      if(!mine){ state.items[id]=theirs; added++; }
+      else if((theirs.lastReview||0) > (mine.lastReview||0)){ state.items[id]=theirs; updated++; }
+    }
+    if(incoming.lastActiveDay && (!state.lastActiveDay || dayValue(incoming.lastActiveDay) > dayValue(state.lastActiveDay))){
+      state.lastActiveDay=incoming.lastActiveDay; state.streak=incoming.streak||0;
+    } else if(incoming.lastActiveDay===state.lastActiveDay){
+      state.streak=Math.max(state.streak||0, incoming.streak||0);
+    }
+    for(var d in incoming.done){ if(!state.done[d] || incoming.done[d] > state.done[d]){ state.done[d]=incoming.done[d]; updated++; } }
+    return {added:added, updated:updated};
+  }
+
+  /* Weekly backup nudge: overdue once there is progress worth keeping and the last
+     backup (download or copy) is a week old, or there has never been one. */
+  function backupStatus(lastBackupAt, hasProgress, now){
+    var days = lastBackupAt ? Math.floor((now - lastBackupAt) / DAY) : null;
+    return { overdue: !!hasProgress && (days===null || days>=REMINDER_DAYS), days: days };
+  }
+
+  var api = { DAY:DAY, REMINDER_DAYS:REMINDER_DAYS, newCard:newCard, markSeen:markSeen, isDue:isDue, isMastered:isMastered,
+    grade:grade, migrate:migrate, dayValue:dayValue, merge:merge, backupStatus:backupStatus };
+  if(typeof module!=="undefined" && module.exports) module.exports = api;
+  else root.SRS = api;
+})(this);
