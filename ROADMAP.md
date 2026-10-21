@@ -1,6 +1,13 @@
 # Roadmap
 
 ## Done
+### v1.5: Reviews cover everything
+- [x] Today's reviews are one mixed session: letters, words, reading items and grammar sentences
+- [x] Reading practice feeds the reviews (first sight comes back tomorrow; misses sooner)
+- [x] Passing a grammar lesson schedules its sentences for review; lessons passed earlier were added, spread over a week
+- [x] 5 new grammar lessons: -고 (and), -지만 (but), -아서/어서 (so), -(으)ㄹ 거예요 (will), counters (개, 명, 잔, 병, 장)
+- [x] Course units 19 (Linking ideas) and 20 (Plans and counting)
+
 ### v1.4.1: Tidy-up
 - [x] Content moved out of `index.html` into `data.js` (plain script, still works opened as a file)
 
@@ -48,8 +55,8 @@
 
 ## Ideas
 - [ ] Automatic cross-device sync (needs a small backend; Copy/Paste covers it for now)
-- [ ] Reading items and grammar sentences in the spaced-repetition reviews, not only practice rounds
-- [ ] More grammar: connecting clauses (-고, -지만, -아서), future (-(으)ㄹ 거예요), counters
+- [ ] Sound-rule examples in the reviews too
+- [ ] More grammar: -(으)ㄹ게요 (I'll, promising), -(으)면 (if), -아/어도 돼요 (is it OK to), time with 시/분
 
 ## Known limits
 - Progress is stored per browser; move it with Settings > Back up progress

@@ -358,7 +358,27 @@ var LESSONS = [
   {id:"g_have",title:"Have / there is: 있어요 / 없어요",kr:"있어요/없어요",
    points:["있어요 = there is / I have. 없어요 = there isn't / I don't have.","A rising tone makes it a question: 물 있어요? (Do you have water?)"],
    examples:[{kr:"물 있어요?",rm:"mul isseoyo?",en:"Do you have water?"},{kr:"시간 없어요",rm:"sigan eopseoyo",en:"I don't have time"},{kr:"화장실이 어디에 있어요?",rm:"hwajangsiri eodie isseoyo?",en:"Where is the toilet?"}],
-   quiz:[{q:"영어 메뉴 ＿?",a:"있어요",opts:["있어요","없어요","이에요"],en:"Do you have an English menu?"},{q:"현금이 ＿",a:"없어요",opts:["없어요","있어요","아니에요"],en:"I don't have cash"},{q:"저기 약국이 ＿",a:"있어요",opts:["있어요","없어요","예요"],en:"There's a pharmacy over there"}]}
+   quiz:[{q:"영어 메뉴 ＿?",a:"있어요",opts:["있어요","없어요","이에요"],en:"Do you have an English menu?"},{q:"현금이 ＿",a:"없어요",opts:["없어요","있어요","아니에요"],en:"I don't have cash"},{q:"저기 약국이 ＿",a:"있어요",opts:["있어요","없어요","예요"],en:"There's a pharmacy over there"}]},
+  {id:"g_and",title:"And: -고",kr:"-고",
+   points:["Verb or describing-word stem + 고 = and. It joins two actions or two descriptions.","Only the last verb carries the ending (and the tense): 밥을 먹고 커피를 마셨어요 = I ate and drank coffee.","For \"and\" between nouns, use 하고 instead: 커피하고 빵 (coffee and bread)."],
+   examples:[{kr:"싸고 맛있어요",rm:"ssago masisseoyo",en:"It's cheap and tasty"},{kr:"부산은 크고 예뻐요",rm:"busaneun keugo yeppeoyo",en:"Busan is big and pretty"},{kr:"밥을 먹고 커피를 마셔요",rm:"babeul meokgo keopireul masyeoyo",en:"I eat, then drink coffee"},{kr:"커피하고 빵 주세요",rm:"keopihago ppang juseyo",en:"Coffee and bread, please"}],
+   quiz:[{q:"이 식당은 싸＿ 맛있어요",a:"고",opts:["고","요","를"],en:"This restaurant is cheap and tasty"},{q:"밥을 먹＿ 커피를 마셔요",a:"고",opts:["고","어요","을"],en:"I eat, then drink coffee"},{q:"커피＿ 빵 주세요",a:"하고",opts:["하고","고","를"],en:"Coffee and bread, please"}]},
+  {id:"g_but",title:"But: -지만",kr:"-지만",
+   points:["Stem + 지만 = but. It joins two ideas that pull against each other.","It works on the past too: 갔지만 = I went, but…","To start a new sentence with \"but\", say 하지만 or 그런데 instead."],
+   examples:[{kr:"비싸지만 맛있어요",rm:"bissajiman masisseoyo",en:"It's expensive but tasty"},{kr:"한국어는 어렵지만 재미있어요",rm:"hangugeoneun eoryeopjiman jaemiisseoyo",en:"Korean is hard but fun"},{kr:"매워요. 하지만 맛있어요",rm:"maewoyo. hajiman masisseoyo",en:"It's spicy. But it's tasty"}],
+   quiz:[{q:"비싸＿ 맛있어요",a:"지만",opts:["지만","고","요"],en:"It's expensive but tasty"},{q:"한국어는 어렵＿ 재미있어요",a:"지만",opts:["지만","고","어요"],en:"Korean is hard but fun"},{q:"어제 갔＿ 문을 닫았어요",a:"지만",opts:["지만","고","어요"],en:"I went yesterday, but it was closed"}]},
+  {id:"g_so",title:"So / because: -아서 / -어서",kr:"-아서/어서",
+   points:["Stem + 아서 / 어서 = so, because. Same split as the present tense: ㅏ/ㅗ → 아서, otherwise 어서, 하다 → 해서.","The tense goes on the last verb, never on -아서: 늦어서 미안해요 (sorry I'm late), not 늦었어서.","It also means \"and then\" for steps that follow on: 시장에 가서 먹어요 = go to the market and eat (there)."],
+   examples:[{kr:"늦어서 미안해요",rm:"neujeoseo mianhaeyo",en:"Sorry I'm late"},{kr:"비가 와서 집에 있어요",rm:"biga waseo jibe isseoyo",en:"It's raining, so I'm at home"},{kr:"피곤해서 일찍 자요",rm:"pigonhaeseo iljjik jayo",en:"I'm tired, so I'm going to bed early"},{kr:"해운대에 가서 수영했어요",rm:"haeundaee gaseo suyeonghaesseoyo",en:"I went to Haeundae and swam"}],
+   quiz:[{hint:"늦다",q:"＿ 미안해요",a:"늦어서",opts:["늦어서","늦아서","늦었어서"],en:"Sorry I'm late"},{q:"비가 와＿ 집에 있어요",a:"서",opts:["서","고","지만"],en:"It's raining, so I'm at home"},{hint:"피곤하다",q:"＿ 일찍 자요",a:"피곤해서",opts:["피곤해서","피곤하서","피곤했어서"],en:"I'm tired, so I'm going to bed early"},{hint:"가다",q:"시장에 ＿ 회를 먹었어요",a:"가서",opts:["가서","가아서","갔어서"],en:"I went to the market and ate raw fish"}]},
+  {id:"g_future",title:"Will: -(으)ㄹ 거예요",kr:"-(으)ㄹ 거예요",
+   points:["Stem ending in a vowel + ㄹ 거예요 = will / going to: 가다 → 갈 거예요.","Stem ending in a consonant + 을 거예요: 먹다 → 먹을 거예요. Stems ending in ㄹ just add 거예요: 살다 → 살 거예요.","It's also a guess about the future: 비가 올 거예요 = it'll probably rain."],
+   examples:[{kr:"내일 부산에 갈 거예요",rm:"naeil busane gal geoyeyo",en:"I'll go to Busan tomorrow"},{kr:"주말에 뭐 할 거예요?",rm:"jumare mwo hal geoyeyo?",en:"What are you doing at the weekend?"},{kr:"저녁에 회를 먹을 거예요",rm:"jeonyeoge hoereul meogeul geoyeyo",en:"I'm going to eat raw fish this evening"},{kr:"내일 비가 올 거예요",rm:"naeil biga ol geoyeyo",en:"It'll probably rain tomorrow"}],
+   quiz:[{hint:"가다",q:"＿",a:"갈 거예요",opts:["갈 거예요","가을 거예요","갔 거예요"],en:"to go"},{hint:"먹다",q:"＿",a:"먹을 거예요",opts:["먹을 거예요","먹 거예요","먹었 거예요"],en:"to eat"},{hint:"하다",q:"주말에 뭐 ＿?",a:"할 거예요",opts:["할 거예요","하을 거예요","해 거예요"],en:"What are you doing at the weekend?"},{hint:"보다",q:"내일 영화를 ＿",a:"볼 거예요",opts:["볼 거예요","보을 거예요","봐 거예요"],en:"I'll watch a film tomorrow"}]},
+  {id:"g_counters",title:"Counting things: 개, 명, 잔…",kr:"개/명/잔",
+   points:["Counting things uses the native numbers (하나, 둘, 셋, 넷). Before a counter word they shorten: 한, 두, 세, 네.","Order: thing + number + counter. 커피 두 잔 = coffee, two cups.","Common counters: 개 (things), 명 (people), 잔 (cups and glasses), 병 (bottles), 장 (tickets and sheets), 마리 (animals)."],
+   examples:[{kr:"커피 두 잔 주세요",rm:"keopi du jan juseyo",en:"Two coffees, please"},{kr:"몇 명이에요?",rm:"myeot myeongieyo?",en:"How many people? (at a restaurant)"},{kr:"세 명이에요",rm:"se myeongieyo",en:"There are three of us"},{kr:"맥주 한 병 주세요",rm:"maekju han byeong juseyo",en:"One bottle of beer, please"},{kr:"표 네 장 주세요",rm:"pyo ne jang juseyo",en:"Four tickets, please"}],
+   quiz:[{q:"커피 ＿ 잔 주세요",a:"두",opts:["두","둘","이"],en:"Two coffees, please"},{q:"세 ＿이에요",a:"명",opts:["명","개","잔"],en:"There are three of us"},{q:"맥주 한 ＿ 주세요",a:"병",opts:["병","명","장"],en:"One bottle of beer, please"},{q:"사과 ＿ 개 주세요",a:"네",opts:["네","넷","사"],en:"Four apples, please"}]}
 ];
 
 /* =====================================================================
@@ -470,7 +490,9 @@ var COURSE = [
   {id:"u15",title:"Doing things",intro:"Verbs, objects, and saying no.",steps:[{type:"lesson",id:"g_object"},{type:"lesson",id:"g_present"},{type:"lesson",id:"g_negation"}]},
   {id:"u16",title:"Asking for things",intro:"Requests, having, and wanting.",steps:[{type:"lesson",id:"g_please"},{type:"lesson",id:"g_have"},{type:"lesson",id:"g_want"}]},
   {id:"u17",title:"Sounding natural",intro:"Why Korean isn't always said the way it's spelled.",steps:[{type:"rule",id:"r_link"},{type:"rule",id:"r_final"},{type:"rule",id:"r_nasal"}]},
-  {id:"u18",title:"Past, places and subjects",intro:"Talk about what you did and where.",steps:[{type:"lesson",id:"g_past"},{type:"lesson",id:"g_subject"},{type:"lesson",id:"g_place"}]}
+  {id:"u18",title:"Past, places and subjects",intro:"Talk about what you did and where.",steps:[{type:"lesson",id:"g_past"},{type:"lesson",id:"g_subject"},{type:"lesson",id:"g_place"}]},
+  {id:"u19",title:"Linking ideas",intro:"Join two thoughts into one sentence: and, but, so.",steps:[{type:"lesson",id:"g_and"},{type:"lesson",id:"g_but"},{type:"lesson",id:"g_so"}]},
+  {id:"u20",title:"Plans and counting",intro:"Say what you're going to do, and order two of something.",steps:[{type:"lesson",id:"g_future"},{type:"lesson",id:"g_counters"}]}
 ];
 
 /* One-line plain-English summary shown at the top of each lesson and rule. */
@@ -487,6 +509,11 @@ var PLAIN = {
   g_want:"Want to do something? Verb + 고 싶어요.",
   g_please:"Asking for a thing: thing + 주세요. Asking someone to do something: verb + 주세요.",
   g_have:"있어요 = there is / I have. 없어요 = there isn't / I don't have.",
+  g_and:"Stick 고 on a verb to say \"and\": 싸고 맛있어요 = cheap and tasty.",
+  g_but:"Stick 지만 on a verb to say \"but\": 비싸지만 맛있어요 = expensive but tasty.",
+  g_so:"아서 / 어서 means \"so\" or \"because\": 늦어서 미안해요 = (I'm) late, so sorry.",
+  g_future:"Add ㄹ 거예요 (or 을 거예요) for \"will\": 갈 거예요 = I'll go.",
+  g_counters:"Korean counts things with a counter word, like \"two cups of\": 커피 두 잔 = two coffees.",
   r_link:"Words run together: a final consonant jumps onto a vowel that follows it.",
   r_final:"Only seven sounds can end a syllable, so several letters sound the same at the end.",
   r_nasal:"Before ㄴ or ㅁ, hard sounds go nasal. That's why 합니다 is \"ham-ni-da\".",

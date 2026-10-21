@@ -470,7 +470,7 @@ section.view.active{display:block; animation:rise .28s ease both;}
       <div class="card module-card" data-goto="grammar">
         <div class="top"><div class="icon" style="background:var(--gold-tint); color:var(--gold);">문</div></div>
         <h3>Grammar basics</h3>
-        <p>Sentence order, the core particles, polite verb endings, past tense, negation and requests.</p>
+        <p>Sentence order, the core particles, polite verb endings, past and future, negation, requests, linking words and counters.</p>
         <div class="progress-track"><div class="progress-fill" id="grammarProgress" style="width:0%"></div></div>
         <div class="meta"><span id="grammarMeta">0 of 0 lessons done</span></div>
       </div>
@@ -545,6 +545,14 @@ section.view.active{display:block; animation:rise .28s ease both;}
       <button class="btn ghost" data-goto="vocab">← Back</button>
     </div>
     <div class="drill-wrap" id="vocabDrillWrap"></div>
+  </section>
+
+  <!-- TODAY'S REVIEWS (all kinds mixed) -->
+  <section class="view" id="view-review">
+    <div class="section-head"><div><span class="eyebrow">Review</span><h2>Today's reviews</h2></div>
+      <button class="btn ghost" data-goto="home">← Today</button>
+    </div>
+    <div class="drill-wrap" id="reviewDrillWrap"></div>
   </section>
 
   <!-- LISTENING -->
@@ -714,8 +722,8 @@ function romanizeSelection(ini,vow,fin){
 /* =====================================================================
    STATE / PERSISTENCE
    ===================================================================== */
-var APP_VERSION = "1.4.1";
-var APP_WHATS_NEW = "behind-the-scenes tidy-up";
+var APP_VERSION = "1.5";
+var APP_WHATS_NEW = "signs and grammar now come back in your daily reviews, plus 5 new lessons: and, but, so, will, and counting things";
 var STORAGE_KEY = "hangeullab_progress_v1";
 var SCHEMA = 2;
 var state = loadState();
@@ -846,16 +854,31 @@ function similarity(a,b){
   var d=levenshtein(a,b);
   return 1 - d/Math.max(a.length,b.length,1);
 }
-function byId(id){ return HANGUL_BY_ID[id] || VOCAB_BY_ID[id]; }
-var HANGUL_BY_ID={}, VOCAB_BY_ID={};
+function byId(id){ return HANGUL_BY_ID[id] || VOCAB_BY_ID[id] || READING_BY_ID[id] || GRAMMAR_ITEM_BY_ID[id]; }
+var HANGUL_BY_ID={}, VOCAB_BY_ID={}, READING_BY_ID={}, GRAMMAR_ITEM_BY_ID={};
 HANGUL.forEach(function(h){ HANGUL_BY_ID[h.id]=h; });
 VOCAB.forEach(function(v){ VOCAB_BY_ID[v.id]=v; });
+READING.forEach(function(r){ READING_BY_ID[r.id]=r; });
+/* Each grammar quiz sentence is a review item, saved as gq_<lesson id>_<quiz index>. */
+function grammarItemId(l, i){ return "gq_"+l.id+"_"+i; }
+LESSONS.forEach(function(l){ l.quiz.forEach(function(it, i){ GRAMMAR_ITEM_BY_ID[grammarItemId(l,i)] = {lesson:l, quiz:it}; }); });
+function itemKind(id){
+  if(HANGUL_BY_ID[id]) return "hangul";
+  if(VOCAB_BY_ID[id]) return "vocab";
+  if(READING_BY_ID[id]) return "read";
+  if(GRAMMAR_ITEM_BY_ID[id]) return "grammar";
+  return null;
+}
+/* Everything the daily reviews cover: letters, words, reading items and grammar sentences. */
+var REVIEW_IDS = [].concat(HANGUL.map(function(h){ return h.id; }), VOCAB.map(function(v){ return v.id; }),
+  READING.map(function(r){ return r.id; }), Object.keys(GRAMMAR_ITEM_BY_ID));
+function dueReviewIds(){ return REVIEW_IDS.filter(isDue); }
 
 /* =====================================================================
    NAVIGATION
    ===================================================================== */
 /* Which bottom tab lights up for each page. */
-var TAB_PARENT = { "step":"course",
+var TAB_PARENT = { "step":"course", "review":"home",
   "hangul":"practise", "builder":"practise", "hangul-drill":"practise", "vocab":"practise", "vocab-drill":"practise",
   "read":"practise", "reading":"practise", "grammar":"practise", "listen":"practise", "speak":"practise" };
 function goto(view){
@@ -889,9 +912,10 @@ function renderHome(){
   var vocabDue = VOCAB.filter(function(v){ return isDue(v.id); });
   var vocabMastered = VOCAB.filter(function(v){ return isMastered(v.id); });
 
+  var allDue = dueReviewIds().length;
   $("#streakN").textContent = state.streak||0;
-  $("#statDue").textContent = hangulDue.length+vocabDue.length;
-  $("#statMastered").textContent = hangulMastered.length+vocabMastered.length;
+  $("#statDue").textContent = allDue;
+  $("#statMastered").textContent = REVIEW_IDS.filter(isMastered).length;
   $("#statLetters").textContent = hangulSeen.length+"/"+HANGUL.length;
   $("#statWords").textContent = vocabSeen.length+"/"+VOCAB.length;
 
@@ -914,7 +938,7 @@ function renderHome(){
   $("#vocabPill").textContent = vocabSeen.length===0 ? (hangulSeen.length<14?"Start with Hangeul":"Ready") : (vocabDue.length>0?vocabDue.length+" due":"On track");
   $("#vocabPill").className = "pill " + (vocabSeen.length===0?"learning":(vocabDue.length>0?"due":"mastered"));
 
-  renderToday(hangulDue.length, vocabDue.length, hangulSeen.length, vocabSeen.length);
+  renderToday(allDue, hangulSeen.length, vocabSeen.length);
 }
 
 /* =====================================================================
@@ -927,12 +951,12 @@ function courseStepsToday(){
   for(var k in state.done){ if((k.indexOf("c_")===0 || LESSON_BY_ID[k] || RULE_BY_ID[k]) && state.done[k] >= t) n++; }
   return n;
 }
-function startReviews(hDue){
+function startReviews(){
   drill.from = "home";
-  if(hDue){ goto("hangul-drill"); startHangulDrill(); } else { goto("vocab-drill"); startVocabDrill(); }
+  goto("review"); startReviewDrill();
 }
-function renderToday(hDue, vDue, hSeen, vSeen){
-  var d = new Date(), totalDue = hDue + vDue;
+function renderToday(totalDue, hSeen, vSeen){
+  var d = new Date();
   $("#todayDate").textContent = KO_DAYS[d.getDay()]+" · "+d.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"});
 
   /* Goal: reviews cleared + one course step. The ring fills by halves. */
@@ -950,9 +974,9 @@ function renderToday(hDue, vDue, hSeen, vSeen){
   if(totalDue>0){
     next.hidden = false;
     next.innerHTML = '<span class="eyebrow">Up next</span><h3>'+totalDue+' review'+(totalDue===1?"":"s")+' waiting</h3>'
-      + '<p>Letters and words you\'ve met, due for a quick refresher. A few minutes keeps them from fading.</p>'
+      + '<p>Letters, words, signs and grammar you\'ve met, due for a quick refresher. A few minutes keeps them from fading.</p>'
       + '<button class="btn" id="nextGo">Start reviews →</button>';
-    $("#nextGo").onclick = function(){ startReviews(hDue); };
+    $("#nextGo").onclick = startReviews;
   } else next.hidden = true;
   $("#courseCard").classList.toggle("secondary", totalDue>0);
 
@@ -1080,7 +1104,14 @@ function startVocabDrill(){
   drill.pos = 0;
   renderDrillCard();
 }
-function drillWrapEl(){ return drill.kind==="hangul" ? $("#hangulDrillWrap") : $("#vocabDrillWrap"); }
+/* Today's reviews: everything due, all kinds mixed. No new items; the course and Practise introduce those. */
+function startReviewDrill(){
+  drill.kind="review";
+  drill.queue = shuffle(dueReviewIds());
+  drill.pos = 0;
+  renderDrillCard();
+}
+function drillWrapEl(){ return drill.kind==="hangul" ? $("#hangulDrillWrap") : (drill.kind==="review" ? $("#reviewDrillWrap") : $("#vocabDrillWrap")); }
 function renderDrillCard(){
   var wrap = drillWrapEl();
   if(drill.pos >= drill.queue.length){
@@ -1090,11 +1121,12 @@ function renderDrillCard(){
     return;
   }
   var id = drill.queue[drill.pos];
+  if(itemKind(id)==="grammar") return renderGrammarReview(wrap, id);
   /* Teach first: a never-seen item opens already turned over, so you meet it before being tested. */
   var isNew = !state.items[id] || !state.items[id].seen;
   if(isNew){ markSeenNow(id); consumeIntroBudget(1); saveState(); }
   var total = drill.queue.length;
-  var isHangul = drill.kind==="hangul";
+  var isHangul = itemKind(id)==="hangul";
   var d = byId(id);
   var frontGlyph = isHangul ? d.glyph : d.kr;
   var frontSub = isHangul ? "" : '<button class="btn ghost hint-btn" id="drillHint">Hint</button>';
@@ -1133,6 +1165,32 @@ function renderDrillCard(){
       gradeItem(id, parseInt(btn.dataset.g,10));
       drill.pos++;
       renderDrillCard();
+    };
+  });
+}
+/* A grammar sentence in the reviews: pick the missing piece. Wrong = Again; right = choose Hard / Good / Easy. */
+function renderGrammarReview(wrap, id){
+  var g = GRAMMAR_ITEM_BY_ID[id], q = grammarQuestions([{quiz:[g.quiz]}])[0], opts = shuffle(q.options);
+  wrap.innerHTML = progressBar(drill.pos, drill.queue.length)
+    + '<div class="card" style="padding:22px 16px;margin-bottom:14px;"><div class="eyebrow" style="text-align:center;margin-bottom:8px;">Grammar · '+g.lesson.title+'</div><div class="quiz-prompt">'+q.prompt+'</div>'
+    + '<div class="listen-hint" style="margin:6px 0 0;">'+q.sub+'</div></div>'
+    + '<div class="option-grid">'+opts.map(function(o,i){ return '<button class="option-btn kr'+(opts.some(function(x){ return x.length>4; })?" words":"")+'" data-i="'+i+'">'+o+'</button>'; }).join("")+'</div>'
+    + '<div class="listen-feedback" id="quizFeedback"></div>'
+    + '<div class="grade-row" id="gradeRow" style="visibility:hidden;"></div>';
+  $all("[data-i]", wrap).forEach(function(btn){
+    btn.onclick = function(){
+      var right = opts[+btn.dataset.i]===q.answer;
+      $all("[data-i]", wrap).forEach(function(b){ b.disabled=true; if(opts[+b.dataset.i]===q.answer) b.classList.add("right"); });
+      if(!right) btn.classList.add("wrong");
+      $("#quizFeedback").innerHTML = '<div style="font-weight:600;color:var('+(right?"--celadon":"--dancheong")+');margin-bottom:4px;">'+(right?"Yes":"Not quite")+'</div>'+q.after;
+      var row = $("#gradeRow");
+      row.innerHTML = right
+        ? '<button class="grade-btn hard" data-g="1">Hard<span class="k">guessed</span></button><button class="grade-btn good" data-g="2">Good<span class="k">got it</span></button><button class="grade-btn easy" data-g="3">Easy<span class="k">instant</span></button>'
+        : '<button class="grade-btn again" data-g="0">Next →<span class="k">comes back soon</span></button>';
+      row.style.gridTemplateColumns = right ? "repeat(3,1fr)" : "1fr";
+      row.style.visibility = "visible";
+      $all("[data-g]", row).forEach(function(b){ b.onclick = function(){ gradeItem(id, +b.dataset.g); drill.pos++; renderDrillCard(); }; });
+      speak(q.audio);
     };
   });
 }
@@ -1337,7 +1395,13 @@ function renderReading(){
   $("#readHint").onclick = function(ev){ ev.stopPropagation(); this.outerHTML = '<div class="mono" style="color:var(--ink-3);margin-top:10px;">'+r.rm+'</div>'; };
   $all("[data-ok]", wrap).forEach(function(b){
     b.onclick = function(){
-      if(b.dataset.ok==="1") reading.score++; else reading.missed.push(r);
+      var ok = b.dataset.ok==="1";
+      if(ok) reading.score++; else reading.missed.push(r);
+      /* Feeds the daily reviews: first sight enters it (back tomorrow, or sooner if missed); due items are graded;
+         a miss always counts; a "got it" on a not-yet-due item leaves its schedule alone. */
+      var it = state.items[r.id];
+      if(!it || !it.seen){ markSeenNow(r.id); gradeItem(r.id, ok?2:0); }
+      else if(isDue(r.id) || !ok) gradeItem(r.id, ok?2:0);
       reading.pos++; renderReading();
     };
   });
@@ -1405,7 +1469,11 @@ function startLessonQuiz(kind, items, doneId){
   var wrap = $("#lessonQuiz");
   runQuiz({ wrap:wrap, qs:qs, small:small,
     onFinish:function(score, n){
-      if(doneId && score >= n-1){ markDone(doneId); return "Marked as done."; }
+      if(doneId && score >= n-1){
+        markDone(doneId);
+        if(kind==="grammar"){ scheduleLessonReviews(LESSON_BY_ID[doneId], 1); return "Marked as done. Its sentences will come back in your daily reviews."; }
+        return "Marked as done.";
+      }
       return doneId ? "Get all but one right to mark it done." : "";
     },
     onAgain:function(){ startLessonQuiz(kind, items, doneId); },
@@ -1415,6 +1483,23 @@ function startLessonQuiz(kind, items, doneId){
     }
   });
   wrap.scrollIntoView({behavior:"smooth", block:"start"});
+}
+/* Passing a lesson counts as the first review of its sentences: they come back in `days` days. */
+function scheduleLessonReviews(l, days){
+  var changed = false;
+  l.quiz.forEach(function(q, i){
+    var id = grammarItemId(l, i), it = ensureItem(id);
+    if(it.seen) return;
+    it.seen = true; it.reps = 1; it.interval = 1; it.lastReview = Date.now();
+    it.due = Date.now() + days*24*60*60*1000;
+    changed = true;
+  });
+  if(changed) saveState();
+}
+/* Lessons passed before v1.5 had no review items: add them once, spread over the next week so they don't land on one day. */
+function seedGrammarReviews(){
+  var k = 0;
+  LESSONS.forEach(function(l){ if(state.done[l.id]) scheduleLessonReviews(l, 1 + (k++ % 7)); });
 }
 function startMixedRules(){
   lessonCtx.kind = "rule"; lessonCtx.id = null; lessonCtx.from = "read";
@@ -2145,6 +2230,7 @@ function openTextModal(title, text, onSubmit){
    ===================================================================== */
 document.addEventListener("DOMContentLoaded", function(){
   applyTheme();
+  seedGrammarReviews();
   renderSettingsCaps();
   wireSettings();
   setupSpeakingControls();

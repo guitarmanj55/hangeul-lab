@@ -8,6 +8,7 @@ Personal Korean-learning web app. Owner: Oli (British, learning Korean, previous
 - Progress lives in localStorage under `hangeullab_progress_v1`; do not change that key or the saved shape without a migration. Saved state carries `schema` (now 2); add migrations to `migrateState()`, which also runs on imported backups
 - Every vocab entry has a permanent `id`; progress is saved against it. Give new words a new id, never rename or reuse one, and never edit `LEGACY_VOCAB_IDS`
 - Lesson and sound-rule completion lives in `state.done` ({id: timestamp}); reading, rule and lesson ids must stay stable too
+- Grammar quiz sentences are review items saved as `gq_<lesson id>_<quiz index>` in `state.items`: only append quiz items to a lesson, never reorder or remove one. Reading items are reviewed under their own `r_` ids
 - Course steps are saved as `c_<unit>_<index>` in `state.done`: only append steps to a unit or add units at the end, never reorder. "Already say" ticks are `k_<vocab id>`
 - Bump `APP_VERSION` and `APP_WHATS_NEW` in `index.html` for each release (drives the "Updated to…" notice)
 - Light and dark themes both stay working; colours come from the CSS tokens at the top of `index.html`
