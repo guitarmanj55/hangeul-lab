@@ -1,6 +1,9 @@
 # Roadmap
 
 ## Done
+### v1.4.1: Tidy-up
+- [x] Content moved out of `index.html` into `data.js` (plain script, still works opened as a file)
+
 ### v1.4: Tidier layout
 - [x] Bottom tab bar (Today, Course, Practise, Me) replaces the eight-tab strip; respects iPhone safe areas
 - [x] Today screen: daily goal ring (reviews clear + one course step), one "up next" card, one-line progress summary
@@ -47,7 +50,6 @@
 - [ ] Automatic cross-device sync (needs a small backend; Copy/Paste covers it for now)
 - [ ] Reading items and grammar sentences in the spaced-repetition reviews, not only practice rounds
 - [ ] More grammar: connecting clauses (-고, -지만, -아서), future (-(으)ㄹ 거예요), counters
-- [ ] Split the data out of `index.html` once it gets unwieldy (as a `data.js` script, so opening the file directly still works)
 
 ## Known limits
 - Progress is stored per browser; move it with Settings > Back up progress

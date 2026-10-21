@@ -1,11 +1,12 @@
 /* Hangeul Lab service worker: works offline once opened online.
-   The page is network-first so updates arrive as soon as you're online; audio,
+   The page and data.js are network-first so updates arrive as soon as you're online; audio,
    icons and fonts are cache-first. Bump CACHE when audio/ is regenerated so the
    new clips are precached for offline use. */
-var CACHE = "hangeullab-v3";
+var CACHE = "hangeullab-v4";
 var SHELL = [
   "./",
   "index.html",
+  "data.js",
   "manifest.webmanifest",
   "icons/icon-192.png",
   "icons/icon-512.png",
@@ -52,7 +53,7 @@ self.addEventListener("fetch", function(e){
   if(req.method !== "GET") return;
   var url = new URL(req.url);
   if(url.origin === location.origin){
-    if(req.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith(".webmanifest")) e.respondWith(networkFirst(req));
+    if(req.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/data.js") || url.pathname.endsWith(".webmanifest")) e.respondWith(networkFirst(req));
     else e.respondWith(cacheFirst(req));
   } else if(url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com"){
     e.respondWith(cacheFirst(req));

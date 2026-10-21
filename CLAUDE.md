@@ -14,15 +14,16 @@ Personal Korean-learning web app. Owner: Oli (British, learning Korean, previous
 - Fonts: Fraunces (display), Noto Serif/Sans KR (Korean), IBM Plex Mono (romanization and numbers)
 
 ## Layout
-- `index.html` the whole app (data, SRS engine, UI)
+- `data.js` all the content: letters, vocab, reading, rules, lessons, beginner words, dialogues, the course and plain-English summaries. Loaded with a plain `<script>` before the app code. Edit content here
+- `index.html` the app itself (SRS engine, UI, CSS)
 - `audio/` recorded clips, named by an FNV-1a hash of the spoken text, plus `index.json` listing them. Generated, never hand-edited
-- `scripts/make_audio.py` builds `audio/` from the `kr:"..."` strings and grammar quiz `q`/`a` pairs in `index.html` and every open syllable (edge-tts, voice ko-KR-SunHiNeural). Its hash must match `clipUrl()` in `index.html`
+- `scripts/make_audio.py` builds `audio/` from the `kr:"..."` strings and grammar quiz `q`/`a` pairs in `data.js` and `index.html`, and every open syllable (edge-tts, voice ko-KR-SunHiNeural). Its hash must match `clipUrl()` in `index.html`
 - `scripts/make_icons.ps1` renders `icons/`
-- `manifest.webmanifest` and `sw.js` make it installable and offline. Bump `CACHE` in `sw.js` after regenerating audio
+- `manifest.webmanifest` and `sw.js` make it installable and offline. `index.html` and `data.js` are network-first. Bump `CACHE` in `sw.js` after regenerating audio or adding a file to `SHELL`
 - `ROADMAP.md` what to do next
 
 ## After changing letters or vocab
-Run `python scripts/make_audio.py` (needs `pip install edge-tts`), then bump `CACHE` in `sw.js`.
+Content lives in `data.js`. Run `python scripts/make_audio.py` (needs `pip install edge-tts`), then bump `CACHE` in `sw.js`.
 
 ## Testing
 Click through all four bottom tabs (Today, Course, Practise, Me), the Course steps (meet, check, conversation, lesson) and each Practise tile. Serve the folder (`python -m http.server 8123`) rather than opening the file, so the service worker runs. Click through: Hangeul grid, a drill, syllable builder, vocab, speaking, settings. Check both themes and a phone-width window.

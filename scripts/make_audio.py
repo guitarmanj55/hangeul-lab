@@ -1,4 +1,4 @@
-"""Generate the recorded audio clips in audio/ from the word lists in index.html.
+"""Generate the recorded audio clips in audio/ from the word lists in data.js and index.html.
 
 Run once on the laptop after changing letters or vocab:
 
@@ -41,7 +41,8 @@ def compose(ini: str, vow: str) -> str:
 
 
 def collect_texts() -> list[str]:
-    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    # Content lives in data.js; index.html is read too in case any spoken text sits in the app code.
+    html = "\n".join((ROOT / f).read_text(encoding="utf-8") for f in ("data.js", "index.html"))
     texts = re.findall(r'\bkr:"([^"]+)"', html)  # vocab, letter examples, reading, rules, lessons
     # Grammar quiz items: q has one ＿ gap that a fills; the app speaks the completed sentence.
     texts += [q.replace("＿", a) for q, a in re.findall(r'\bq:"([^"]*)",a:"([^"]*)"', html)]
