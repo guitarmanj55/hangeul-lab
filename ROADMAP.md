@@ -1,6 +1,12 @@
 # Roadmap
 
 ## Done
+### v1.4: Tidier layout
+- [x] Bottom tab bar (Today, Course, Practise, Me) replaces the eight-tab strip; respects iPhone safe areas
+- [x] Today screen: daily goal ring (reviews clear + one course step), one "up next" card, one-line progress summary
+- [x] Practise hub with tiles for letters, vocab, reading, grammar, listening and speaking; "‹ Practise" back links
+- [x] Me page: progress stats above settings
+
 ### v1.3: Beginner path
 - [x] Course tab: 18 units, 41 steps, Continue card on Home; letters → words you can read → phrases → conversations → grammar → sound rules
 - [x] Teach first: meet each item, then a multiple-choice check (80% to pass); passing schedules the first review for tomorrow

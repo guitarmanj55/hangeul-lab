@@ -25,4 +25,4 @@ Personal Korean-learning web app. Owner: Oli (British, learning Korean, previous
 Run `python scripts/make_audio.py` (needs `pip install edge-tts`), then bump `CACHE` in `sw.js`.
 
 ## Testing
-Click through the Course tab (meet, check, conversation, lesson steps) as well. Serve the folder (`python -m http.server 8123`) rather than opening the file, so the service worker runs. Click through: Hangeul grid, a drill, syllable builder, vocab, speaking, settings. Check both themes and a phone-width window.
+Click through all four bottom tabs (Today, Course, Practise, Me), the Course steps (meet, check, conversation, lesson) and each Practise tile. Serve the folder (`python -m http.server 8123`) rather than opening the file, so the service worker runs. Click through: Hangeul grid, a drill, syllable builder, vocab, speaking, settings. Check both themes and a phone-width window.

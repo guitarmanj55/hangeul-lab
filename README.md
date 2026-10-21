@@ -39,4 +39,4 @@ Then bump `CACHE` in `sw.js` so installed copies pick up the new clips.
 
 ## Status
 
-v1.3: guided beginner course. See `ROADMAP.md` for history and ideas.
+v1.4: guided beginner course with a Today / Course / Practise / Me layout. See `ROADMAP.md` for history and ideas.
