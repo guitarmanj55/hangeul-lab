@@ -67,6 +67,9 @@
 - [x] Installable on a phone home screen, working offline (web app manifest + service worker)
 
 ## Ideas
+- [ ] Numbers drill: native (하나, 둘, 셋) against Sino-Korean (일, 이, 삼), practised through time, prices and counters
+- [ ] Study streak: a calendar grid in Me of the days you studied, plus how many reviews fall due over the next 7 days
+- [ ] Typing practice: hear a word, spell it with the iPhone's Korean keyboard (works in the home-screen app, unlike mic scoring)
 - [ ] Automatic cross-device sync (needs a small backend; Copy/Paste covers it for now)
 - [ ] More grammar: -(으)니까 (because, for reasons and suggestions), -아/어야 돼요 (have to), -(으)러 가요 (go to do), -는 것 (doing as a noun)
 
