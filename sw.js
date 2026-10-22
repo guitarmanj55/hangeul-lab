@@ -2,7 +2,7 @@
    The page, data.js and srs.js are network-first so updates arrive as soon as you're online; audio,
    icons and fonts are cache-first. Bump CACHE when audio/ is regenerated so the
    new clips are precached for offline use. */
-var CACHE = "hangeullab-v7";
+var CACHE = "hangeullab-v8";
 var SHELL = [
   "./",
   "index.html",

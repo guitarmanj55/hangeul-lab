@@ -378,7 +378,23 @@ var LESSONS = [
   {id:"g_counters",title:"Counting things: 개, 명, 잔…",kr:"개/명/잔",
    points:["Counting things uses the native numbers (하나, 둘, 셋, 넷). Before a counter word they shorten: 한, 두, 세, 네.","Order: thing + number + counter. 커피 두 잔 = coffee, two cups.","Common counters: 개 (things), 명 (people), 잔 (cups and glasses), 병 (bottles), 장 (tickets and sheets), 마리 (animals)."],
    examples:[{kr:"커피 두 잔 주세요",rm:"keopi du jan juseyo",en:"Two coffees, please"},{kr:"몇 명이에요?",rm:"myeot myeongieyo?",en:"How many people? (at a restaurant)"},{kr:"세 명이에요",rm:"se myeongieyo",en:"There are three of us"},{kr:"맥주 한 병 주세요",rm:"maekju han byeong juseyo",en:"One bottle of beer, please"},{kr:"표 네 장 주세요",rm:"pyo ne jang juseyo",en:"Four tickets, please"}],
-   quiz:[{q:"커피 ＿ 잔 주세요",a:"두",opts:["두","둘","이"],en:"Two coffees, please"},{q:"세 ＿이에요",a:"명",opts:["명","개","잔"],en:"There are three of us"},{q:"맥주 한 ＿ 주세요",a:"병",opts:["병","명","장"],en:"One bottle of beer, please"},{q:"사과 ＿ 개 주세요",a:"네",opts:["네","넷","사"],en:"Four apples, please"}]}
+   quiz:[{q:"커피 ＿ 잔 주세요",a:"두",opts:["두","둘","이"],en:"Two coffees, please"},{q:"세 ＿이에요",a:"명",opts:["명","개","잔"],en:"There are three of us"},{q:"맥주 한 ＿ 주세요",a:"병",opts:["병","명","장"],en:"One bottle of beer, please"},{q:"사과 ＿ 개 주세요",a:"네",opts:["네","넷","사"],en:"Four apples, please"}]},
+  {id:"g_time",title:"Telling the time: 시 / 분",kr:"시/분",
+   points:["Hours use the native numbers in their short form: 한 시, 두 시, 세 시, 네 시, 다섯 시… 열한 시, 열두 시.","Minutes use the Sino-Korean numbers: 십 분 (10 minutes), 삼십 분 (30 minutes). Half past is 반: 두 시 반.","오전 = a.m., 오후 = p.m. Add 에 for \"at\": 세 시에 만나요 = let's meet at three."],
+   examples:[{kr:"지금 몇 시예요?",rm:"jigeum myeot siyeyo?",en:"What time is it now?"},{kr:"두 시 삼십 분이에요",rm:"du si samsip bunieyo",en:"It's 2:30"},{kr:"다섯 시 반이에요",rm:"daseot si banieyo",en:"It's half past five"},{kr:"세 시에 만나요",rm:"se sie mannayo",en:"Let's meet at three"},{kr:"오후 일곱 시에 저녁을 먹어요",rm:"ohu ilgop sie jeonyeogeul meogeoyo",en:"I have dinner at 7 p.m."}],
+   quiz:[{q:"지금 ＿ 시예요",a:"두",opts:["두","이","둘"],en:"It's two o'clock now"},{q:"세 시 ＿ 분이에요",a:"삼십",opts:["삼십","서른","세"],en:"It's 3:30"},{q:"다섯 시 ＿이에요",a:"반",opts:["반","분","시"],en:"It's half past five"},{q:"세 시＿ 만나요",a:"에",opts:["에","에서","를"],en:"Let's meet at three"},{q:"＿ 시예요",a:"열한",opts:["열한","십일","열하나"],en:"It's eleven o'clock"}]},
+  {id:"g_promise",title:"I'll: -(으)ㄹ게요",kr:"-(으)ㄹ게요",
+   points:["Stem ending in a vowel + ㄹ게요, in a consonant + 을게요: 가다 → 갈게요, 먹다 → 먹을게요. Stems ending in ㄹ add 게요: 살다 → 살게요.","It's \"I'll\" said to the person in front of you: a promise, an offer or a decision that takes them into account. You already know 주문할게요 (I'll order).","Only for yourself and never in a question. For plans and \"what will you do?\", use -(으)ㄹ 거예요."],
+   examples:[{kr:"이걸로 할게요",rm:"igeollo halgeyo",en:"I'll have this one"},{kr:"먼저 갈게요",rm:"meonjeo galgeyo",en:"I'll head off first"},{kr:"내일 연락할게요",rm:"naeil yeollakalgeyo",en:"I'll get in touch tomorrow"},{kr:"잘 먹을게요",rm:"jal meogeulgeyo",en:"I'll enjoy this (thanks for the food)"}],
+   quiz:[{hint:"가다",q:"먼저 ＿",a:"갈게요",opts:["갈게요","가을게요","갔게요"],en:"I'll head off first"},{hint:"먹다",q:"잘 ＿",a:"먹을게요",opts:["먹을게요","먹게요","먹었게요"],en:"I'll enjoy this (thanks for the food)"},{hint:"연락하다",q:"내일 ＿",a:"연락할게요",opts:["연락할게요","연락하을게요","연락해게요"],en:"I'll get in touch tomorrow"},{q:"주말에 뭐 ＿?",a:"할 거예요",opts:["할 거예요","할게요","했게요"],en:"What are you doing at the weekend?"}]},
+  {id:"g_if",title:"If: -(으)면",kr:"-(으)면",
+   points:["Stem ending in a vowel or ㄹ + 면, in a consonant + 으면: 가다 → 가면, 살다 → 살면, 있다 → 있으면. 하다 → 하면.","The \"if\" part comes first and the main sentence follows: 시간 있으면 같이 가요 = if you have time, let's go together.","It also means \"when\" for things that will happen or always happen: 부산에 가면 회를 먹어요 = when I go to Busan, I eat raw fish."],
+   examples:[{kr:"시간 있으면 같이 가요",rm:"sigan isseumyeon gachi gayo",en:"If you have time, let's go together"},{kr:"비가 오면 집에 있을 거예요",rm:"biga omyeon jibe isseul geoyeyo",en:"If it rains, I'll stay at home"},{kr:"필요하면 말해 주세요",rm:"piryohamyeon malhae juseyo",en:"If you need anything, tell me"},{kr:"모르면 물어보세요",rm:"moreumyeon mureoboseyo",en:"If you don't know, ask"}],
+   quiz:[{hint:"있다",q:"시간 ＿ 같이 가요",a:"있으면",opts:["있으면","있면","있어면"],en:"If you have time, let's go together"},{hint:"오다",q:"비가 ＿ 집에 있을 거예요",a:"오면",opts:["오면","오으면","왔면"],en:"If it rains, I'll stay at home"},{hint:"필요하다",q:"＿ 말해 주세요",a:"필요하면",opts:["필요하면","필요해면","필요하으면"],en:"If you need anything, tell me"},{q:"부산에 가＿ 회를 먹어요",a:"면",opts:["면","고","지만"],en:"When I go to Busan, I eat raw fish"}]},
+  {id:"g_permit",title:"Is it OK to…: -아도 / -어도 돼요",kr:"-아도/어도 돼요",
+   points:["Take the present-tense form, drop 요 and add 도 돼요: 앉아요 → 앉아도 돼요, 먹어요 → 먹어도 돼요, 해요 → 해도 돼요.","As a question it asks permission: 여기 앉아도 돼요? = may I sit here? Answer 네, 돼요 (yes) or 안 돼요 (no).","You've met it already in 사진 찍어도 돼요? and 입어 봐도 돼요?"],
+   examples:[{kr:"여기 앉아도 돼요?",rm:"yeogi anjado dwaeyo?",en:"May I sit here?"},{kr:"카드로 계산해도 돼요?",rm:"kadeuro gyesanhaedo dwaeyo?",en:"Can I pay by card?"},{kr:"창문 열어도 돼요?",rm:"changmun yeoreodo dwaeyo?",en:"Is it OK if I open the window?"},{kr:"네, 돼요",rm:"ne, dwaeyo",en:"Yes, that's fine"},{kr:"아니요, 안 돼요",rm:"aniyo, an dwaeyo",en:"No, you can't"}],
+   quiz:[{hint:"앉다",q:"여기 ＿?",a:"앉아도 돼요",opts:["앉아도 돼요","앉어도 돼요","앉도 돼요"],en:"May I sit here?"},{hint:"먹다",q:"이거 ＿?",a:"먹어도 돼요",opts:["먹어도 돼요","먹아도 돼요","먹고 돼요"],en:"Can I eat this?"},{hint:"계산하다",q:"카드로 ＿?",a:"계산해도 돼요",opts:["계산해도 돼요","계산하도 돼요","계산하아도 돼요"],en:"Can I pay by card?"},{q:"아니요, 안 ＿",a:"돼요",opts:["돼요","해요","있어요"],en:"No, you can't"}]}
 ];
 
 /* =====================================================================
@@ -492,7 +508,11 @@ var COURSE = [
   {id:"u17",title:"Sounding natural",intro:"Why Korean isn't always said the way it's spelled.",steps:[{type:"rule",id:"r_link"},{type:"rule",id:"r_final"},{type:"rule",id:"r_nasal"}]},
   {id:"u18",title:"Past, places and subjects",intro:"Talk about what you did and where.",steps:[{type:"lesson",id:"g_past"},{type:"lesson",id:"g_subject"},{type:"lesson",id:"g_place"}]},
   {id:"u19",title:"Linking ideas",intro:"Join two thoughts into one sentence: and, but, so.",steps:[{type:"lesson",id:"g_and"},{type:"lesson",id:"g_but"},{type:"lesson",id:"g_so"}]},
-  {id:"u20",title:"Plans and counting",intro:"Say what you're going to do, and order two of something.",steps:[{type:"lesson",id:"g_future"},{type:"lesson",id:"g_counters"}]}
+  {id:"u20",title:"Plans and counting",intro:"Say what you're going to do, and order two of something.",steps:[{type:"lesson",id:"g_future"},{type:"lesson",id:"g_counters"}]},
+  {id:"u21",title:"Time and promises",intro:"Say what time it is, and tell someone what you'll do.",steps:[{type:"lesson",id:"g_time"},{type:"lesson",id:"g_promise"}]},
+  {id:"u22",title:"Sounds that change",intro:"Three more reasons Korean isn't said the way it's spelled. You'll hear them in place names all over Busan.",steps:[{type:"rule",id:"r_liquid"},{type:"rule",id:"r_rton"},{type:"rule",id:"r_aspir"}]},
+  {id:"u23",title:"If and may",intro:"Make plans that depend on something, and ask if something's OK.",steps:[{type:"lesson",id:"g_if"},{type:"lesson",id:"g_permit"}]},
+  {id:"u24",title:"The last sound rules",intro:"Tense sounds, 같이 said \"gachi\", and the ㅎ that disappears. After this you've met every rule.",steps:[{type:"rule",id:"r_tense"},{type:"rule",id:"r_palatal"},{type:"rule",id:"r_hsilent"}]}
 ];
 
 /* One-line plain-English summary shown at the top of each lesson and rule. */
@@ -514,6 +534,10 @@ var PLAIN = {
   g_so:"아서 / 어서 means \"so\" or \"because\": 늦어서 미안해요 = (I'm) late, so sorry.",
   g_future:"Add ㄹ 거예요 (or 을 거예요) for \"will\": 갈 거예요 = I'll go.",
   g_counters:"Korean counts things with a counter word, like \"two cups of\": 커피 두 잔 = two coffees.",
+  g_time:"Hours use 한, 두, 세…; minutes use 일, 이, 삼…: 두 시 삼십 분 = 2:30.",
+  g_promise:"Add ㄹ게요 (or 을게요) to promise or offer: 갈게요 = I'll go (OK?).",
+  g_if:"Add 면 (or 으면) for \"if\": 시간 있으면 = if you have time.",
+  g_permit:"Verb + 아도/어도 돼요? asks \"is it OK if I…?\": 앉아도 돼요? = may I sit?",
   r_link:"Words run together: a final consonant jumps onto a vowel that follows it.",
   r_final:"Only seven sounds can end a syllable, so several letters sound the same at the end.",
   r_nasal:"Before ㄴ or ㅁ, hard sounds go nasal. That's why 합니다 is \"ham-ni-da\".",

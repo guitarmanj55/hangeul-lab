@@ -1,6 +1,10 @@
 # Roadmap
 
 ## Done
+### v1.7: Grammar for making plans
+- [x] 4 new grammar lessons: telling the time (시/분), -(으)ㄹ게요 (I'll, promising), -(으)면 (if), -아도/어도 돼요 (is it OK to)
+- [x] Course units 21–24: the new lessons, plus the six sound rules the course hadn't reached yet
+- [x] Sound-rule examples come back in the daily reviews; rules passed earlier were added, spread over a week
 ### v1.6: Safer progress
 - [x] Weekly backup reminder on Today and in Me (download or copy counts as a backup)
 - [x] A failed save shows a warning instead of failing silently; the app asks the phone to keep its storage
@@ -64,8 +68,7 @@
 
 ## Ideas
 - [ ] Automatic cross-device sync (needs a small backend; Copy/Paste covers it for now)
-- [ ] Sound-rule examples in the reviews too
-- [ ] More grammar: -(으)ㄹ게요 (I'll, promising), -(으)면 (if), -아/어도 돼요 (is it OK to), time with 시/분
+- [ ] More grammar: -(으)니까 (because, for reasons and suggestions), -아/어야 돼요 (have to), -(으)러 가요 (go to do), -는 것 (doing as a noun)
 
 ## Known limits
 - Progress is stored per browser; move it with Settings > Back up progress

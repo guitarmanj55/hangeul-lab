@@ -124,3 +124,14 @@ test("backup reminder: nothing to back up, never backed up, recent, a week old",
   assert.deepEqual(SRS.backupStatus(NOW - 6 * DAY, true, NOW), { overdue: false, days: 6 });
   assert.deepEqual(SRS.backupStatus(NOW - 7 * DAY, true, NOW), { overdue: true, days: 7 });
 });
+
+test("passing a lesson or rule schedules its items once, a few days out", () => {
+  const it = SRS.newCard();
+  assert.equal(SRS.passAsFirstReview(it, NOW, 3), true);
+  assert.equal(it.due, NOW + 3 * DAY);
+  assert.equal(it.reps, 1);
+  assert.equal(SRS.isDue(it, NOW + 2 * DAY), false);
+  assert.equal(SRS.isDue(it, NOW + 3 * DAY), true);
+  assert.equal(SRS.passAsFirstReview(it, NOW + 9 * DAY, 1), false);
+  assert.equal(it.due, NOW + 3 * DAY);
+});

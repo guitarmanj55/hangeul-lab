@@ -58,6 +58,15 @@
   /* "2026-10-2" -> 20261002, so day strings without zero padding still compare. */
   function dayValue(s){ var p=String(s).split("-"); return (+p[0])*10000+(+p[1])*100+(+p[2]); }
 
+  /* Passing a lesson or sound rule counts as the first review of its sentences: they come back
+     in `days` days. Returns false (and leaves the card alone) if it was already being reviewed. */
+  function passAsFirstReview(it, now, days){
+    if(it.seen) return false;
+    it.seen=true; it.reps=1; it.interval=1; it.lastReview=now;
+    it.due = now + days*DAY;
+    return true;
+  }
+
   /* Merge, not replace: for each item keep whichever copy was reviewed most recently, so moving
      progress between two devices in either direction never loses reviews. Items `isKnown` rejects
      (content that no longer exists) are skipped. Theme and daily cap stay as set on this device. */
@@ -86,7 +95,7 @@
   }
 
   var api = { DAY:DAY, REMINDER_DAYS:REMINDER_DAYS, newCard:newCard, markSeen:markSeen, isDue:isDue, isMastered:isMastered,
-    grade:grade, migrate:migrate, dayValue:dayValue, merge:merge, backupStatus:backupStatus };
+    grade:grade, passAsFirstReview:passAsFirstReview, migrate:migrate, dayValue:dayValue, merge:merge, backupStatus:backupStatus };
   if(typeof module!=="undefined" && module.exports) module.exports = api;
   else root.SRS = api;
 })(this);

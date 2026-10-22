@@ -728,8 +728,8 @@ function romanizeSelection(ini,vow,fin){
 /* =====================================================================
    STATE / PERSISTENCE
    ===================================================================== */
-var APP_VERSION = "1.6";
-var APP_WHATS_NEW = "a weekly reminder to back up your progress, a warning if saving ever fails, and backups now bring back your reading and grammar reviews too";
+var APP_VERSION = "1.7";
+var APP_WHATS_NEW = "4 new grammar lessons (telling the time, -(으)ㄹ게요, -(으)면, -아도 돼요), 4 new course units that cover every sound rule, and sound-rule examples now come back in your reviews";
 var STORAGE_KEY = "hangeullab_progress_v1";
 var SCHEMA = 2;
 var state = loadState();
@@ -831,24 +831,28 @@ function similarity(a,b){
   var d=levenshtein(a,b);
   return 1 - d/Math.max(a.length,b.length,1);
 }
-function byId(id){ return HANGUL_BY_ID[id] || VOCAB_BY_ID[id] || READING_BY_ID[id] || GRAMMAR_ITEM_BY_ID[id]; }
-var HANGUL_BY_ID={}, VOCAB_BY_ID={}, READING_BY_ID={}, GRAMMAR_ITEM_BY_ID={};
+function byId(id){ return HANGUL_BY_ID[id] || VOCAB_BY_ID[id] || READING_BY_ID[id] || GRAMMAR_ITEM_BY_ID[id] || RULE_ITEM_BY_ID[id]; }
+var HANGUL_BY_ID={}, VOCAB_BY_ID={}, READING_BY_ID={}, GRAMMAR_ITEM_BY_ID={}, RULE_ITEM_BY_ID={};
 HANGUL.forEach(function(h){ HANGUL_BY_ID[h.id]=h; });
 VOCAB.forEach(function(v){ VOCAB_BY_ID[v.id]=v; });
 READING.forEach(function(r){ READING_BY_ID[r.id]=r; });
 /* Each grammar quiz sentence is a review item, saved as gq_<lesson id>_<quiz index>. */
 function grammarItemId(l, i){ return "gq_"+l.id+"_"+i; }
 LESSONS.forEach(function(l){ l.quiz.forEach(function(it, i){ GRAMMAR_ITEM_BY_ID[grammarItemId(l,i)] = {lesson:l, quiz:it}; }); });
+/* Each sound-rule example is a review item too, saved as rx_<rule id>_<example index>. */
+function ruleItemId(r, i){ return "rx_"+r.id+"_"+i; }
+RULES.forEach(function(r){ r.examples.forEach(function(e, i){ RULE_ITEM_BY_ID[ruleItemId(r,i)] = {rule:r, example:e}; }); });
 function itemKind(id){
   if(HANGUL_BY_ID[id]) return "hangul";
   if(VOCAB_BY_ID[id]) return "vocab";
   if(READING_BY_ID[id]) return "read";
   if(GRAMMAR_ITEM_BY_ID[id]) return "grammar";
+  if(RULE_ITEM_BY_ID[id]) return "rule";
   return null;
 }
-/* Everything the daily reviews cover: letters, words, reading items and grammar sentences. */
+/* Everything the daily reviews cover: letters, words, reading items, grammar sentences and sound-rule examples. */
 var REVIEW_IDS = [].concat(HANGUL.map(function(h){ return h.id; }), VOCAB.map(function(v){ return v.id; }),
-  READING.map(function(r){ return r.id; }), Object.keys(GRAMMAR_ITEM_BY_ID));
+  READING.map(function(r){ return r.id; }), Object.keys(GRAMMAR_ITEM_BY_ID), Object.keys(RULE_ITEM_BY_ID));
 function dueReviewIds(){ return REVIEW_IDS.filter(isDue); }
 
 /* =====================================================================
@@ -1112,7 +1116,8 @@ function renderDrillCard(){
     return;
   }
   var id = drill.queue[drill.pos];
-  if(itemKind(id)==="grammar") return renderGrammarReview(wrap, id);
+  if(itemKind(id)==="grammar"){ var g = GRAMMAR_ITEM_BY_ID[id]; return renderQuizReview(wrap, id, grammarQuestions([{quiz:[g.quiz]}])[0], "Grammar · "+g.lesson.title); }
+  if(itemKind(id)==="rule"){ var rx = RULE_ITEM_BY_ID[id]; return renderQuizReview(wrap, id, ruleQuestions([{title:rx.rule.title, examples:[rx.example]}])[0], "Sound rule · "+rx.rule.title); }
   /* Teach first: a never-seen item opens already turned over, so you meet it before being tested. */
   var isNew = !state.items[id] || !state.items[id].seen;
   if(isNew){ markSeenNow(id); consumeIntroBudget(1); saveState(); }
@@ -1159,11 +1164,11 @@ function renderDrillCard(){
     };
   });
 }
-/* A grammar sentence in the reviews: pick the missing piece. Wrong = Again; right = choose Hard / Good / Easy. */
-function renderGrammarReview(wrap, id){
-  var g = GRAMMAR_ITEM_BY_ID[id], q = grammarQuestions([{quiz:[g.quiz]}])[0], opts = shuffle(q.options);
+/* A grammar sentence or sound-rule example in the reviews: pick the answer. Wrong = Again; right = choose Hard / Good / Easy. */
+function renderQuizReview(wrap, id, q, eyebrow){
+  var opts = shuffle(q.options);
   wrap.innerHTML = progressBar(drill.pos, drill.queue.length)
-    + '<div class="card" style="padding:22px 16px;margin-bottom:14px;"><div class="eyebrow" style="text-align:center;margin-bottom:8px;">Grammar · '+g.lesson.title+'</div><div class="quiz-prompt">'+q.prompt+'</div>'
+    + '<div class="card" style="padding:22px 16px;margin-bottom:14px;"><div class="eyebrow" style="text-align:center;margin-bottom:8px;">'+eyebrow+'</div><div class="quiz-prompt">'+q.prompt+'</div>'
     + '<div class="listen-hint" style="margin:6px 0 0;">'+q.sub+'</div></div>'
     + '<div class="option-grid">'+opts.map(function(o,i){ return '<button class="option-btn kr'+(opts.some(function(x){ return x.length>4; })?" words":"")+'" data-i="'+i+'">'+o+'</button>'; }).join("")+'</div>'
     + '<div class="listen-feedback" id="quizFeedback"></div>'
@@ -1463,7 +1468,8 @@ function startLessonQuiz(kind, items, doneId){
       if(doneId && score >= n-1){
         markDone(doneId);
         if(kind==="grammar"){ scheduleLessonReviews(LESSON_BY_ID[doneId], 1); return "Marked as done. Its sentences will come back in your daily reviews."; }
-        return "Marked as done.";
+        scheduleRuleReviews(RULE_BY_ID[doneId], 1);
+        return "Marked as done. Its examples will come back in your daily reviews.";
       }
       return doneId ? "Get all but one right to mark it done." : "";
     },
@@ -1475,22 +1481,20 @@ function startLessonQuiz(kind, items, doneId){
   });
   wrap.scrollIntoView({behavior:"smooth", block:"start"});
 }
-/* Passing a lesson counts as the first review of its sentences: they come back in `days` days. */
-function scheduleLessonReviews(l, days){
-  var changed = false;
-  l.quiz.forEach(function(q, i){
-    var id = grammarItemId(l, i), it = ensureItem(id);
-    if(it.seen) return;
-    it.seen = true; it.reps = 1; it.interval = 1; it.lastReview = Date.now();
-    it.due = Date.now() + days*24*60*60*1000;
-    changed = true;
-  });
+/* Passing a lesson or rule counts as the first review of its items: they come back in `days` days. */
+function scheduleFirstReviews(ids, days){
+  var now = Date.now(), changed = false;
+  ids.forEach(function(id){ if(SRS.passAsFirstReview(ensureItem(id), now, days)) changed = true; });
   if(changed) saveState();
 }
-/* Lessons passed before v1.5 had no review items: add them once, spread over the next week so they don't land on one day. */
-function seedGrammarReviews(){
+function scheduleLessonReviews(l, days){ scheduleFirstReviews(l.quiz.map(function(q, i){ return grammarItemId(l, i); }), days); }
+function scheduleRuleReviews(r, days){ scheduleFirstReviews(r.examples.map(function(e, i){ return ruleItemId(r, i); }), days); }
+/* Lessons passed before v1.5 and rules passed before v1.7 had no review items: add them once,
+   spread over the next week so they don't land on one day. */
+function seedQuizReviews(){
   var k = 0;
   LESSONS.forEach(function(l){ if(state.done[l.id]) scheduleLessonReviews(l, 1 + (k++ % 7)); });
+  RULES.forEach(function(r){ if(state.done[r.id]) scheduleRuleReviews(r, 1 + (k++ % 7)); });
 }
 function startMixedRules(){
   lessonCtx.kind = "rule"; lessonCtx.id = null; lessonCtx.from = "read";
@@ -2210,7 +2214,7 @@ function openTextModal(title, text, onSubmit){
    ===================================================================== */
 document.addEventListener("DOMContentLoaded", function(){
   applyTheme();
-  seedGrammarReviews();
+  seedQuizReviews();
   renderSettingsCaps();
   wireSettings();
   setupSpeakingControls();
