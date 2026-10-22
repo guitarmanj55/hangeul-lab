@@ -1,6 +1,12 @@
 # Roadmap
 
 ## Done
+### v1.8: Numbers, typing and a calendar
+- [x] Numbers drill in Practise: prices, times and counting (and ages), Hangeul → figure and figure → Hangeul; wrong answers are the real mix-ups (이 잔 for 두 잔, 셋 시 for 세 시)
+- [x] Course unit 25, "Numbers in real life": one step each for prices, time and counting
+- [x] Typing practice: hear a word or syllable, spell it on the Korean keyboard; near misses are spotted letter by letter
+- [x] Study calendar in Me (last 12 weeks, rebuilt from review history for older saves) and a 7-day forecast of reviews due
+- [x] Number phrases and the typing check live in `korean.js` with `node --test` tests; 171 new audio clips
 ### v1.7: Grammar for making plans
 - [x] 4 new grammar lessons: telling the time (시/분), -(으)ㄹ게요 (I'll, promising), -(으)면 (if), -아도/어도 돼요 (is it OK to)
 - [x] Course units 21–24: the new lessons, plus the six sound rules the course hadn't reached yet
@@ -67,10 +73,9 @@
 - [x] Installable on a phone home screen, working offline (web app manifest + service worker)
 
 ## Ideas
-- [ ] Numbers drill: native (하나, 둘, 셋) against Sino-Korean (일, 이, 삼), practised through time, prices and counters
-- [ ] Study streak: a calendar grid in Me of the days you studied, plus how many reviews fall due over the next 7 days
-- [ ] Typing practice: hear a word, spell it with the iPhone's Korean keyboard (works in the home-screen app, unlike mic scoring)
 - [ ] Automatic cross-device sync (needs a small backend; Copy/Paste covers it for now)
+- [ ] Numbers beyond the drill: phone numbers, dates (시월 이십이 일) and floors, maybe as review items
+- [ ] Typing feeds the reviews: a word typed right on its due day counts as a review
 - [ ] More grammar: -(으)니까 (because, for reasons and suggestions), -아/어야 돼요 (have to), -(으)러 가요 (go to do), -는 것 (doing as a noun)
 
 ## Known limits

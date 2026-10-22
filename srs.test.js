@@ -135,3 +135,50 @@ test("passing a lesson or rule schedules its items once, a few days out", () => 
   assert.equal(SRS.passAsFirstReview(it, NOW + 9 * DAY, 1), false);
   assert.equal(it.due, NOW + 3 * DAY);
 });
+
+test("study days are local, zero-padded and count each thing done", () => {
+  const s = { studyDays: {} };
+  const t = new Date(2026, 9, 2, 10).getTime();
+  SRS.logStudy(s, t);
+  SRS.logStudy(s, t + 60 * 1000);
+  SRS.logStudy(s, t, 0);
+  assert.deepEqual(s.studyDays, { "2026-10-02": 2 });
+});
+
+test("old saves get a calendar rebuilt from reviews, finished steps and the streak", () => {
+  const s = {
+    items: { a: { lastReview: new Date(2026, 9, 1, 9).getTime() }, b: { lastReview: new Date(2026, 9, 1, 20).getTime() }, c: { lastReview: 0 } },
+    done: { c_u1_0: new Date(2026, 8, 20, 9).getTime() },
+    streak: 3, lastActiveDay: "2026-10-22",
+  };
+  assert.equal(SRS.seedStudyDays(s), 5);
+  assert.deepEqual(s.studyDays, { "2026-10-01": 2, "2026-09-20": 1, "2026-10-22": 1, "2026-10-21": 1, "2026-10-20": 1 });
+});
+
+test("longest streak runs across month ends and ignores gaps", () => {
+  assert.equal(SRS.longestStreak({}), 0);
+  assert.equal(SRS.longestStreak({ "2026-09-29": 1, "2026-09-30": 4, "2026-10-01": 1, "2026-10-03": 1, "2026-10-04": 1 }), 3);
+});
+
+test("forecast counts reviews per local day, with overdue ones today", () => {
+  const start = new Date(2026, 9, 22).getTime();
+  const at = (days, hours) => new Date(2026, 9, 22 + days, hours).getTime();
+  const cards = [
+    { seen: true, due: at(-3, 9) },
+    { seen: true, due: at(0, 23) },
+    { seen: true, due: at(1, 0) },
+    { seen: true, due: at(6, 12) },
+    { seen: true, due: at(7, 1) },
+    { seen: false, due: 0 },
+  ];
+  assert.deepEqual(SRS.dueForecast(cards, start, 7), [2, 1, 0, 0, 0, 0, 1]);
+});
+
+test("merge keeps the busier copy of each study day", () => {
+  const state = { items: {}, done: {}, streak: 0, studyDays: { "2026-10-01": 3 } };
+  SRS.merge(state, { items: {}, done: {}, studyDays: { "2026-10-01": 1, "2026-10-02": 5 } }, () => true);
+  assert.deepEqual(state.studyDays, { "2026-10-01": 3, "2026-10-02": 5 });
+  const old = { items: {}, done: {}, streak: 0 };
+  SRS.merge(old, { items: {}, done: {} }, () => true);
+  assert.deepEqual(old.studyDays, {});
+});

@@ -1,5 +1,5 @@
-/* Hangeul Lab pure logic: the SRS scheduler, saved-progress migrations, backup merging and the
-   backup reminder. No DOM or browser globals, so `node --test` can run srs.test.js against it.
+/* Hangeul Lab pure logic: the SRS scheduler, saved-progress migrations, backup merging, the
+   backup reminder and the study calendar. No DOM or browser globals, so `node --test` can run srs.test.js against it.
    Loaded with a plain <script> before the app code (sets window.SRS); Node gets module.exports. */
 (function(root){
   var DAY = 24*60*60*1000;
@@ -84,7 +84,55 @@
       state.streak=Math.max(state.streak||0, incoming.streak||0);
     }
     for(var d in incoming.done){ if(!state.done[d] || incoming.done[d] > state.done[d]){ state.done[d]=incoming.done[d]; updated++; } }
+    state.studyDays = state.studyDays || {};
+    for(var k in incoming.studyDays){ state.studyDays[k] = Math.max(state.studyDays[k]||0, incoming.studyDays[k]||0); }
     return {added:added, updated:updated};
+  }
+
+  /* Study calendar: studyDays is {"2026-10-22": how many things were reviewed or finished that day}.
+     Keys are local days, zero-padded so they sort. */
+  function pad(n){ return (n<10?"0":"")+n; }
+  function dayKey(ms){ var d=new Date(ms); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function logStudy(state, now, n){
+    state.studyDays = state.studyDays || {};
+    var k = dayKey(now);
+    state.studyDays[k] = (state.studyDays[k]||0) + (n===undefined ? 1 : n);
+  }
+  /* Saves from before v1.8 kept no calendar. Rebuild what we can: each item's last review, each finished
+     lesson or step, and the current streak's run of days. Returns how many days were found. */
+  function seedStudyDays(state){
+    var days = {}, id;
+    function add(ms){ if(ms){ var k=dayKey(ms); days[k]=(days[k]||0)+1; } }
+    for(id in state.items) add(state.items[id].lastReview);
+    for(id in state.done) add(state.done[id]);
+    if(state.lastActiveDay && state.streak){
+      var p = String(state.lastActiveDay).split("-"), d = new Date(+p[0], +p[1]-1, +p[2], 12);
+      for(var i=0;i<state.streak;i++){ var k=dayKey(d.getTime()); if(!days[k]) days[k]=1; d.setDate(d.getDate()-1); }
+    }
+    state.studyDays = days;
+    return Object.keys(days).length;
+  }
+  /* Longest run of consecutive study days. */
+  function longestStreak(studyDays){
+    var keys = Object.keys(studyDays||{}).filter(function(k){ return studyDays[k]>0; }).sort(), best=0, run=0, prev=null;
+    keys.forEach(function(k){
+      var p = k.split("-"), t = new Date(+p[0], +p[1]-1, +p[2], 12);
+      if(prev){ var next = new Date(prev); next.setDate(next.getDate()+1); run = dayKey(next.getTime())===k ? run+1 : 1; }
+      else run = 1;
+      prev = t; if(run>best) best=run;
+    });
+    return best;
+  }
+  /* Reviews falling due on each of the next `n` local days; day 0 also counts anything overdue.
+     startOfToday is local midnight; cards are the current review items. */
+  function dueForecast(cards, startOfToday, n){
+    var ends = [], out = [], d = new Date(startOfToday), i;
+    for(i=0;i<n;i++){ d.setDate(d.getDate()+1); ends.push(d.getTime()); out.push(0); }
+    cards.forEach(function(it){
+      if(!it || !it.seen) return;
+      for(i=0;i<n;i++){ if(it.due < ends[i]){ out[i]++; return; } }
+    });
+    return out;
   }
 
   /* Weekly backup nudge: overdue once there is progress worth keeping and the last
@@ -95,7 +143,8 @@
   }
 
   var api = { DAY:DAY, REMINDER_DAYS:REMINDER_DAYS, newCard:newCard, markSeen:markSeen, isDue:isDue, isMastered:isMastered,
-    grade:grade, passAsFirstReview:passAsFirstReview, migrate:migrate, dayValue:dayValue, merge:merge, backupStatus:backupStatus };
+    grade:grade, passAsFirstReview:passAsFirstReview, migrate:migrate, dayValue:dayValue, merge:merge, backupStatus:backupStatus,
+    dayKey:dayKey, logStudy:logStudy, seedStudyDays:seedStudyDays, longestStreak:longestStreak, dueForecast:dueForecast };
   if(typeof module!=="undefined" && module.exports) module.exports = api;
   else root.SRS = api;
 })(this);

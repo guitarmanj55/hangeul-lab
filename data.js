@@ -512,7 +512,22 @@ var COURSE = [
   {id:"u21",title:"Time and promises",intro:"Say what time it is, and tell someone what you'll do.",steps:[{type:"lesson",id:"g_time"},{type:"lesson",id:"g_promise"}]},
   {id:"u22",title:"Sounds that change",intro:"Three more reasons Korean isn't said the way it's spelled. You'll hear them in place names all over Busan.",steps:[{type:"rule",id:"r_liquid"},{type:"rule",id:"r_rton"},{type:"rule",id:"r_aspir"}]},
   {id:"u23",title:"If and may",intro:"Make plans that depend on something, and ask if something's OK.",steps:[{type:"lesson",id:"g_if"},{type:"lesson",id:"g_permit"}]},
-  {id:"u24",title:"The last sound rules",intro:"Tense sounds, 같이 said \"gachi\", and the ㅎ that disappears. After this you've met every rule.",steps:[{type:"rule",id:"r_tense"},{type:"rule",id:"r_palatal"},{type:"rule",id:"r_hsilent"}]}
+  {id:"u24",title:"The last sound rules",intro:"Tense sounds, 같이 said \"gachi\", and the ㅎ that disappears. After this you've met every rule.",steps:[{type:"rule",id:"r_tense"},{type:"rule",id:"r_palatal"},{type:"rule",id:"r_hsilent"}]},
+  {id:"u25",title:"Numbers in real life",intro:"Korean has two sets of numbers. Prices use one, counting uses the other, and telling the time uses both.",steps:[{type:"numbers",mode:"price"},{type:"numbers",mode:"time"},{type:"numbers",mode:"count"}]}
+];
+
+/* Numbers drill modes (the phrases themselves are generated in korean.js). examples: shown in the course before the check. */
+var NUMBER_MODES = [
+  {id:"price",label:"Prices",title:"Prices",
+   note:"Prices use the Sino-Korean numbers (일, 이, 삼…) and 원. 1 is left unsaid before 십, 백, 천 and 만: ₩1,500 is 천오백 원. Big numbers group by 만 (10,000), so ₩15,000 is 만 오천 원.",
+   examples:[500,1500,3500,10000,15000]},
+  {id:"time",label:"Time",title:"Telling the time",
+   note:"Hours use the native numbers in their short form (한 시, 두 시, 세 시, 네 시…), minutes use Sino-Korean (십 분, 삼십 분). Half past can be 반.",
+   examples:["1:00","3:30","5:30","10:15","12:45"]},
+  {id:"count",label:"Counting",title:"Counting things",
+   note:"Counting things and people, and saying your age, use the native numbers, shortened before the counter: 하나 → 한, 둘 → 두, 셋 → 세, 넷 → 네, 스물 → 스무.",
+   examples:["1 coffee","2 bottles of beer","4 apples","3 students","20 years old"]},
+  {id:"mixed",label:"Mixed",title:"All mixed up",note:"Prices, times and counting in one round. Watch which set of numbers each one needs."}
 ];
 
 /* One-line plain-English summary shown at the top of each lesson and rule. */

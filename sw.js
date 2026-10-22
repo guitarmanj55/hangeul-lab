@@ -1,13 +1,14 @@
 /* Hangeul Lab service worker: works offline once opened online.
-   The page, data.js and srs.js are network-first so updates arrive as soon as you're online; audio,
+   The page, data.js, srs.js and korean.js are network-first so updates arrive as soon as you're online; audio,
    icons and fonts are cache-first. Bump CACHE when audio/ is regenerated so the
    new clips are precached for offline use. */
-var CACHE = "hangeullab-v8";
+var CACHE = "hangeullab-v9";
 var SHELL = [
   "./",
   "index.html",
   "data.js",
   "srs.js",
+  "korean.js",
   "manifest.webmanifest",
   "icons/icon-192.png",
   "icons/icon-512.png",
@@ -43,7 +44,7 @@ function cacheFirst(req){
 }
 function networkFirst(req){
   /* GitHub Pages lets browsers reuse files for 10 minutes; no-cache asks the server each time (a cheap check when unchanged),
-     so index.html, data.js and srs.js never come from different releases. */
+     so index.html, data.js, srs.js and korean.js never come from different releases. */
   return fetch(req.url, {cache:"no-cache", credentials:"same-origin"}).then(function(res){
     if(res.ok){ var copy = res.clone(); caches.open(CACHE).then(function(c){ c.put(req, copy); }); }
     return res;
@@ -57,7 +58,7 @@ self.addEventListener("fetch", function(e){
   if(req.method !== "GET") return;
   var url = new URL(req.url);
   if(url.origin === location.origin){
-    if(req.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/data.js") || url.pathname.endsWith("/srs.js") || url.pathname.endsWith(".webmanifest")) e.respondWith(networkFirst(req));
+    if(req.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/data.js") || url.pathname.endsWith("/srs.js") || url.pathname.endsWith("/korean.js") || url.pathname.endsWith(".webmanifest")) e.respondWith(networkFirst(req));
     else e.respondWith(cacheFirst(req));
   } else if(url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com"){
     e.respondWith(cacheFirst(req));
