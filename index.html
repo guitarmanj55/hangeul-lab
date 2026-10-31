@@ -173,7 +173,7 @@ section.view.active{display:block; animation:rise .28s ease both;}
   padding:20px; box-shadow:var(--shadow);
 }
 .btn{
-  font-size:13px; font-weight:600; padding:10px 16px; border-radius:var(--radius); border:1px solid var(--indigo);
+  font-size:13px; font-weight:600; padding:10px 16px; min-height:44px; min-width:44px; border-radius:var(--radius); border:1px solid var(--indigo);
   background:var(--indigo); color:#fff; cursor:pointer; transition:opacity .15s, transform .1s;
 }
 .btn:hover{opacity:.9;}
@@ -793,8 +793,8 @@ function romanizeSelection(ini,vow,fin){
 /* =====================================================================
    STATE / PERSISTENCE
    ===================================================================== */
-var APP_VERSION = "1.9";
-var APP_WHATS_NEW = "works fully offline now with all fonts saved on the phone, and pinch or double-tap no longer zooms the page";
+var APP_VERSION = "1.9.1";
+var APP_WHATS_NEW = "buttons are easier to tap";
 var STORAGE_KEY = "hangeullab_progress_v1";
 var SCHEMA = 2;
 var state = loadState();
