@@ -1,6 +1,8 @@
 # Hangeul Lab
 
-Personal Korean-learning web app. Owner: Oli (British, learning Korean, previously on placement in Busan). Reading Hangeul comes first, speaking second.
+Personal Korean-learning web app. Owner: Oli (British, learning Korean, previously on placement in Busan). Reading Hangeul comes first, speaking second. Live at https://guitarmanj55.github.io/hangeul-lab/.
+
+Oli is a Korean novice (7 months in Busan, phrases picked up by ear): keep explanations plain-English and beginner-first. A tested release can be pushed without a separate go-ahead (since v1.2.1).
 
 ## Rules
 - Vocab drills always show Hangeul as the prompt, never romanization
