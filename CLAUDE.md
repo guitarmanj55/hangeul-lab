@@ -30,6 +30,8 @@ Oli is a Korean novice (7 months in Busan, phrases picked up by ear): keep expla
 ## After changing letters or vocab
 Content lives in `data.js`. Run `scripts/make_audio.py` with `C:\Users\OJacq\AppData\Local\Programs\Python\Python312\python.exe` (Python is not on PATH; needs `pip install edge-tts`), then bump `CACHE` in `sw.js`.
 
+Fonts are vendored in `fonts/` (no Google Fonts at runtime, so the app works offline), keeping only the Korean font slices whose characters appear in the app's text. New Korean text can need new slices: delete `fonts/`, run `node scripts/vendor-fonts.js . "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Noto+Serif+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"`, put the printed file names (with a `fonts/` prefix) in `FONTS` in `sw.js`, and bump `CACHE`. Glyphs not in a slice fall back to the phone's Korean font.
+
 ## Testing
 Run `node --test` for the logic in `srs.js` and `korean.js` (Node 24 is installed). Keep scheduling, migration and merge rules in `srs.js` with a test beside them.
 
